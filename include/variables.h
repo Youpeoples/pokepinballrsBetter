@@ -17,12 +17,12 @@
 
 // Place all external variable declarations in this file
 
-extern struct {u16 unk0[5]; u16 unkA[5];} gUnknown_086A6B14;
-extern s8 gUnknown_02002850;
-extern struct ToneData gUnknown_08532D6C[];
-extern struct ToneData gUnknown_08533360[];
-extern struct ToneData gUnknown_08533960[];
-extern struct ToneData gUnknown_08533F60[];
+extern struct {u16 rubyTransitionFrames[5]; u16 sapphireTransitionFrames[5];} gFieldTransitionAnimData;
+extern s8 gFieldSelectSoftReset;
+extern struct ToneData gPokemonCryToneBank0[];
+extern struct ToneData gPokemonCryToneBank1[];
+extern struct ToneData gPokemonCryToneBank2[];
+extern struct ToneData gPokemonCryToneBank3[];
 extern u16 gOptionsBGMList[];
 
 /*** 
@@ -47,19 +47,19 @@ extern u16 gOptionsBGMList[];
 *   2 : unknown
 *   3 : px wide
 ***/
-extern u16 gUnknown_086BB910[11][4];
-extern struct {u8 unk0; s16 unk2;} gUnknown_086BB9B4[];
+extern u16 gButtonInfoTable[11][4];
+extern struct {u8 tileId; s16 frameDuration;} gButtonAnimData[];
 extern u16 gOptionsSEList[];
-extern u8 gUnknown_02031AF0[][10];
+extern u8 gCustomButtonConfigs[][10];
 extern u8 gDefaultButtonConfigs[4][10];
 extern void (*const gOptionsStateFuncs[])(void);
 extern u32 gHighScoreNameEntry[HIGH_SCORE_NAME_LENGTH];
-extern u16 gUnknown_0201A520[3][BG_PLTT_SIZE];
-extern u16 gUnknown_03000000[];
-extern u8 gUnknown_03001800[3][0x800];
+extern u16 gPaletteFadeBuffers[3][BG_PLTT_SIZE];
+extern u16 gTempGfxBuffer[];
+extern u8 gEReaderTextTileBuffer[3][0x800];
 //extern ? gOamBuffer;
 //extern ? IntrMain_Buffer;
-extern u16 gUnknown_03005C00[];
+extern u16 gBG0TilemapBuffer[];
 //extern ? SoundMainRAM_Buffer;
 extern u16 sGbPlayerCurKeys;
 extern u16 sGbPlayerPrevKeys;
@@ -72,17 +72,17 @@ struct RfuSIO32Id {
     u16 lastId;
     // size 0xC
 };
-extern struct RfuSIO32Id gUnknown_02002808;
-extern u32 gUnknown_02002818;
-extern u32 gUnknown_0200281C;
+extern struct RfuSIO32Id gSio32Id;
+extern u32 gSio32ReceivedData;
+extern u32 gSio32RemoteDeviceId;
 //extern ? gTitlescreen;
 //extern ? gEraseSaveDataAccessStep;
 //extern ? gEraseSaveDataAccessCounter;
 //extern ? gEReaderAccessStep;
 //extern ? gEReaderAccessCounter;
-//extern ? gUnknown_020028A4;
-//extern ? gUnknown_020028A5;
-//extern ? gUnknown_02002958;
+//extern ? gTitleTransitionActive;
+//extern ? gTitleRestartDebounce;
+//extern ? gDpcmSampleBuffer;
 //extern ? gIntrTable;
 //extern ? gMain;
 //extern ? gVBlankIntrFuncPtr;
@@ -92,26 +92,26 @@ extern u32 gUnknown_0200281C;
 //extern ? gUnknown_02017BD4;
 //extern ? gUnknown_02017BE0;
 //extern ? gVCountIntrFuncPtr;
-//extern ? gUnknown_02019BE4;
-//extern ? gUnknown_02019BE8;
-//extern ? gUnknown_02019BEC;
-//extern ? gUnknown_02019BF0;
-//extern ? gUnknown_02019BF4;
-//extern ? gUnknown_02019BF8;
-//extern ? gUnknown_02019BFC;
-//extern ? gUnknown_02019C00;
-//extern ? gUnknown_02019C04;
-//extern ? gUnknown_02019C08;
+//extern ? gRumbleLoopCounter;
+//extern ? gRumbleFrameCounter;
+//extern ? gRumbleMotorMode;
+//extern ? gSio32ReconnectTimer;
+//extern ? gSio32SerialEnabled;
+//extern ? gRumblePatternIndex;
+//extern ? gRumblePatternPosition;
+//extern ? gRumbleCommand;
+//extern ? gRumblePaused;
+//extern ? gRumbleSpeedMode;
 //extern ? gGameBoyPlayerEnabled;
-//extern ? gUnknown_02019C10;
+//extern ? gSio32CommState;
 extern s8 gAutoDisplayTitlescreenMenu;
-//extern ? gUnknown_0201C190;
-//extern ? gUnknown_0202BE00;
-//extern ? gUnknown_202BE24;
-extern s16 gUnknown_0202BEEC;
-//extern ? gUnknown_0202C588;
+//extern ? gTitleNoSaveMenuSpriteSets;
+//extern ? gTitleSavedMenuSpriteSets;
+//extern ? gTitleReturnedFromMenu;
+extern s16 gEReaderReceivedCardId;
+//extern ? gHighScoreEntrySource;
 //extern ? gCurrentPinballGame;
-//extern ? gUnknown_02031520;
+//extern ? gBoardConfig;
 //extern ? gSoundInfo;
 //extern ? gPokemonCryMusicPlayers;
 //extern ? gMPlayJumpTable;
@@ -149,22 +149,22 @@ extern const IntrFunc gIntrTableTemplate[14];
 //extern ? gUnknown_086A4BFC;
 //extern ? gUnknown_086A4C18;
 //extern ? gUnknown_086A4C2C;
-extern const int *gUnknown_086A4C44[];
-extern const u16 gUnknown_086A4CF8[][3*0x18];
-extern const s8 gUnknown_086A7FA4[3]; //Sized based on call using gUnknown_02002858.unk1C + data
-extern const s8 gUnknown_086A7FA8[3]; //Same as above
-extern const s16 gUnknown_086A964C[11];
-extern const s8 gUnknown_086A9662[4];
-extern const s8 gUnknown_086A9666[6][2];
-extern const s8 gUnknown_086A9672[9][2];
-extern const u16 gUnknown_086A96A4[4];
-extern const u16 gUnknown_086A96D4[];
-extern const struct SpriteSet *const gUnknown_086A96E4[];
-extern const u8 *const gUnknown_086A96F8[7];
-extern const u8 *const gUnknown_086A9714[];
-extern const s8 gUnknown_086A9748[];
-extern const u8 *const gUnknown_086A975C[7];
-extern const u8 *const gUnknown_086A9778[];
+extern const int *gRumblePatterns[];
+extern const u16 gEReaderTextGlyphTable[][3*0x18];
+extern const s8 gScorePaletteAnimOffsets[3]; //Sized based on call using gHighScoreScreenState.paletteAnimPhase + data
+extern const s8 gScorePaletteResetOffsets[3]; //Same as above
+extern const s16 gTitleMenuStateTable[11];
+extern const s8 gTitlePressStartAnimDurations[4];
+extern const s8 gTitleMenuSlideInAnimData[6][2];
+extern const s8 gTitleMenuSlideOutAnimData[9][2];
+extern const u16 gTitleNoSaveMenuActions[4];
+extern const u16 gTitleSavedMenuActions[];
+extern const struct SpriteSet *const gTitlePressStartSpriteSets[];
+extern const u8 *const gTitleNoSaveDefaultSprites[7];
+extern const u8 *const gTitleNoSaveAnimSprites[];
+extern const s8 gTitleMenuRetractDurations[];
+extern const u8 *const gTitleSavedDefaultSprites[7];
+extern const u8 *const gTitleSavedAnimSprites[];
 extern const s16 gEReaderAccessButtonSequence[];
 //extern ? gMonPortraitGroupPals;
 //extern ? gMonPortraitGroupGfx;
@@ -174,13 +174,13 @@ extern const s16 gEReaderAccessButtonSequence[];
 //extern ? gMonHatchSpriteGroup3_Gfx;
 //extern ? gMonHatchSpriteGroup4_Gfx;
 extern const u8 gMonHatchSpriteGroup5_Gfx[];
-extern struct VectorU16 gUnknown_086A6B28[];
-extern const struct SpriteSet *const gUnknown_086A6AD4[];
-extern const struct SpriteSet *const gUnknown_086A7DA8[];
-extern const struct SpriteSet *const gUnknown_086A7DB0[];
-extern const struct SpriteSet *const gUnknown_086A7DD4[];
+extern struct VectorU16 gFieldSelectBallSpeedPositions[];
+extern const struct SpriteSet *const gFieldSelectSpriteSets[];
+extern const struct SpriteSet *const gNameEntryCursorSpriteSets[];
+extern const struct SpriteSet *const gHighScoreScreenSpriteSets[];
+extern const struct SpriteSet *const gCompletionBannerSpriteSets[];
 extern void (*gFieldSelectStateFuncs[])(void);
-extern u8 gUnknown_080A2400[];
+extern u8 gFieldSelectBG0Tilemap[];
 extern u8 gFieldSelectWindow_Gfx[];
 //extern ? gUnknown_080A4000;
 extern u8 gFieldSelectFrameShadowTilemap[];
@@ -233,25 +233,25 @@ extern const u16 gTitlescreenSprites_Pals[];
 //extern ? gMonPortraitsGroup11_Pals;
 //extern ? gMonPortraitsGroup12_Pals;
 //extern ? gMonPortraitsGroup13_Pals;
-extern struct VectorU16 gUnknown_086A9684[4];
-extern struct VectorU16 gUnknown_086A9694[4];
-extern struct VectorU16 gUnknown_086A96AC[5];
-extern struct VectorU16 gUnknown_086A96C0[5];
-extern const struct VectorU32 gUnknown_080797F0[2][8];
+extern struct VectorU16 gTitleNoSaveArrowPositions[4];
+extern struct VectorU16 gTitleNoSaveSelectorPositions[4];
+extern struct VectorU16 gTitleSavedArrowPositions[5];
+extern struct VectorU16 gTitleSavedSelectorPositions[5];
+extern const struct VectorU32 gHighScoreNamePixelPositions[2][8];
 
-struct Unk086ACD50
+struct CollisionCorrectionEntry
 {
-    s8 unk0;
-    s8 unk1;
-    u16 unk2;
+    s8 correctionX;
+    s8 correctionY;
+    u16 angleThreshold;
 };
-extern struct Unk086ACD50 gUnknown_086ACD50[8];
-extern struct Unk086ACD50 gUnknown_086ACD74[3];
+extern struct CollisionCorrectionEntry gWallCollisionPositionCorrection[8];
+extern struct CollisionCorrectionEntry gFlipperCollisionAngleCorrection[3];
 
-extern u16 gUnknown_02019C40[];
+extern u16 gPokedexVramBuffer[];
 extern s16 gPokedexNumOwned;
 extern s16 gPokedexSelectedMon;
-extern s8 gUnknown_0202ADE4;
+extern s8 gLinkExchangeResult;
 extern s16 gPokedexNumSeen;
 extern s16 gPokedexListPosition;
 
@@ -265,27 +265,27 @@ extern u8 gPokedexBackground_Pals[];
 extern u8 gPokedexSprites_Pals[];
 extern u8 gPokedexSprites_Gfx[];
 
-extern s16 gUnknown_0201A448;
-extern s16 gUnknown_0202BF00;
-extern s16 gUnknown_0202A57C;
-extern s16 gUnknown_0201A4F0;
-extern s16 gUnknown_0202BE20;
+extern s16 gPokedexAnimatedIconFrame;
+extern s16 gPokedexAnimatedIconTimer;
+extern s16 gPokedexCursorOffset;
+extern s16 gPokedexCursorBlinkOffset;
+extern s16 gPokedexBlinkTimer;
 extern s16 gPokedexScrollWaitFrames;
-extern s8 gUnknown_02019C24;
-extern s16 gUnknown_0202BF0C;
-extern s16 gUnknown_0201A440;
-extern s16 gUnknown_0202BEF4;
-extern s16 gUnknown_0202A588;
-extern s16 gUnknown_0202A55C;
-extern s16 gUnknown_0202A568[2];
-extern s16 gUnknown_0202C5E8;
-extern s16 gUnknown_0202A558;
-extern s8 gUnknown_0202BEE0;
-extern s8 gUnknown_0202BF04;
-extern s16 gUnknown_0202BF14;
-extern s8 gUnknown_0202C590;
-extern s16 gUnknown_0201B120;
-extern s8 gUnknown_0202BEC4;
+extern s8 gPokedexScrollActive;
+extern s16 gPokedexSpriteAnimFrame;
+extern s16 gPokedexSpriteAnimTimer;
+extern s16 gPokedexPageIndicatorTimer;
+extern s16 gPokedexShowAnimSprite;
+extern s16 gPokedexShowPortrait;
+extern s16 gPokedexShowCatchHatch[2];
+extern s16 gPokedexDetailFrameCount;
+extern s16 gPokedexInfoWindowSlideStep;
+extern s8 gPokedexButtonPromptFrame;
+extern s8 gPokedexShowButtonPrompt;
+extern s16 gPokedexSpriteCategory;
+extern s8 gPokedexShowLinkCableIcon;
+extern s16 gPokedexLinkStateTimer;
+extern s8 gPokedexShowPopupWindow;
 
 /****
  *  Yellow confirmation/info window mode
@@ -298,132 +298,132 @@ extern s8 gUnknown_0202BEC4;
 extern s8 Pokedex_PopupTypeIx;
 extern s8 gPokedex_EraseSaveDataAccessCounter;
 extern s8 gPokedex_EraseSaveDataAccessStep;
-extern s8 gUnknown_0202C794;
-extern s8 gUnknown_0201C1B4;
-extern s8 gUnknown_0202C5AC;
-extern s8 gUnknown_02019C28;
+extern s8 gPokedexDescriptionPage;
+extern s8 gPokedexShowPageIndicator;
+extern s8 gPokedexPageIndicatorBlink;
+extern s8 gPokedexSpriteIndexBase;
 extern s16 gPokedexFlags[];
 extern s16 gPokedexFlagExchangeBuffer[];
 extern s16 gPokedexListEntryCount;
 
-extern u32 gUnknown_0201B170;
-extern u32 gUnknown_0202BED8;
+extern u32 gMergedSapphireScoreIndex;
+extern u32 gMergedRubyScoreIndex;
 
 extern u16 gDexInfoWindowEmptyTextRowTiles[];
 extern u16 gDexInfoWindowMiddleRowTiles[];
 extern u16 gDexInfoWindowBottomRowTiles[];
 extern u16 gDexInfoWindowEmptyRowTiles[];
-extern u16 gUnknown_0202A590[];
-extern u16 gUnknown_08086B40[];
-extern u16 gUnknown_083722E8[0x4000];
+extern u16 gPokedexInfoWindowBackupTiles[];
+extern u16 gPokedexInfoWindowTiles[];
+extern u16 gRayquazaBodyCollisionMap[0x4000];
 extern s16 gDexAnimationIx[];
 extern s16 gTitleRevealJingle[][10][2];
-extern u8 gUnknown_0201B124;
+extern u8 gLinkExchangeStep;
 
 extern const struct PokemonSpecies gSpeciesInfo[];
-extern const struct SpriteSet * const gUnknown_086A54D8[13];
+extern const struct SpriteSet * const gCatchHatchSpriteSets[13];
 extern u8 (*gMonHatchSpriteGroupGfx[])[0x10E0];
 extern u8 (*gMonHatchSpriteGroupPals[])[0x20];
 
-extern u32 gUnknown_0202ADD0;
-extern s16 gUnknown_0202C5F0[];
-extern u16 gUnknown_0201A4D0[][2];
-extern u32 gUnknown_0202BDF0;
-extern u8 gUnknown_0201C1AC;
-extern u8 gUnknown_0202ADDC;
-extern u16 gUnknown_0201A510;
-extern s16 gUnknown_0201A444;
-extern s8 gUnknown_0201B128;
-extern s8 gUnknown_0202A564;
-extern s8 gUnknown_02019C20;
-extern s8 gUnknown_0202ADE8;
+extern u32 gLinkStatusResult;
+extern s16 gLinkSendBuffer[];
+extern u16 gLinkRecvBuffer[][2];
+extern u32 gLinkConnectionState;
+extern u8 gLinkPlayerCount;
+extern u8 gLinkNegotiationFlags;
+extern u16 gLinkExchangeFrameCounter;
+extern s16 gLinkTimeoutCounter;
+extern s8 gPokedexLinkTransferPhase;
+extern s8 gEReaderLinkHandshakeStarted;
+extern s8 gEReaderLinkDataReceived;
+extern s8 gEReaderLinkAckSent;
 
-extern const u16 gUnknown_086A7FAC[];
-extern s16 gUnknown_0202C5C0[];
+extern const u16 gHighScoreCharToTileMap[];
+extern s16 gScoreDigitBuffer[];
 
-struct unkStruct_8079730
+struct HighScoreNamePosition
 {
-    u32 unk0;
-    u32 unk4;
-    u32 unk8;
+    u32 yBaseOffset;
+    u32 yPixelPosition;
+    u32 fieldWidth;
 };
-extern const struct unkStruct_8079730 gUnknown_08079730[][8];
+extern const struct HighScoreNamePosition gHighScoreNamePositions[][8];
 
-extern struct Vector16 gUnknown_086A7768[0x8];
-extern s16 gUnknown_086A7788[0x8];
-extern s16 gUnknown_0202ADA0[];
-extern s32 gUnknown_0202BEF0;
-extern const struct SpriteSet *const gUnknown_086A769C[];
+extern struct Vector16 gIntroScene1_BGAnimTiming[0x8];
+extern s16 gIntroScene1_TileOffsets[0x8];
+extern s16 gIntroBGParams[];
+extern s32 gIntroPalFadeLevel;
+extern const struct SpriteSet *const gIntroScene1_SpriteSets[];
 extern struct SpriteGroup gMain_spriteGroups_40[];
 extern struct SpriteGroup gMain_spriteGroups_48;
-extern struct Vector16 gUnknown_086A7798[0x4];
-extern s32 gUnknown_0201C188;
+extern struct Vector16 gIntroScene1_ScaleOffsets[0x4];
+extern s32 gIntroScaleY;
 
-extern const struct SpriteSet *const gUnknown_086A795C[];
-extern const struct SpriteSet *const gUnknown_086A79EC[];
-extern u8 gUnknown_080E1540[];
-extern u8 gUnknown_080E1740[];
+extern const struct SpriteSet *const gIntroScene3_SpriteSets[];
+extern const struct SpriteSet *const gIntroScene5_SpriteSets[];
+extern u8 gIntroScene4_Pal[];
+extern u8 gIntroScene4_BG3Tilemap[];
 extern u8 gIntroScene4Sprites_Gfx[];
-extern u8 gUnknown_080E5F60[];
-extern u8 gUnknown_080E7F60[];
+extern u8 gIntroScene4_BG0Tiles[];
+extern u8 gIntroScene4_BG1Tiles[];
 
-extern u16 gUnknown_03002300[];
+extern u16 gTextTilemapBuffer[];
 
-extern u8 gUnknown_080E9F60[];
-extern u8 gUnknown_080EA160[];
-extern u8 gUnknown_080EB160[];
-extern u8 gUnknown_080EC160[];
+extern u8 gIntroScene5_Pal[];
+extern u8 gIntroScene5_BG2Tilemap[];
+extern u8 gIntroScene5_BG1Tiles[];
+extern u8 gIntroScene5_BG3Tilemap[];
 extern u8 gIntroScene5Text_Gfx[];
-extern u8 gUnknown_080F1980[];
+extern u8 gIntroScene5_BG0Tiles[];
 extern u8 gIntroScene5Sprites_Gfx[];
-extern s16 gUnknown_086A7A1C[];
+extern s16 gIntroScene5_TileOffsets[];
 
-extern s8 gUnknown_0202C548;
-extern s8 gUnknown_0202BEB4;
+extern s8 gIntroScene6VelocityIndex;
+extern s8 gIntroScene6EntitySpawnIndex;
 
-extern u8 gUnknown_080F61A0[];
-extern u8 gUnknown_080F63A0[];
+extern u8 gIntroScene6_Pal[];
+extern u8 gIntroScene6_BG3Tilemap[];
 extern u8 gIntroScene6Sprites_Gfx[];
-extern u8 gUnknown_080FCFC0[];
-extern u8 gUnknown_080FD7C0[];
-extern u8 gUnknown_080FDFC0[];
+extern u8 gIntroScene6_BG2Tilemap[];
+extern u8 gIntroScene6_BG0Tilemap[];
+extern u8 gIntroScene6_BG1Tiles[];
 extern u8 gIntroScene6Stars_Gfx[];
 
-extern u8 gUnknown_086A7AE4[];
-extern const struct SpriteSet *const gUnknown_086A7A78[];
+extern u8 gIntroScene6_BounceFlags[];
+extern const struct SpriteSet *const gIntroScene6_SpriteSets[];
 
-extern s16 gUnknown_0202C5E4;
-extern s16 gUnknown_0202ADD8;
-extern const struct SpriteSet *const gUnknown_086A7B74[];
-extern const struct SpriteSetTableEntry gUnknown_086B155C[];
-extern u8 gUnknown_08100FE0[];
-extern u8 gUnknown_081011E0[];
+extern s16 gIntroWailmerScaleX;
+extern s16 gIntroWailmerScaleY;
+extern const struct SpriteSet *const gIntroScene7_SpriteSets[];
+extern const struct SpriteSetTableEntry gFieldSpriteSets[];
+extern u8 gIntroScene7_Pal[];
+extern u8 gIntroScene7_BG3Tilemap[];
 extern u8 gIntroScene7Sprites_Gfx[];
-extern u8 gUnknown_08106A00[];
-extern u8 gUnknown_08108A00[];
-extern u8 gUnknown_0810AA00[];
+extern u8 gIntroScene7_BG2Tiles[];
+extern u8 gIntroScene7_BG0Tiles[];
+extern u8 gIntroScene7_BG1Tiles[];
 extern u8 gIntroScene7Wailmer_Gfx[];
 
-extern s8 gUnknown_0201A4BC;
+extern s8 gLinkExchangeSendPhase;
 
-extern u8 gUnknown_0810EA20[];
-extern u8 gUnknown_0810EC20[];
+extern u8 gIntroScene8a_Pal[];
+extern u8 gIntroScene8a_BG2Tilemap[];
 extern u8 gIntroScene7Explosion_Gfx[];
 extern u8 gIntroScene7WailmerLaunch_Gfx[];
 
-extern s8 gUnknown_086A7D4C[];
-extern s8 gUnknown_0202BEDC;
-extern s8 gUnknown_0202A56C;
+extern s8 gIntroScene8b_BallDecelTable[];
+extern s8 gIntroObjWhiteFlash;
+extern s8 gIntroBGWhiteFlash;
 
-extern u8 gUnknown_08115860[];
-extern u8 gUnknown_08115A60[];
+extern u8 gIntroScene8b_Pal[];
+extern u8 gIntroScene8b_BG3Tilemap[];
 extern u8 gIntroScene8Clouds_Gfx[];
 extern u8 gIntroScene8Ball_Gfx[];
 
 extern u16 gCommonAndEggWeights[];
 extern u16 gMain_saveData_pokedexFlags_90[10];
 extern u16 Sio32ConnectionData[4]; 
-extern u32 gUnknown_02002814;
+extern u32 gSio32SendData;
 
 /*
     Note: gMain lives at gUnknown_0200B0C0 in running memory.

@@ -14,7 +14,7 @@ u16 IsInVblank(void)
 
 void SetMainCallback(void (*func)(void))
 {
-    gUnknown_02017BD4 = func;
+    gMainCallbackShadow = func;
     if (!IsInVblank())
         gMainCallback = func;
 }
@@ -22,12 +22,12 @@ void SetMainCallback(void (*func)(void))
 void ResetMainCallback(void)
 {
     gMainCallback = DefaultMainCallback;
-    gUnknown_02017BD4 = DefaultMainCallback;
+    gMainCallbackShadow = DefaultMainCallback;
 }
 
 void SetVBlankIntrFunc(void (*func)(void))
 {
-    gUnknown_02017BD0 = func;
+    gVBlankIntrFuncShadow = func;
     if (!IsInVblank())
         *gVBlankIntrFuncPtr = func;
 }
@@ -35,12 +35,12 @@ void SetVBlankIntrFunc(void (*func)(void))
 void ResetVBlankIntrFunc(void)
 {
     *gVBlankIntrFuncPtr = VBlankIntr;
-    gUnknown_02017BD0 = VBlankIntr;
+    gVBlankIntrFuncShadow = VBlankIntr;
 }
 
 void SetVCountIntrFunc(void (*func)(void))
 {
-    gUnknown_0200FBA0 = func;
+    gVCountIntrFuncShadow = func;
     if (!IsInVblank())
         *gVCountIntrFuncPtr = func;
 }
@@ -48,6 +48,6 @@ void SetVCountIntrFunc(void (*func)(void))
 void ResetVCountIntrFunc(void)
 {
     *gVCountIntrFuncPtr = VCountIntr;
-    gUnknown_0200FBA0 = VCountIntr;
+    gVCountIntrFuncShadow = VCountIntr;
 }
 

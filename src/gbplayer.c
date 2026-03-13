@@ -87,58 +87,58 @@ void InitGameBoyPlayer(void)
     REG_BLDCNT = BLDCNT_TGT2_ALL | BLDCNT_EFFECT_LIGHTEN | BLDCNT_TGT1_ALL;
     REG_BLDY = 0x10;
     REG_DISPCNT = DISPCNT_OBJ_ON | DISPCNT_BG0_ON;
-    gUnknown_02019C00 = 0;
-    gUnknown_02019BEC = 0;
-    gUnknown_02019BF4 = 0;
-    gUnknown_02019BF0 = 0;
+    gRumbleCommand = 0;
+    gRumbleMotorMode = 0;
+    gSio32SerialEnabled = 0;
+    gSio32ReconnectTimer = 0;
     gGameBoyPlayerEnabled = CheckGameBoyPlayer();
     REG_IE &= ~INTR_FLAG_VBLANK;
     REG_DISPSTAT &= ~DISPSTAT_VBLANK_INTR;
     REG_DISPCNT = 0;
-    gUnknown_02019BFC = -1;
-    gUnknown_02019BE4 = 0;
-    gUnknown_02019BE8 = 0;
-    gUnknown_02019BF8 = 0;
-    gUnknown_02019C08 = 2;
+    gRumblePatternPosition = -1;
+    gRumbleLoopCounter = 0;
+    gRumbleFrameCounter = 0;
+    gRumblePatternIndex = 0;
+    gRumbleSpeedMode = 2;
 }
 
-void sub_10C0(void)
+void EnableGbPlayerRumble(void)
 {
     if (gGameBoyPlayerEnabled == 1)
     {
         gIntrTable[0] = Sio32IDIntr;
-        gIntrTable[1] = sub_1828;
-        gUnknown_02019BF4 = 1;
-        sub_1340();
+        gIntrTable[1] = Sio32TimeoutIntr;
+        gSio32SerialEnabled = 1;
+        InitSio32Hardware();
     }
 
-    gUnknown_02019BFC = -1;
-    gUnknown_02019BE4 = 0;
-    gUnknown_02019C08 = 2;
-    gUnknown_02019C04 = 0;
+    gRumblePatternPosition = -1;
+    gRumbleLoopCounter = 0;
+    gRumbleSpeedMode = 2;
+    gRumblePaused = 0;
 }
 
-void sub_111C(void)
+void DisableGbPlayerRumble(void)
 {
     // TODO This probably wasn't the original code, but it matches.
-    int *var0 = &gUnknown_02019BF4;
+    int *var0 = &gSio32SerialEnabled;
     int val = 0;
-    gUnknown_02019C00 = val;
-    gUnknown_02019BEC = val;
+    gRumbleCommand = val;
+    gRumbleMotorMode = val;
     *var0 = val;
-    gUnknown_02019BF0 = val;
-    gUnknown_02019BFC = -1;
-    gUnknown_02019BE4 = val;
-    gUnknown_02019BE8 = val;
-    gUnknown_02019BF8 = val;
-    gUnknown_02019C08 = 2;
+    gSio32ReconnectTimer = val;
+    gRumblePatternPosition = -1;
+    gRumbleLoopCounter = val;
+    gRumbleFrameCounter = val;
+    gRumblePatternIndex = val;
+    gRumbleSpeedMode = 2;
 }
 
-int sub_1170(void)
+int IsGbPlayerReady(void)
 {
     if (gGameBoyPlayerEnabled == 1)
     {
-        u8 val = gUnknown_02019C10 - 4;
+        u8 val = gSio32CommState - 4;
         if (val > 1)
             return 0;
     }
@@ -146,7 +146,7 @@ int sub_1170(void)
     return 1;
 }
 
-void sub_1198(void)
+void RestoreDefaultInterrupts(void)
 {
     gIntrTable[0] = SerialIntr;
     gIntrTable[1] = Timer3Intr;
@@ -156,31 +156,31 @@ void PlayRumble(int arg0)
 {
     if (gMain_saveData.rumbleEnabled)
     {
-        gUnknown_02019BF8 = arg0;
-        gUnknown_02019BFC = 0;
-        gUnknown_02019BE4 = 0;
-        gUnknown_02019BE8 = 0;
+        gRumblePatternIndex = arg0;
+        gRumblePatternPosition = 0;
+        gRumbleLoopCounter = 0;
+        gRumbleFrameCounter = 0;
     }
 }
 
-void sub_11E4(int arg0)
+void SetRumbleMode(int arg0)
 {
-    gUnknown_02019C08 = arg0;
+    gRumbleSpeedMode = arg0;
 }
 
-void sub_11F0(int arg0)
+void SetRumblePaused(int arg0)
 {
-    gUnknown_02019C04 = arg0;
+    gRumblePaused = arg0;
 }
 
-void sub_11FC(void)
+void ProcessRumbleFrame(void)
 {
     int var0;
     int var1;
 
     if (gGameBoyPlayerEnabled == 1)
     {
-        switch (gUnknown_02019C10)
+        switch (gSio32CommState)
         {
         case 0:
         case 1:
@@ -188,75 +188,75 @@ void sub_11FC(void)
             break;
         case 3:
         case 4:
-            if (gUnknown_02019BFC >= 0 && gUnknown_02019C08 && !gUnknown_02019C04)
+            if (gRumblePatternPosition >= 0 && gRumbleSpeedMode && !gRumblePaused)
             {
-                if (!(gUnknown_02019BE8 & 1))
+                if (!(gRumbleFrameCounter & 1))
                 {
                     while (1)
                     {
-                        var0 = gUnknown_086A4C44[gUnknown_02019BF8][gUnknown_02019BFC++];
-                        var1 = gUnknown_086A4C44[gUnknown_02019BF8][gUnknown_02019BFC];
+                        var0 = gRumblePatterns[gRumblePatternIndex][gRumblePatternPosition++];
+                        var1 = gRumblePatterns[gRumblePatternIndex][gRumblePatternPosition];
                         if (var0 == -1)
                         {
-                            gUnknown_02019BFC = var0;
-                            gUnknown_02019C00 = 0;
+                            gRumblePatternPosition = var0;
+                            gRumbleCommand = 0;
                             break;
                         }
 
                         if (var0 < -1)
                         {
-                            if (gUnknown_02019BE4)
+                            if (gRumbleLoopCounter)
                             {
-                                if (--gUnknown_02019BE4 == 0)
+                                if (--gRumbleLoopCounter == 0)
                                 {
-                                    gUnknown_02019BFC++;
+                                    gRumblePatternPosition++;
                                 }
                                 else
                                 {
-                                    gUnknown_02019BFC--;
-                                    gUnknown_02019BFC -= var1;
+                                    gRumblePatternPosition--;
+                                    gRumblePatternPosition -= var1;
                                 }
                             }
                             else
                             {
-                                gUnknown_02019BE4 = ~var0;
-                                gUnknown_02019BFC--;
-                                gUnknown_02019BFC -= var1;
+                                gRumbleLoopCounter = ~var0;
+                                gRumblePatternPosition--;
+                                gRumblePatternPosition -= var1;
                             }
                         }
                         else
                         {
-                            gUnknown_02019C00 = var0;
+                            gRumbleCommand = var0;
                             break;
                         }
                     }
                 }
-                else if (gUnknown_02019BE8 % 2 == 1 && gUnknown_02019C08 == 1)
+                else if (gRumbleFrameCounter % 2 == 1 && gRumbleSpeedMode == 1)
                 {
-                    gUnknown_02019C00 = 0;
+                    gRumbleCommand = 0;
                 }
             }
             else
             {
-                gUnknown_02019C00 = 0;
+                gRumbleCommand = 0;
             }
             break;
         case 5:
-            if (++gUnknown_02019BF0 > 60)
+            if (++gSio32ReconnectTimer > 60)
             {
-                if (gUnknown_02019BF4)
-                    sub_1340();
+                if (gSio32SerialEnabled)
+                    InitSio32Hardware();
 
-                gUnknown_02019BF0 = 0;
+                gSio32ReconnectTimer = 0;
             }
             break;
         }
     }
 
-    gUnknown_02019BE8++;
+    gRumbleFrameCounter++;
 }
 
-void sub_1340(void)
+void InitSio32Hardware(void)
 {
     REG_IME = 0;
     REG_IE &= ~(INTR_FLAG_TIMER3 | INTR_FLAG_SERIAL);
@@ -269,8 +269,8 @@ void sub_1340(void)
     REG_IE |= INTR_FLAG_TIMER3 | INTR_FLAG_SERIAL;
     REG_IME = INTR_FLAG_VBLANK;
     REG_SIOCNT_L &= -2;
-    gUnknown_02019C10 = 0;
-    CpuFill32(0, &gUnknown_02002808, 0xC);
+    gSio32CommState = 0;
+    CpuFill32(0, &gSio32Id, 0xC);
     REG_IME = 0;
     REG_SIOCNT |= SIO_MULTI_BUSY;
     REG_IME = INTR_FLAG_VBLANK;
@@ -283,129 +283,129 @@ void sub_1340(void)
 void Sio32IDIntr(void)
 {
     s32 iVar6;
-    gUnknown_02002818 = REG_SIODATA32;
+    gSio32ReceivedData = REG_SIODATA32;
     REG_TM3CNT_H = 0;
     REG_TM3CNT_L = 0x8000;
 
-    switch (gUnknown_02019C10)
+    switch (gSio32CommState)
     {
         case 0: {
             u32 receiverChunk = REG_SIODATA32;
             u32 senderChunk;
-            senderChunk = receiverChunk << 16 * gUnknown_02002808.MS_mode >> 16;
-            receiverChunk = receiverChunk << 16 * (1 - gUnknown_02002808.MS_mode) >> 16;
-            if (gUnknown_02002808.lastId == 0)
+            senderChunk = receiverChunk << 16 * gSio32Id.MS_mode >> 16;
+            receiverChunk = receiverChunk << 16 * (1 - gSio32Id.MS_mode) >> 16;
+            if (gSio32Id.lastId == 0)
             {
-                if ((u16) senderChunk == gUnknown_02002808.recv_id)
+                if ((u16) senderChunk == gSio32Id.recv_id)
                 {
-                    if (gUnknown_02002808.count < 4)
+                    if (gSio32Id.count < 4)
                     {
-                        if (gUnknown_02002808.recv_id == (u16)~gUnknown_02002808.send_id)
+                        if (gSio32Id.recv_id == (u16)~gSio32Id.send_id)
                         {
-                            if ((u16) receiverChunk == (u16)~gUnknown_02002808.recv_id)
-                                ++gUnknown_02002808.count;
+                            if ((u16) receiverChunk == (u16)~gSio32Id.recv_id)
+                                ++gSio32Id.count;
                         }
                         // goto green
                     }
                     else // blue
                     {
-                        gUnknown_02002808.lastId = receiverChunk;
+                        gSio32Id.lastId = receiverChunk;
                         if (receiverChunk == 0x8002)
                         {
-                            gUnknown_02019C10 = 1;
-                            gUnknown_02002814 = sub_1748(1);
-                            REG_SIODATA32 = gUnknown_02002814;
-                            gUnknown_02002808.count = 0;
+                            gSio32CommState = 1;
+                            gSio32SendData = Sio32BuildCommand(1);
+                            REG_SIODATA32 = gSio32SendData;
+                            gSio32Id.count = 0;
                             break;
                         }
                         else
                         {
-                            gUnknown_02002808.lastId = 0;
-                            gUnknown_02002808.count = 0;
+                            gSio32Id.lastId = 0;
+                            gSio32Id.count = 0;
                         }
                     }
                 }
                 else
                 {
-                    gUnknown_02002808.count = 0;
+                    gSio32Id.count = 0;
                 }
             }
             // green
-            if (gUnknown_02002808.count < 4)
+            if (gSio32Id.count < 4)
             {
-                gUnknown_02002808.send_id = *(gUnknown_02002808.count + Sio32ConnectionData); // oh no
+                gSio32Id.send_id = *(gSio32Id.count + Sio32ConnectionData); // oh no
             }
             else
             {
-                gUnknown_02002808.send_id = 0x8000;
+                gSio32Id.send_id = 0x8000;
             }
-            gUnknown_02002808.recv_id = ~receiverChunk;
+            gSio32Id.recv_id = ~receiverChunk;
             REG_SIODATA32 =
-                (gUnknown_02002808.send_id << ((1 - gUnknown_02002808.MS_mode) << 4)) +
-                (gUnknown_02002808.recv_id << (gUnknown_02002808.MS_mode << 4));
+                (gSio32Id.send_id << ((1 - gSio32Id.MS_mode) << 4)) +
+                (gSio32Id.recv_id << (gSio32Id.MS_mode << 4));
             break;
     }
         case 1:
-            iVar6 = sub_16A0(gUnknown_02019C10);
+            iVar6 = Sio32ValidateResponse(gSio32CommState);
             if (iVar6 != 0)
             {
                 u32 stack_temp;
-                gUnknown_02002808.count = 0;
+                gSio32Id.count = 0;
                 stack_temp = 0;
-                CpuSet(&stack_temp, &gUnknown_02002808, 0x5000003);
-                gUnknown_02019C10 = 0;
+                CpuSet(&stack_temp, &gSio32Id, 0x5000003);
+                gSio32CommState = 0;
             }
             else
             {
-                gUnknown_02019C10 = 2;
+                gSio32CommState = 2;
             }
 
-            if (gUnknown_02019BF4 == 0)
+            if (gSio32SerialEnabled == 0)
             {
-                gUnknown_02019C10 = 4;
+                gSio32CommState = 4;
             }
-            gUnknown_02002814 = sub_1748(gUnknown_02019C10);
-            REG_SIODATA32 = gUnknown_02002814;
+            gSio32SendData = Sio32BuildCommand(gSio32CommState);
+            REG_SIODATA32 = gSio32SendData;
             break;
         case 2:
-            iVar6 = sub_16A0(gUnknown_02019C10);
+            iVar6 = Sio32ValidateResponse(gSio32CommState);
             if (iVar6 != 0)
             {
                 u32 stack_temp;
-                gUnknown_02002808.count = 0;
+                gSio32Id.count = 0;
                 stack_temp = 0;
-                CpuSet(&stack_temp, &gUnknown_02002808, 0x5000003);
-                gUnknown_02019C10 = 0;
+                CpuSet(&stack_temp, &gSio32Id, 0x5000003);
+                gSio32CommState = 0;
             }
             else
             {
-                gUnknown_02019C10 = 3;
+                gSio32CommState = 3;
             }
 
-            if (gUnknown_02019BF4 == 0)
+            if (gSio32SerialEnabled == 0)
             {
-                gUnknown_02019C10 = 4;
+                gSio32CommState = 4;
             }
-            gUnknown_02002814 = sub_1748(gUnknown_02019C10);
-            REG_SIODATA32 = gUnknown_02002814;
+            gSio32SendData = Sio32BuildCommand(gSio32CommState);
+            REG_SIODATA32 = gSio32SendData;
             break;
         case 3:
-            iVar6 = sub_16A0(gUnknown_02019C10);
+            iVar6 = Sio32ValidateResponse(gSio32CommState);
             if (iVar6 != 0)
             {
                 u32 stack_temp;
-                gUnknown_02002808.count = 0;
+                gSio32Id.count = 0;
                 stack_temp = 0;
-                CpuSet(&stack_temp, &gUnknown_02002808, 0x5000003);
-                gUnknown_02019C10 = 0;
+                CpuSet(&stack_temp, &gSio32Id, 0x5000003);
+                gSio32CommState = 0;
             }
 
-            if (gUnknown_02019BF4 == 0)
+            if (gSio32SerialEnabled == 0)
             {
-                gUnknown_02019C10 = 4;
+                gSio32CommState = 4;
             }
-            gUnknown_02002814 = sub_1748(gUnknown_02019C10);
-            REG_SIODATA32 = gUnknown_02002814;
+            gSio32SendData = Sio32BuildCommand(gSio32CommState);
+            REG_SIODATA32 = gSio32SendData;
             break;
         case 4:
         case 5:
@@ -420,7 +420,7 @@ void Sio32IDIntr(void)
     REG_TM3CNT_H = 0xC1;
 }
 
-u32 sub_1668(u32 arg1, u32 arg2)
+u32 Sio32EncodePacket(u32 arg1, u32 arg2)
 {
     u8 uVar1;
     u32 uVar2;
@@ -441,13 +441,13 @@ u32 sub_1668(u32 arg1, u32 arg2)
     return uVar2;
 }
 
-u32 sub_16A0(u8 param_1)
+u32 Sio32ValidateResponse(u8 param_1)
 {
     s8 cVar1;
     u32 uVar3;
 
-    uVar3 = gUnknown_02002818 >> 0x1C;
-    cVar1 = sub_170C();
+    uVar3 = gSio32ReceivedData >> 0x1C;
+    cVar1 = Sio32VerifyChecksum();
 
     if (cVar1) return 1;
     switch (param_1)
@@ -456,8 +456,8 @@ u32 sub_16A0(u8 param_1)
             return 1;
         case 1:
             {
-                u32 *r1 = &gUnknown_0200281C;
-                u32 r0 = (gUnknown_02002818 << 4) >> 8;
+                u32 *r1 = &gSio32RemoteDeviceId;
+                u32 r0 = (gSio32ReceivedData << 4) >> 8;
                 *r1 = r0 & 1;
                 if (uVar3 != 1) return 1;
             }
@@ -466,8 +466,8 @@ u32 sub_16A0(u8 param_1)
             if (uVar3 != 2)
                 return 1;
             {
-                u32* r0 = &gUnknown_0200281C;
-                u32 r1 = (gUnknown_02002818 << 4) >> 8;
+                u32* r0 = &gSio32RemoteDeviceId;
+                u32 r1 = (gSio32ReceivedData << 4) >> 8;
                 if (*r0 != r1) return 1;
             }
             break;
@@ -478,7 +478,7 @@ u32 sub_16A0(u8 param_1)
     return 0;
 }
 
-u32 sub_170C(void)
+u32 Sio32VerifyChecksum(void)
 {
     u8 uVar1;
     u32 uVar2;
@@ -486,9 +486,9 @@ u32 sub_170C(void)
     u32 uVar4;
     u32 uVar5;
 
-    uVar2 = gUnknown_02002818 / 16;
+    uVar2 = gSio32ReceivedData / 16;
     ++uVar2; --uVar2;
-    uVar3 = gUnknown_02002818 % 16;
+    uVar3 = gSio32ReceivedData % 16;
     uVar4 = uVar2 >> 0x18;
 
     for (uVar1 = 6; uVar1 != 0; uVar1--)
@@ -508,7 +508,7 @@ u32 sub_170C(void)
     }
 }
 
-u32 sub_1748(u8 param_1)
+u32 Sio32BuildCommand(u8 param_1)
 {
     u32 uVar1;
     u32 uVar2;
@@ -517,22 +517,22 @@ u32 sub_1748(u8 param_1)
     switch (param_1)
     {
         case 2:
-            uVar1 = gUnknown_0200281C;
+            uVar1 = gSio32RemoteDeviceId;
             uVar2 = 2;
             goto case_fallthrough;
         case 3:
-            if (gUnknown_02019C00 == 0)
+            if (gRumbleCommand == 0)
             {
-                uVar1 = sub_17D8(0);
-                param_3 = sub_1668(uVar1, 4);
+                uVar1 = EncodeRumbleCommand(0);
+                param_3 = Sio32EncodePacket(uVar1, 4);
             }
-            if (gUnknown_02019C00 == 1)
+            if (gRumbleCommand == 1)
             {
-                uVar1 = sub_17D8(1);
-                param_3 = sub_1668(uVar1, 4);
+                uVar1 = EncodeRumbleCommand(1);
+                param_3 = Sio32EncodePacket(uVar1, 4);
             }
-            if (gUnknown_02019C00 != 2) break;
-            uVar1 = sub_17D8(2);
+            if (gRumbleCommand != 2) break;
+            uVar1 = EncodeRumbleCommand(2);
             uVar2 = 4;
             goto case_fallthrough;
         case 1:
@@ -541,17 +541,17 @@ u32 sub_1748(u8 param_1)
             uVar1 = 1;
             uVar2 = 1;
         case_fallthrough: // Fairly confident that this is not in fact a fakematch, due to the break above
-            param_3 = sub_1668(uVar1, uVar2);
+            param_3 = Sio32EncodePacket(uVar1, uVar2);
     }
 
     return param_3;
 }
 
-u32 sub_17D8(u32 arg1)
+u32 EncodeRumbleCommand(u32 arg1)
 {
     u32 retVal;
 
-    switch (gUnknown_02019BEC)
+    switch (gRumbleMotorMode)
     {
     case 0:
         retVal = arg1;
@@ -572,7 +572,7 @@ u32 sub_17D8(u32 arg1)
     return retVal;
 }
 
-void sub_1828(void)
+void Sio32TimeoutIntr(void)
 {
     // TODO macro?
     REG_IME = 0;
@@ -586,5 +586,5 @@ void sub_1828(void)
     REG_TM3CNT_H = 0;
     REG_TM3CNT_L = 0x8000;
 
-    gUnknown_02019C10 = 5;
+    gSio32CommState = 5;
 }

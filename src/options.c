@@ -37,10 +37,10 @@ enum CursorPositions
 struct OptionsData
 {
     s16 stateMain;
-    u16 unk2;
-    u16 unk4;
-    u16 unk6;
-    s16 unk8;
+    u16 cursorBlinkToggle;
+    u16 soundTestBlinkToggle;
+    u16 buttonFlashVisible;
+    s16 buttonFlashTimer;
     s16 cursorPosition;
     u16 buttonConfigType;
     s16 selectedBGM;
@@ -52,23 +52,23 @@ struct OptionsData
     u8 digit10sSE;
     u8 digit1sSE;
     s16 scollWaitFrames;
-    u8 unk1A[6];
-    s16 unk20;
-    s16 unk22;
-    s16 unk24[2];
-    s16 unk28;
+    u8 buttonEditFlags[6];
+    s16 captureFramesRemaining;
+    s16 capturedKeysMask;
+    s16 capturedButtonSlots[2];
+    s16 capturedButtonCount;
     bool8 rumbleEnabled;
-    s8 unk2B;
-    s8 unk2C;
-    u8 unk2D;
-    s8 unk2E;
-    u8 unk2F;
-    u8 unk30;
+    s8 rumbleAnimTimer;
+    s8 rumbleAnimFrame;
+    u8 rumbleAnimTileId;
+    s8 rumbleAnimActive;
+    u8 rumbleIdleBlinkState;
+    u8 soundTestActive;
 };
 
 extern struct OptionsData gOptionsData;
 extern s16 gMain_saveData_customButtonConfig[][2];
-extern u8 gUnknown_02031B18[];
+extern u8 gCustomButtonConfigTileIds[];
 
 extern const u16 gOptionsBackground_Pals[];
 extern const u8 gOptionsText_Gfx[];
@@ -96,8 +96,8 @@ void Options_LoadGraphics(void)
     DmaCopy16(3, gOptionsBackground_Pals, (void *)PLTT, 0x200);
     DmaCopy16(3, gOptionsText_Gfx, (void *)(VRAM + 0x4000), 0x1800);
     DmaCopy16(3, gOptionsBackground_Gfx, (void *)(VRAM + 0x8000), 0xC00);
-    DmaCopy16(3, gOptionsText_Tilemap, gUnknown_03005C00, 0x800);
-    DmaCopy16(3, gUnknown_03005C00, (void *)VRAM, 0x800);
+    DmaCopy16(3, gOptionsText_Tilemap, gBG0TilemapBuffer, 0x800);
+    DmaCopy16(3, gBG0TilemapBuffer, (void *)VRAM, 0x800);
 
     if (gGameBoyPlayerEnabled != TRUE)
     {
@@ -105,16 +105,16 @@ void Options_LoadGraphics(void)
         SetStringPalette(18, 5, 3, 2, 2);
     }
 
-    DmaCopy16(3, gUnknown_03005C00, (void *)VRAM, 0x800);
+    DmaCopy16(3, gBG0TilemapBuffer, (void *)VRAM, 0x800);
     DmaCopy16(3, gOptionsBackground_Tilemap, (void *)(VRAM + 0x800), 0x800);
     DmaCopy16(3, gGBAButtonIcons_Pals, (void *)(PLTT + 0x200), 0x60);
     DmaCopy16(3, gOptionsSprites_Gfx, (void *)(VRAM + 0x10000), 0x2020);
     Options_InitStates();
-    sub_51C9C();
+    UpdateOptionsSpritePositions();
     m4aMPlayAllStop();
-    sub_0CBC();
-    sub_024C();
-    sub_10C0();
+    EnableVBlankInterrupts();
+    FadeInScreen();
+    EnableGbPlayerRumble();
 
     gMain.subState++;
 }
@@ -125,10 +125,10 @@ void Options_InitStates(void)
     int j;
 
     gOptionsData.stateMain = OPTIONS_STATE_MAIN;
-    gOptionsData.unk2 = 0;
-    gOptionsData.unk4 = 0;
-    gOptionsData.unk6 = 1;
-    gOptionsData.unk8 = 0;
+    gOptionsData.cursorBlinkToggle = 0;
+    gOptionsData.soundTestBlinkToggle = 0;
+    gOptionsData.buttonFlashVisible = 1;
+    gOptionsData.buttonFlashTimer = 0;
     gOptionsData.cursorPosition = CURSOR_POS_BGM;
     gOptionsData.buttonConfigType = gMain_saveData.buttonConfigType;
     gOptionsData.selectedBGM = 0;
@@ -141,18 +141,18 @@ void Options_InitStates(void)
     gOptionsData.digit1sSE = 1;
     gOptionsData.scollWaitFrames = 0;
     for (i = 0; i < 6; i++)
-        gOptionsData.unk1A[i] = 0;
-    gOptionsData.unk20 = 0;
-    gOptionsData.unk22 = 0;
+        gOptionsData.buttonEditFlags[i] = 0;
+    gOptionsData.captureFramesRemaining = 0;
+    gOptionsData.capturedKeysMask = 0;
     for (i = 0; i < 2; i++)
-        gOptionsData.unk24[i] = 10;
-    gOptionsData.unk28 = 0;
+        gOptionsData.capturedButtonSlots[i] = 10;
+    gOptionsData.capturedButtonCount = 0;
     for (i = 0; i < 4; i++)
     {
         for (j = 0; j < 10; j++)
-            gUnknown_02031AF0[i][j] = gDefaultButtonConfigs[i][j];
+            gCustomButtonConfigs[i][j] = gDefaultButtonConfigs[i][j];
     }
-    sub_52528();
+    InitCustomButtonConfigDisplay();
     if (gGameBoyPlayerEnabled == TRUE)
     {
         gOptionsData.rumbleEnabled = gMain_saveData.rumbleEnabled;
@@ -163,19 +163,19 @@ void Options_InitStates(void)
         gOptionsData.rumbleEnabled = FALSE;
         gMain_saveData.rumbleEnabled = FALSE;
     }
-    gOptionsData.unk2E = 0;
-    gOptionsData.unk2B = 0;
-    gOptionsData.unk2C = 0;
-    gOptionsData.unk2D = 0;
-    gOptionsData.unk2F = 0;
-    gOptionsData.unk30 = 0;
+    gOptionsData.rumbleAnimActive = 0;
+    gOptionsData.rumbleAnimTimer = 0;
+    gOptionsData.rumbleAnimFrame = 0;
+    gOptionsData.rumbleAnimTileId = 0;
+    gOptionsData.rumbleIdleBlinkState = 0;
+    gOptionsData.soundTestActive = 0;
 }
 
 void Options_HandleInput(void)
 {
     s16 r4;
 
-    sub_51C9C();
+    UpdateOptionsSpritePositions();
     switch (gOptionsData.stateMain)
     {
     case OPTIONS_STATE_MAIN:
@@ -231,26 +231,26 @@ void Options_HandleInput(void)
                 m4aSongNumStart(SE_MENU_SELECT);
                 gOptionsData.stateMain = OPTIONS_STATE_BGM_SELECT,
                 gOptionsData.scollWaitFrames = 0;
-                gOptionsData.unk30 = 1;
-                if (gOptionsData.unk2E == 1)
+                gOptionsData.soundTestActive = 1;
+                if (gOptionsData.rumbleAnimActive == 1)
                 {
-                    gOptionsData.unk2B = 0;
-                    gOptionsData.unk2D = 0;
-                    gOptionsData.unk2C = 0;
-                    gOptionsData.unk2E = 0;
+                    gOptionsData.rumbleAnimTimer = 0;
+                    gOptionsData.rumbleAnimTileId = 0;
+                    gOptionsData.rumbleAnimFrame = 0;
+                    gOptionsData.rumbleAnimActive = 0;
                 }
                 break;
             case CURSOR_POS_SE:
                 m4aSongNumStart(SE_MENU_SELECT);
                 gOptionsData.stateMain = OPTIONS_STATE_SE_MENU_MOVE_0x67,
                 gOptionsData.scollWaitFrames = 0;
-                gOptionsData.unk30 = 1;
-                if (gOptionsData.unk2E == 1)
+                gOptionsData.soundTestActive = 1;
+                if (gOptionsData.rumbleAnimActive == 1)
                 {
-                    gOptionsData.unk2B = 0;
-                    gOptionsData.unk2D = 0;
-                    gOptionsData.unk2C = 0;
-                    gOptionsData.unk2E = 0;
+                    gOptionsData.rumbleAnimTimer = 0;
+                    gOptionsData.rumbleAnimTileId = 0;
+                    gOptionsData.rumbleAnimFrame = 0;
+                    gOptionsData.rumbleAnimActive = 0;
                 }
                 break;
             case CURSOR_POS_BUTTON_CONFIG_TYPE_A:
@@ -272,11 +272,11 @@ void Options_HandleInput(void)
                 if (gGameBoyPlayerEnabled == TRUE)
                 {
                     m4aSongNumStart(SE_MENU_SELECT);
-                    gOptionsData.unk2D = 0;
-                    if (gOptionsData.unk2E == 1)
-                        gOptionsData.unk2E = 0;
-                    gOptionsData.unk2B = 0;
-                    gOptionsData.unk2C = 0;
+                    gOptionsData.rumbleAnimTileId = 0;
+                    if (gOptionsData.rumbleAnimActive == 1)
+                        gOptionsData.rumbleAnimActive = 0;
+                    gOptionsData.rumbleAnimTimer = 0;
+                    gOptionsData.rumbleAnimFrame = 0;
                     gOptionsData.rumbleEnabled = FALSE;
                 }
                 break;
@@ -285,11 +285,11 @@ void Options_HandleInput(void)
                 {
                     m4aSongNumStart(SE_MENU_SELECT);
                     PlayRumble(11);
-                    if (gOptionsData.unk2E == 0)
-                        gOptionsData.unk2E = 1;
+                    if (gOptionsData.rumbleAnimActive == 0)
+                        gOptionsData.rumbleAnimActive = 1;
 
-                    gOptionsData.unk2B = 0;
-                    gOptionsData.unk2C = 0;
+                    gOptionsData.rumbleAnimTimer = 0;
+                    gOptionsData.rumbleAnimFrame = 0;
                     gOptionsData.rumbleEnabled = TRUE;
                 }
                 break;
@@ -302,7 +302,7 @@ void Options_HandleInput(void)
             SetButtonConfigInputs(gMain_saveData.buttonConfigType);
         }
         if (!(gMain.systemFrameCount & 7))
-            gOptionsData.unk2 = 1 - gOptionsData.unk2;
+            gOptionsData.cursorBlinkToggle = 1 - gOptionsData.cursorBlinkToggle;
         break;
     case OPTIONS_STATE_BGM_SELECT:
         if (JOY_HELD(DPAD_LEFT))
@@ -346,12 +346,12 @@ void Options_HandleInput(void)
         {
             m4aMPlayAllStop();
             m4aSongNumStart(SE_MENU_CANCEL);
-            gOptionsData.unk4 = 0;
-            gOptionsData.unk30 = 0;
+            gOptionsData.soundTestBlinkToggle = 0;
+            gOptionsData.soundTestActive = 0;
             gOptionsData.stateMain = OPTIONS_STATE_MAIN;
         }
         if (!(gMain.systemFrameCount & 7))
-            gOptionsData.unk4 = 1 - gOptionsData.unk4;
+            gOptionsData.soundTestBlinkToggle = 1 - gOptionsData.soundTestBlinkToggle;
         if (gOptionsData.scollWaitFrames > 0)
             gOptionsData.scollWaitFrames--;
         break;
@@ -397,12 +397,12 @@ void Options_HandleInput(void)
         {
             m4aMPlayAllStop();
             m4aSongNumStart(SE_MENU_CANCEL);
-            gOptionsData.unk4 = 0;
-            gOptionsData.unk30 = 0;
+            gOptionsData.soundTestBlinkToggle = 0;
+            gOptionsData.soundTestActive = 0;
             gOptionsData.stateMain = OPTIONS_STATE_MAIN;
         }
         if (!(gMain.systemFrameCount & 7))
-            gOptionsData.unk4 = 1 - gOptionsData.unk4;
+            gOptionsData.soundTestBlinkToggle = 1 - gOptionsData.soundTestBlinkToggle;
         if (gOptionsData.scollWaitFrames > 0)
             gOptionsData.scollWaitFrames--;
         break;
@@ -427,7 +427,7 @@ void Options_HandleInput(void)
         {
             m4aSongNumStart(SE_MENU_SELECT);
             gOptionsData.stateMain = OPTIONS_STATE_BUTTON_CONFIG_INPUT,
-            gOptionsData.unk1A[gOptionsData.cursorPosition - CURSOR_POS_LEFT_FLIPPER] = 1;
+            gOptionsData.buttonEditFlags[gOptionsData.cursorPosition - CURSOR_POS_LEFT_FLIPPER] = 1;
         }
         else if (JOY_NEW(B_BUTTON))
         {
@@ -436,77 +436,77 @@ void Options_HandleInput(void)
             gOptionsData.stateMain = OPTIONS_STATE_MAIN;
         }
         if (!(gMain.systemFrameCount & 7))
-            gOptionsData.unk2 = 1 - gOptionsData.unk2;
+            gOptionsData.cursorBlinkToggle = 1 - gOptionsData.cursorBlinkToggle;
         break;
     case OPTIONS_STATE_BUTTON_CONFIG_INPUT:
-        gOptionsData.unk8++;
-        if (gOptionsData.unk8 > 24)
+        gOptionsData.buttonFlashTimer++;
+        if (gOptionsData.buttonFlashTimer > 24)
         {
-            gOptionsData.unk8 = 0;
-            gOptionsData.unk6 = 1 - gOptionsData.unk6;
+            gOptionsData.buttonFlashTimer = 0;
+            gOptionsData.buttonFlashVisible = 1 - gOptionsData.buttonFlashVisible;
         }
         if (JOY_NEW(KEYS_MASK ^ START_BUTTON))
         {
             s16 i;
 
             m4aSongNumStart(SE_MENU_SELECT);
-            gOptionsData.unk20 = 10;
-            gOptionsData.unk22 = 0;
+            gOptionsData.captureFramesRemaining = 10;
+            gOptionsData.capturedKeysMask = 0;
             for (i = 0; i < 2; i++)
-                gOptionsData.unk24[i] = 10;
-            gOptionsData.unk28 = 0;
+                gOptionsData.capturedButtonSlots[i] = 10;
+            gOptionsData.capturedButtonCount = 0;
         }
-        if (gOptionsData.unk20 > 0)
+        if (gOptionsData.captureFramesRemaining > 0)
         {
-            sub_524BC();
-            gOptionsData.unk20--;
-            if (gOptionsData.unk20 == 0)
+            CaptureButtonConfigInput();
+            gOptionsData.captureFramesRemaining--;
+            if (gOptionsData.captureFramesRemaining == 0)
             {
-                gUnknown_02031AF0[4][(gOptionsData.cursorPosition - CURSOR_POS_LEFT_FLIPPER) * 2 + 0] = gOptionsData.unk24[0];
-                gUnknown_02031AF0[4][(gOptionsData.cursorPosition - CURSOR_POS_LEFT_FLIPPER) * 2 + 1] = gOptionsData.unk24[1];
-                gMain_saveData.customButtonConfig[(gOptionsData.cursorPosition - CURSOR_POS_LEFT_FLIPPER)][0] = gUnknown_086BB910[gOptionsData.unk24[0]][0];
-                gMain_saveData.customButtonConfig[(gOptionsData.cursorPosition - CURSOR_POS_LEFT_FLIPPER)][1] = gUnknown_086BB910[gOptionsData.unk24[1]][0];
+                gCustomButtonConfigs[4][(gOptionsData.cursorPosition - CURSOR_POS_LEFT_FLIPPER) * 2 + 0] = gOptionsData.capturedButtonSlots[0];
+                gCustomButtonConfigs[4][(gOptionsData.cursorPosition - CURSOR_POS_LEFT_FLIPPER) * 2 + 1] = gOptionsData.capturedButtonSlots[1];
+                gMain_saveData.customButtonConfig[(gOptionsData.cursorPosition - CURSOR_POS_LEFT_FLIPPER)][0] = gButtonInfoTable[gOptionsData.capturedButtonSlots[0]][0];
+                gMain_saveData.customButtonConfig[(gOptionsData.cursorPosition - CURSOR_POS_LEFT_FLIPPER)][1] = gButtonInfoTable[gOptionsData.capturedButtonSlots[1]][0];
                 gOptionsData.stateMain = OPTIONS_STATE_BUTTON_CONFIG_SELECT,
-                gOptionsData.unk1A[gOptionsData.cursorPosition - CURSOR_POS_LEFT_FLIPPER] = 0;
-                gOptionsData.unk8 = 0;
-                gOptionsData.unk6 = 1;
+                gOptionsData.buttonEditFlags[gOptionsData.cursorPosition - CURSOR_POS_LEFT_FLIPPER] = 0;
+                gOptionsData.buttonFlashTimer = 0;
+                gOptionsData.buttonFlashVisible = 1;
             }
         }
         break;
     }
-    if (gOptionsData.unk2E == 1)
+    if (gOptionsData.rumbleAnimActive == 1)
     {
-        if (++gOptionsData.unk2B > gUnknown_086BB9B4[gOptionsData.unk2C].unk2)
+        if (++gOptionsData.rumbleAnimTimer > gButtonAnimData[gOptionsData.rumbleAnimFrame].frameDuration)
         {
-            gOptionsData.unk2B = 0;
-            gOptionsData.unk2C++;
-            if (gOptionsData.unk2C > 12)
+            gOptionsData.rumbleAnimTimer = 0;
+            gOptionsData.rumbleAnimFrame++;
+            if (gOptionsData.rumbleAnimFrame > 12)
             {
-                gOptionsData.unk2C = 0;
-                gOptionsData.unk2D = 0;
-                gOptionsData.unk2E = 0;
+                gOptionsData.rumbleAnimFrame = 0;
+                gOptionsData.rumbleAnimTileId = 0;
+                gOptionsData.rumbleAnimActive = 0;
             }
-            gOptionsData.unk2D = gUnknown_086BB9B4[gOptionsData.unk2C].unk0;
+            gOptionsData.rumbleAnimTileId = gButtonAnimData[gOptionsData.rumbleAnimFrame].tileId;
         }
     }
     else
     {
-        gOptionsData.unk2B++;
-        if (gOptionsData.unk2B > 18)
+        gOptionsData.rumbleAnimTimer++;
+        if (gOptionsData.rumbleAnimTimer > 18)
         {
-            gOptionsData.unk2B = 0;
-            gOptionsData.unk2D = 1 - gOptionsData.unk2D;
+            gOptionsData.rumbleAnimTimer = 0;
+            gOptionsData.rumbleAnimTileId = 1 - gOptionsData.rumbleAnimTileId;
         }
     }
-    sub_11FC();
+    ProcessRumbleFrame();
 }
 
 void Options_State2_51C3C(void)
 {
-    sub_111C();
-    if (sub_1170())
+    DisableGbPlayerRumble();
+    if (IsGbPlayerReady())
     {
-        sub_1198();
+        RestoreDefaultInterrupts();
         gMain.subState++;
     }
 }
@@ -515,16 +515,16 @@ void Options_State3_51C60(void)
 {
     gMain_saveData.rumbleEnabled = gOptionsData.rumbleEnabled;
     SaveFile_WriteToSram();
-    sub_02B4();
+    FadeOutScreen();
     m4aMPlayAllStop();
-    sub_0D10();
+    DisableVBlankInterrupts();
     gAutoDisplayTitlescreenMenu = TRUE;
     SetMainGameState(STATE_TITLE);
 }
 
 // TODO
 NAKED
-void sub_51C9C(void)
+void UpdateOptionsSpritePositions(void)
 {
     asm_unified("\n\
     push {r4, r5, r6, r7, lr}\n\
@@ -594,7 +594,7 @@ _08051CEA:\n\
     adds r2, r5, #0\n\
     subs r2, #0xb8\n\
 _08051D1E:\n\
-    ldr r0, _08051D48 @ =gUnknown_0200293A\n\
+    ldr r0, _08051D48 @ =gOptionsButtonConfigEditFlags\n\
     add r0, ip\n\
     ldrb r0, [r0]\n\
     cmp r0, #1\n\
@@ -612,7 +612,7 @@ _08051D38: .4byte gMain_spriteGroups\n\
 _08051D3C: .4byte gOptionsData\n\
 _08051D40: .4byte gMain_spriteGroups_8\n\
 _08051D44: .4byte gMain_spriteGroups_10\n\
-_08051D48: .4byte gUnknown_0200293A\n\
+_08051D48: .4byte gOptionsButtonConfigEditFlags\n\
 _08051D4C: .4byte gMain_spriteGroups_28\n\
 _08051D50:\n\
     str r2, [r1]\n\
@@ -707,11 +707,11 @@ _08051DCE:\n\
     asrs r0, r0, #0x18\n\
     ldr r1, _08051F74 @ =gMain_spriteGroups_31\n\
     strh r0, [r1]\n\
-    ldr r0, _08051F78 @ =gUnknown_086BB9EC\n\
+    ldr r0, _08051F78 @ =gOptionsSpriteSets\n\
     movs r1, #0x20\n\
     ldr r2, _08051F7C @ =gMain_spriteGroups\n\
     bl LoadSpriteSets\n\
-    ldr r2, _08051F80 @ =gUnknown_086BB968\n\
+    ldr r2, _08051F80 @ =gOptionsCursorPositionTable\n\
     movs r3, #0xa\n\
     ldrsh r1, [r5, r3]\n\
     lsls r1, r1, #2\n\
@@ -774,7 +774,7 @@ _08051E6C:\n\
     ldrh r2, [r4, #8]\n\
     lsls r2, r2, #3\n\
     add r2, r8\n\
-    ldr r0, _08051F90 @ =gUnknown_02002932\n\
+    ldr r0, _08051F90 @ =gOptionsBGMDigitTileIds\n\
     add r0, ip\n\
     ldrb r1, [r0]\n\
     adds r1, #0x16\n\
@@ -835,7 +835,7 @@ _08051EE2:\n\
     ldrh r2, [r4, #8]\n\
     lsls r2, r2, #3\n\
     add r2, r8\n\
-    ldr r0, _08051F98 @ =gUnknown_02002935\n\
+    ldr r0, _08051F98 @ =gOptionsSEDigitTileIds\n\
     add r0, ip\n\
     ldrb r1, [r0]\n\
     adds r1, #0x16\n\
@@ -892,15 +892,15 @@ _08051F68: .4byte gMain_spriteGroups_8\n\
 _08051F6C: .4byte gMain_spriteGroups_30\n\
 _08051F70: .4byte gOptionsData\n\
 _08051F74: .4byte gMain_spriteGroups_31\n\
-_08051F78: .4byte gUnknown_086BB9EC\n\
+_08051F78: .4byte gOptionsSpriteSets\n\
 _08051F7C: .4byte gMain_spriteGroups\n\
-_08051F80: .4byte gUnknown_086BB968\n\
+_08051F80: .4byte gOptionsCursorPositionTable\n\
 _08051F84: .4byte gOamBuffer\n\
 _08051F88: .4byte 0x000001FF\n\
 _08051F8C: .4byte 0xFFFFFE00\n\
-_08051F90: .4byte gUnknown_02002932\n\
+_08051F90: .4byte gOptionsBGMDigitTileIds\n\
 _08051F94: .4byte 0xFFFFFC00\n\
-_08051F98: .4byte gUnknown_02002935\n\
+_08051F98: .4byte gOptionsSEDigitTileIds\n\
 _08051F9C:\n\
     cmp r0, #1\n\
     bne _08051FA6\n\
@@ -954,7 +954,7 @@ _08051FB2:\n\
     movs r4, #0xc\n\
     ldrsh r0, [r3, r4]\n\
     lsls r0, r0, #1\n\
-    ldr r7, _080520E4 @ =gUnknown_086BB9A8\n\
+    ldr r7, _080520E4 @ =gOptionsBGMSelectorYPositions\n\
     adds r0, r0, r7\n\
     ldrh r0, [r0]\n\
     strh r0, [r2, #4]\n\
@@ -1067,7 +1067,7 @@ _080520D4: .4byte 0xFFFFFE00\n\
 _080520D8: .4byte 0x000001FF\n\
 _080520DC: .4byte gMain_spriteGroups_8\n\
 _080520E0: .4byte gOptionsData\n\
-_080520E4: .4byte gUnknown_086BB9A8\n\
+_080520E4: .4byte gOptionsBGMSelectorYPositions\n\
 _080520E8:\n\
     mov r2, r8\n\
     ldr r1, [r2]\n\
@@ -1088,7 +1088,7 @@ _080520E8:\n\
     lsls r0, r0, #1\n\
     ldr r1, [sp, #0x88]\n\
     adds r0, r1, r0\n\
-    ldr r2, _08052490 @ =gUnknown_02031AF0\n\
+    ldr r2, _08052490 @ =gCustomButtonConfigs\n\
     adds r0, r0, r2\n\
     ldrb r0, [r0]\n\
     ldrh r2, [r4, #8]\n\
@@ -1096,7 +1096,7 @@ _080520E8:\n\
     ldr r3, _08052494 @ =gOamBuffer\n\
     adds r2, r2, r3\n\
     lsls r0, r0, #3\n\
-    ldr r1, _08052498 @ =gUnknown_086BB910\n\
+    ldr r1, _08052498 @ =gButtonInfoTable\n\
     adds r6, r0, r1\n\
     ldrh r0, [r6, #2]\n\
     ldr r1, _0805249C @ =0x000003FF\n\
@@ -1166,7 +1166,7 @@ _080520E8:\n\
     adds r0, #1\n\
     ldr r1, [sp, #0x88]\n\
     adds r0, r1, r0\n\
-    ldr r2, _08052490 @ =gUnknown_02031AF0\n\
+    ldr r2, _08052490 @ =gCustomButtonConfigs\n\
     adds r0, r0, r2\n\
     ldrb r0, [r0]\n\
     mov sb, r0\n\
@@ -1265,7 +1265,7 @@ _080521B8:\n\
     adds r3, r3, r4\n\
     mov r0, sb\n\
     lsls r4, r0, #3\n\
-    ldr r1, _08052498 @ =gUnknown_086BB910\n\
+    ldr r1, _08052498 @ =gButtonInfoTable\n\
     adds r4, r4, r1\n\
     ldrh r0, [r4, #2]\n\
     ldr r1, _0805249C @ =0x000003FF\n\
@@ -1544,9 +1544,9 @@ _08052470:\n\
     pop {r0}\n\
     bx r0\n\
     .align 2, 0\n\
-_08052490: .4byte gUnknown_02031AF0\n\
+_08052490: .4byte gCustomButtonConfigs\n\
 _08052494: .4byte gOamBuffer\n\
-_08052498: .4byte gUnknown_086BB910\n\
+_08052498: .4byte gButtonInfoTable\n\
 _0805249C: .4byte 0x000003FF\n\
 _080524A0: .4byte 0xFFFFFC00\n\
 _080524A4: .4byte 0x000001FF\n\
@@ -1557,10 +1557,10 @@ _080524B4: .4byte gMain_spriteGroups_31\n\
 _080524B8: .4byte gMain");
 }
 
-void sub_524BC(void)
+void CaptureButtonConfigInput(void)
 {
     int i, pressedKeys;
-    if (gOptionsData.unk28 >= 2)
+    if (gOptionsData.capturedButtonCount >= 2)
         return;
 
     pressedKeys = JOY_HELD(KEYS_MASK ^ START_BUTTON);
@@ -1570,17 +1570,17 @@ void sub_524BC(void)
     for (i = 0; i < 10; i++)
     {
         int key = pressedKeys & (1 << i);
-        if (key && !(gOptionsData.unk22 & key))
+        if (key && !(gOptionsData.capturedKeysMask & key))
         {
-            gOptionsData.unk22 |= key;
-            gOptionsData.unk24[gOptionsData.unk28] = i;
-            if (++gOptionsData.unk28 == 2)
+            gOptionsData.capturedKeysMask |= key;
+            gOptionsData.capturedButtonSlots[gOptionsData.capturedButtonCount] = i;
+            if (++gOptionsData.capturedButtonCount == 2)
                 return;
         }
     }
 }
 
-void sub_52528(void)
+void InitCustomButtonConfigDisplay(void)
 {
     int i, j;
     u8 var0;
@@ -1622,12 +1622,12 @@ void sub_52528(void)
                 var0 = 10;
                 break;
             }
-            gUnknown_02031B18[i * 2 + j] = var0;
+            gCustomButtonConfigTileIds[i * 2 + j] = var0;
         }
     }
 }
 
-extern const u8 gUnknown_08527EFE[];
+extern const u8 gDefaultCustomButtonConfigTileIds[];
 
 void SetButtonConfigInputs(s8 buttonConfigType)
 {
@@ -1635,76 +1635,76 @@ void SetButtonConfigInputs(s8 buttonConfigType)
     switch (buttonConfigType)
     {
     case BUTTON_CONFIG_RESET:
-        gMain.buttonConfigs[0][0] = gUnknown_086BB910[5][0];
-        gMain.buttonConfigs[0][1] = gUnknown_086BB910[10][0];
-        gMain.buttonConfigs[1][0] = gUnknown_086BB910[0][0];
-        gMain.buttonConfigs[1][1] = gUnknown_086BB910[10][0];
-        gMain.buttonConfigs[2][0] = gUnknown_086BB910[9][0];
-        gMain.buttonConfigs[2][1] = gUnknown_086BB910[10][0];
-        gMain.buttonConfigs[3][0] = gUnknown_086BB910[8][0];
-        gMain.buttonConfigs[3][1] = gUnknown_086BB910[10][0];
-        gMain.buttonConfigs[4][0] = gUnknown_086BB910[9][0];
-        gMain.buttonConfigs[4][1] = gUnknown_086BB910[8][0];
-        gMain_saveData.customButtonConfig[PINBALL_INPUT_LEFT_FLIPPER][0]  = gUnknown_086BB910[1][0];
-        gMain_saveData.customButtonConfig[PINBALL_INPUT_LEFT_FLIPPER][1]  = gUnknown_086BB910[10][0];
-        gMain_saveData.customButtonConfig[PINBALL_INPUT_RIGHT_FLIPPER][0] = gUnknown_086BB910[0][0];
-        gMain_saveData.customButtonConfig[PINBALL_INPUT_RIGHT_FLIPPER][1] = gUnknown_086BB910[10][0];
-        gMain_saveData.customButtonConfig[PINBALL_INPUT_TILT_LEFT][0]     = gUnknown_086BB910[5][0];
-        gMain_saveData.customButtonConfig[PINBALL_INPUT_TILT_LEFT][1]     = gUnknown_086BB910[10][0];
-        gMain_saveData.customButtonConfig[PINBALL_INPUT_TILT_RIGHT][0]    = gUnknown_086BB910[4][0];
-        gMain_saveData.customButtonConfig[PINBALL_INPUT_TILT_RIGHT][1]    = gUnknown_086BB910[10][0];
-        gMain_saveData.customButtonConfig[PINBALL_INPUT_TILT_UP][0]       = gUnknown_086BB910[6][0];
-        gMain_saveData.customButtonConfig[PINBALL_INPUT_TILT_UP][1]       = gUnknown_086BB910[10][0];
+        gMain.buttonConfigs[0][0] = gButtonInfoTable[5][0];
+        gMain.buttonConfigs[0][1] = gButtonInfoTable[10][0];
+        gMain.buttonConfigs[1][0] = gButtonInfoTable[0][0];
+        gMain.buttonConfigs[1][1] = gButtonInfoTable[10][0];
+        gMain.buttonConfigs[2][0] = gButtonInfoTable[9][0];
+        gMain.buttonConfigs[2][1] = gButtonInfoTable[10][0];
+        gMain.buttonConfigs[3][0] = gButtonInfoTable[8][0];
+        gMain.buttonConfigs[3][1] = gButtonInfoTable[10][0];
+        gMain.buttonConfigs[4][0] = gButtonInfoTable[9][0];
+        gMain.buttonConfigs[4][1] = gButtonInfoTable[8][0];
+        gMain_saveData.customButtonConfig[PINBALL_INPUT_LEFT_FLIPPER][0]  = gButtonInfoTable[1][0];
+        gMain_saveData.customButtonConfig[PINBALL_INPUT_LEFT_FLIPPER][1]  = gButtonInfoTable[10][0];
+        gMain_saveData.customButtonConfig[PINBALL_INPUT_RIGHT_FLIPPER][0] = gButtonInfoTable[0][0];
+        gMain_saveData.customButtonConfig[PINBALL_INPUT_RIGHT_FLIPPER][1] = gButtonInfoTable[10][0];
+        gMain_saveData.customButtonConfig[PINBALL_INPUT_TILT_LEFT][0]     = gButtonInfoTable[5][0];
+        gMain_saveData.customButtonConfig[PINBALL_INPUT_TILT_LEFT][1]     = gButtonInfoTable[10][0];
+        gMain_saveData.customButtonConfig[PINBALL_INPUT_TILT_RIGHT][0]    = gButtonInfoTable[4][0];
+        gMain_saveData.customButtonConfig[PINBALL_INPUT_TILT_RIGHT][1]    = gButtonInfoTable[10][0];
+        gMain_saveData.customButtonConfig[PINBALL_INPUT_TILT_UP][0]       = gButtonInfoTable[6][0];
+        gMain_saveData.customButtonConfig[PINBALL_INPUT_TILT_UP][1]       = gButtonInfoTable[10][0];
         for (i = 0; i < 10; i++)
-            gUnknown_02031B18[i] = gUnknown_08527EFE[i];
+            gCustomButtonConfigTileIds[i] = gDefaultCustomButtonConfigTileIds[i];
         break;
     case BUTTON_CONFIG_TYPE_A:
-        gMain.buttonConfigs[0][0] = gUnknown_086BB910[5][0];
-        gMain.buttonConfigs[0][1] = gUnknown_086BB910[10][0];
-        gMain.buttonConfigs[1][0] = gUnknown_086BB910[0][0];
-        gMain.buttonConfigs[1][1] = gUnknown_086BB910[10][0];
-        gMain.buttonConfigs[2][0] = gUnknown_086BB910[9][0];
-        gMain.buttonConfigs[2][1] = gUnknown_086BB910[10][0];
-        gMain.buttonConfigs[3][0] = gUnknown_086BB910[8][0];
-        gMain.buttonConfigs[3][1] = gUnknown_086BB910[10][0];
-        gMain.buttonConfigs[4][0] = gUnknown_086BB910[9][0];
-        gMain.buttonConfigs[4][1] = gUnknown_086BB910[8][0];
+        gMain.buttonConfigs[0][0] = gButtonInfoTable[5][0];
+        gMain.buttonConfigs[0][1] = gButtonInfoTable[10][0];
+        gMain.buttonConfigs[1][0] = gButtonInfoTable[0][0];
+        gMain.buttonConfigs[1][1] = gButtonInfoTable[10][0];
+        gMain.buttonConfigs[2][0] = gButtonInfoTable[9][0];
+        gMain.buttonConfigs[2][1] = gButtonInfoTable[10][0];
+        gMain.buttonConfigs[3][0] = gButtonInfoTable[8][0];
+        gMain.buttonConfigs[3][1] = gButtonInfoTable[10][0];
+        gMain.buttonConfigs[4][0] = gButtonInfoTable[9][0];
+        gMain.buttonConfigs[4][1] = gButtonInfoTable[8][0];
         break;
     case BUTTON_CONFIG_TYPE_B:
-        gMain.buttonConfigs[0][0] = gUnknown_086BB910[5][0];
-        gMain.buttonConfigs[0][1] = gUnknown_086BB910[10][0];
-        gMain.buttonConfigs[1][0] = gUnknown_086BB910[0][0];
-        gMain.buttonConfigs[1][1] = gUnknown_086BB910[10][0];
-        gMain.buttonConfigs[2][0] = gUnknown_086BB910[9][0];
-        gMain.buttonConfigs[2][1] = gUnknown_086BB910[10][0];
-        gMain.buttonConfigs[3][0] = gUnknown_086BB910[8][0];
-        gMain.buttonConfigs[3][1] = gUnknown_086BB910[10][0];
-        gMain.buttonConfigs[4][0] = gUnknown_086BB910[1][0];
-        gMain.buttonConfigs[4][1] = gUnknown_086BB910[10][0];
+        gMain.buttonConfigs[0][0] = gButtonInfoTable[5][0];
+        gMain.buttonConfigs[0][1] = gButtonInfoTable[10][0];
+        gMain.buttonConfigs[1][0] = gButtonInfoTable[0][0];
+        gMain.buttonConfigs[1][1] = gButtonInfoTable[10][0];
+        gMain.buttonConfigs[2][0] = gButtonInfoTable[9][0];
+        gMain.buttonConfigs[2][1] = gButtonInfoTable[10][0];
+        gMain.buttonConfigs[3][0] = gButtonInfoTable[8][0];
+        gMain.buttonConfigs[3][1] = gButtonInfoTable[10][0];
+        gMain.buttonConfigs[4][0] = gButtonInfoTable[1][0];
+        gMain.buttonConfigs[4][1] = gButtonInfoTable[10][0];
         break;
     case BUTTON_CONFIG_TYPE_C:
-        gMain.buttonConfigs[0][0] = gUnknown_086BB910[9][0];
-        gMain.buttonConfigs[0][1] = gUnknown_086BB910[10][0];
-        gMain.buttonConfigs[1][0] = gUnknown_086BB910[8][0];
-        gMain.buttonConfigs[1][1] = gUnknown_086BB910[10][0];
-        gMain.buttonConfigs[2][0] = gUnknown_086BB910[5][0];
-        gMain.buttonConfigs[2][1] = gUnknown_086BB910[10][0];
-        gMain.buttonConfigs[3][0] = gUnknown_086BB910[0][0];
-        gMain.buttonConfigs[3][1] = gUnknown_086BB910[10][0];
-        gMain.buttonConfigs[4][0] = gUnknown_086BB910[5][0];
-        gMain.buttonConfigs[4][1] = gUnknown_086BB910[0][0];
+        gMain.buttonConfigs[0][0] = gButtonInfoTable[9][0];
+        gMain.buttonConfigs[0][1] = gButtonInfoTable[10][0];
+        gMain.buttonConfigs[1][0] = gButtonInfoTable[8][0];
+        gMain.buttonConfigs[1][1] = gButtonInfoTable[10][0];
+        gMain.buttonConfigs[2][0] = gButtonInfoTable[5][0];
+        gMain.buttonConfigs[2][1] = gButtonInfoTable[10][0];
+        gMain.buttonConfigs[3][0] = gButtonInfoTable[0][0];
+        gMain.buttonConfigs[3][1] = gButtonInfoTable[10][0];
+        gMain.buttonConfigs[4][0] = gButtonInfoTable[5][0];
+        gMain.buttonConfigs[4][1] = gButtonInfoTable[0][0];
         break;
     case BUTTON_CONFIG_TYPE_D:
-        gMain.buttonConfigs[0][0] = gUnknown_086BB910[9][0];
-        gMain.buttonConfigs[0][1] = gUnknown_086BB910[10][0];
-        gMain.buttonConfigs[1][0] = gUnknown_086BB910[8][0];
-        gMain.buttonConfigs[1][1] = gUnknown_086BB910[10][0];
-        gMain.buttonConfigs[2][0] = gUnknown_086BB910[5][0];
-        gMain.buttonConfigs[2][1] = gUnknown_086BB910[10][0];
-        gMain.buttonConfigs[3][0] = gUnknown_086BB910[4][0];
-        gMain.buttonConfigs[3][1] = gUnknown_086BB910[10][0];
-        gMain.buttonConfigs[4][0] = gUnknown_086BB910[6][0];
-        gMain.buttonConfigs[4][1] = gUnknown_086BB910[10][0];
+        gMain.buttonConfigs[0][0] = gButtonInfoTable[9][0];
+        gMain.buttonConfigs[0][1] = gButtonInfoTable[10][0];
+        gMain.buttonConfigs[1][0] = gButtonInfoTable[8][0];
+        gMain.buttonConfigs[1][1] = gButtonInfoTable[10][0];
+        gMain.buttonConfigs[2][0] = gButtonInfoTable[5][0];
+        gMain.buttonConfigs[2][1] = gButtonInfoTable[10][0];
+        gMain.buttonConfigs[3][0] = gButtonInfoTable[4][0];
+        gMain.buttonConfigs[3][1] = gButtonInfoTable[10][0];
+        gMain.buttonConfigs[4][0] = gButtonInfoTable[6][0];
+        gMain.buttonConfigs[4][1] = gButtonInfoTable[10][0];
         break;
     case BUTTON_CONFIG_TYPE_EDIT:
         gMain.buttonConfigs[0][0] = gMain_saveData.customButtonConfig[PINBALL_INPUT_LEFT_FLIPPER][0];

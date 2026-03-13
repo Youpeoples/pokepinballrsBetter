@@ -35,14 +35,14 @@ struct Link
     u16 handshakeBuffer[4]; // 0x4
     bool8 receivedNothing; // 0xC
     u8 serialIntrCounter; // 0xD
-    u8 unkE; // 0xE
+    u8 sendPaused; // 0xE
     u8 fillerF; // 0xF
     bool8 handshakeAsMaster; // 0x10
-    u8 unk11;
+    u8 checksumError;
     u8 hardwareError;
-    u8 unk13;
+    u8 invalidIdError;
     u8 queueFull; // 0x14
-    u8 unk15;
+    u8 lagError;
     u16 checksum; // 0x16
     u8 sendCmdIndex; // 0x18
     u8 recvCmdIndex; // 0x19
@@ -53,7 +53,7 @@ struct Link
 };
 
 // extern function declarations
-extern void sub_19B4(void);
+extern void InitLinkHardware(void);
 extern void DisableSerial(void);
 extern s32 LinkMain1(u8 *shouldAdvanceLinkState, s16 *sendCmd, u16 (*recvCmds)[MAX_LINK_PLAYERS]);
 extern void Timer3Init(void);
@@ -62,7 +62,7 @@ extern void SerialCB(void);
 // extern IWRAM variable declarations
 
 // extern EWRAM variable declarations
-extern u8 gUnknown_0202BEC8;
+extern u8 gLinkAdvanceState;
 extern struct Link gLink;
 
 // extern const definitions

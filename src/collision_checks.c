@@ -5,12 +5,12 @@
 #include "constants/dusclops_states.h"
 #include "constants/ruby_states.h"
 
-extern const u16 gUnknown_08254B10[];
-extern const u16 gUnknown_08257390[];
-extern const u16 gUnknown_08259C10[];
+extern const u16 gRubyAltEntity0CollisionMap[];
+extern const u16 gRubyAltEntity1CollisionMap[];
+extern const u16 gWhiscashCollisionMap[];
 
 extern struct SongHeader se_unk_99;
-extern u16 gUnknown_086ACE70[];
+extern u16 gSapphireTargetBumperIndexMap[];
 
 
 s16 COLLISION_CHECK_RUBY_14E08(struct Vector16 *arg0, u16* arg1) {
@@ -19,27 +19,27 @@ s16 COLLISION_CHECK_RUBY_14E08(struct Vector16 *arg0, u16* arg1) {
     u16 sp00;
     u8 sp02;
     u16 return_val;
-    s16 unk0;
-    s32 unk1;
-    s32 unk2;
+    s16 collisionTileIndex;
+    s32 tileMapPage;
+    s32 boardLayer;
 
     u32 some_enum;
     u32 switch_enum;
 
     return_val = 0;
-    gCurrentPinballGame->ball->unk4 = 0;
+    gCurrentPinballGame->ball->spinAcceleration = 0;
 
     vec1.x = arg0->x / 8;
     vec1.y = arg0->y / 8;
     vec2.x = arg0->x % 8;
     vec2.y = arg0->y % 8;
-    unk1 = vec1.y / 64;
-    unk2 = gCurrentPinballGame->unk24;
+    tileMapPage = vec1.y / 64;
+    boardLayer = gCurrentPinballGame->boardLayerDepth;
     vec1.y %= 64;
 
-    unk0 = gUnknown_02031520.unk14.unk38[unk2 + unk1][vec1.y * 64 + vec1.x];
-    sp00 = gUnknown_02031520.unk14.unk48[unk2 + unk1][unk0 * 64 + vec2.y * 8 + vec2.x];
-    sp02 = gUnknown_02031520.unk14.unk58[unk2 + unk1][unk0 * 64 + vec2.y * 8 + vec2.x];
+    collisionTileIndex = gBoardConfig.fieldLayout.collisionTileMap[boardLayer + tileMapPage][vec1.y * 64 + vec1.x];
+    sp00 = gBoardConfig.fieldLayout.collisionAngleMap[boardLayer + tileMapPage][collisionTileIndex * 64 + vec2.y * 8 + vec2.x];
+    sp02 = gBoardConfig.fieldLayout.collisionTypeMap[boardLayer + tileMapPage][collisionTileIndex * 64 + vec2.y * 8 + vec2.x];
 
     CheckRubyPondBumperCollision(arg0, &sp00, &sp02);
 
@@ -50,21 +50,21 @@ s16 COLLISION_CHECK_RUBY_14E08(struct Vector16 *arg0, u16* arg1) {
     case 0:
     case 3:
     case 5:
-        gCurrentPinballGame->unk23 = (switch_enum - 1);
-        gCurrentPinballGame->unk22 = 1;
+        gCurrentPinballGame->collisionSurfaceType = (switch_enum - 1);
+        gCurrentPinballGame->collisionResponseType = 1;
         *arg1 = sp00;
 
         if (*arg1 >= 0x3FF0 && *arg1 <= 0x4010)
         {
-            if (gCurrentPinballGame->ball->positionQ0.x < gUnknown_02031520.unk14.unk26 - 8 ||
-                gCurrentPinballGame->ball->positionQ0.y < gUnknown_02031520.unk14.unk28 - 8)
+            if (gCurrentPinballGame->ball->positionQ0.x < gBoardConfig.fieldLayout.ballSpawnX - 8 ||
+                gCurrentPinballGame->ball->positionQ0.y < gBoardConfig.fieldLayout.ballSpawnY - 8)
             {
 
-                if (gCurrentPinballGame->ball->unk6 > 0)
+                if (gCurrentPinballGame->ball->spinSpeed > 0)
                 {
                     *arg1 = 0x3E00;
                 }
-                else if (gCurrentPinballGame->ball->unk6 != 0)
+                else if (gCurrentPinballGame->ball->spinSpeed != 0)
                 {
                     *arg1 = 0x4100;
                 }
@@ -72,14 +72,14 @@ s16 COLLISION_CHECK_RUBY_14E08(struct Vector16 *arg0, u16* arg1) {
                 {
                     if (gMain.systemFrameCount & 1)
                     {
-                        gCurrentPinballGame->ball->unk4 = 0x28;
-                        gCurrentPinballGame->ball->unk6 = 1;
+                        gCurrentPinballGame->ball->spinAcceleration = 0x28;
+                        gCurrentPinballGame->ball->spinSpeed = 1;
                         *arg1 = 0x3E00;
                     }
                     else
                     {
-                        gCurrentPinballGame->ball->unk4 = 0xFFD8;
-                        gCurrentPinballGame->ball->unk6 = 0xFFFF;
+                        gCurrentPinballGame->ball->spinAcceleration = 0xFFD8;
+                        gCurrentPinballGame->ball->spinSpeed = 0xFFFF;
                         *arg1 = 0x4100;
                     }
                 }
@@ -89,19 +89,19 @@ s16 COLLISION_CHECK_RUBY_14E08(struct Vector16 *arg0, u16* arg1) {
         break;
     case 1:
     case 2:
-        gCurrentPinballGame->unk23 = switch_enum - 1;
-        gCurrentPinballGame->unk22 = 2;
+        gCurrentPinballGame->collisionSurfaceType = switch_enum - 1;
+        gCurrentPinballGame->collisionResponseType = 2;
         *arg1 = sp00 & 0x0000FFF0;
         return_val = 1;
 
         break;
     case 4:
         gCurrentPinballGame->whiscashState = WHISCASH_STATE_ABSORB_ZONE_HIT;
-        gCurrentPinballGame->unk1F = 1;
+        gCurrentPinballGame->ballFrozenState = 1;
         some_enum = 0;
         break;
     }
-    sub_153CC((s32) some_enum, &return_val, arg1);
+    ProcessRubyCollisionEvent((s32) some_enum, &return_val, arg1);
 
     return return_val;
 }
@@ -119,14 +119,14 @@ void CheckRubyPondBumperCollision(struct Vector16* arg0, u16* arg1, u8* arg2)
     lowerNibble = 0;
     ix = 0;
 
-    if (gCurrentPinballGame->unk5B2 == 0)
+    if (gCurrentPinballGame->ballInLowerHalf == 0)
     {
-        if (gCurrentPinballGame->unk24 != 0)
+        if (gCurrentPinballGame->boardLayerDepth != 0)
             return;
 
         if (gCurrentPinballGame->shouldProcessWhiscash)
         {
-            if (gCurrentPinballGame->unk2A3 == 0)
+            if (gCurrentPinballGame->whiscashInvulnerable == 0)
                 return;
 
             deltaX = arg0->x + gCurrentPinballGame->rubyBumperCollisionPosition[0].x;
@@ -138,8 +138,8 @@ void CheckRubyPondBumperCollision(struct Vector16* arg0, u16* arg1, u8* arg2)
             if (deltaY > 87U)
                 return;
 
-            maskedResult = 0xFFF0 & gUnknown_08259C10[(deltaY * 80) + deltaX];
-            lowerNibble = 0xF & gUnknown_08259C10[(deltaY * 80) + deltaX];
+            maskedResult = 0xFFF0 & gWhiscashCollisionMap[(deltaY * 80) + deltaX];
+            lowerNibble = 0xF & gWhiscashCollisionMap[(deltaY * 80) + deltaX];
 
             if (lowerNibble == 0)
                 return;
@@ -167,8 +167,8 @@ void CheckRubyPondBumperCollision(struct Vector16* arg0, u16* arg1, u8* arg2)
 
         if (deltaX <= 63U && deltaY <= 63U)
         {
-            maskedResult = 0xFFF0 & gUnknown_08252B10[(deltaY * 64) + deltaX];
-            lowerNibble = 0xF & gUnknown_08252B10[(deltaY * 64) + deltaX];
+            maskedResult = 0xFFF0 & gSharedBumperCollisionMap[(deltaY * 64) + deltaX];
+            lowerNibble = 0xF & gSharedBumperCollisionMap[(deltaY * 64) + deltaX];
 
             if (lowerNibble != 0)
                 ix = 0;
@@ -181,8 +181,8 @@ void CheckRubyPondBumperCollision(struct Vector16* arg0, u16* arg1, u8* arg2)
 
             if (deltaX <= 63U && deltaY <= 63U)
             {
-                maskedResult = 0xFFF0 & gUnknown_08252B10[(deltaY * 64) + deltaX];
-                lowerNibble = 0xF & gUnknown_08252B10[(deltaY * 64) + deltaX];
+                maskedResult = 0xFFF0 & gSharedBumperCollisionMap[(deltaY * 64) + deltaX];
+                lowerNibble = 0xF & gSharedBumperCollisionMap[(deltaY * 64) + deltaX];
                 if (lowerNibble != 0)
                     ix = 1;
             }
@@ -194,8 +194,8 @@ void CheckRubyPondBumperCollision(struct Vector16* arg0, u16* arg1, u8* arg2)
 
                 if (deltaX <= 63U && deltaY <= 63U)
                 {
-                    maskedResult = 0xFFF0 & gUnknown_08252B10[(deltaY * 64) + deltaX];
-                    lowerNibble = 0xF & gUnknown_08252B10[(deltaY * 64) + deltaX];
+                    maskedResult = 0xFFF0 & gSharedBumperCollisionMap[(deltaY * 64) + deltaX];
+                    lowerNibble = 0xF & gSharedBumperCollisionMap[(deltaY * 64) + deltaX];
 
                     if (lowerNibble == 0)
                         return;
@@ -209,7 +209,7 @@ void CheckRubyPondBumperCollision(struct Vector16* arg0, u16* arg1, u8* arg2)
         }
 
         if (!gCurrentPinballGame->rubyPondContentsChanging)
-            gCurrentPinballGame->unk170[ix] = 107;
+            gCurrentPinballGame->pondBumperStates[ix] = 107;
 
         *arg1 = maskedResult;
         *arg2 = lowerNibble;
@@ -223,38 +223,38 @@ void CheckRubyPondBumperCollision(struct Vector16* arg0, u16* arg1, u8* arg2)
     {
         if ((*arg2 & 0xF) == 0)
         {
-            if (gCurrentPinballGame->unk2E5[0] > 0)
+            if (gCurrentPinballGame->hatchTileAnimPhase[0] > 0)
             {
                 s16 deltaY_alt;
-                deltaX = 2 * (-24 -gCurrentPinballGame->unk2EC[0]) + arg0->x;
+                deltaX = 2 * (-24 -gCurrentPinballGame->hatchTileShakeOffset[0]) + arg0->x;
                 deltaY_alt = arg0->y -580;
 
                 if (deltaX <= 71U && deltaY_alt <= 71U)
                 {
-                    *arg1 = 0xFFF0 & gUnknown_08254B10[(deltaY_alt * 72) + deltaX];
-                    *arg2 = 0xF & gUnknown_08254B10[(deltaY_alt * 72) + deltaX];
+                    *arg1 = 0xFFF0 & gRubyAltEntity0CollisionMap[(deltaY_alt * 72) + deltaX];
+                    *arg2 = 0xF & gRubyAltEntity0CollisionMap[(deltaY_alt * 72) + deltaX];
 
                     if (*arg2 & 1)
                     {
-                        gCurrentPinballGame->unk2E2 = 1;
+                        gCurrentPinballGame->hatchTileHitFlag = 1;
                         *arg2 = 6;
                     }
                 }
             }
 
-            if (gCurrentPinballGame->unk2E5[1] > 0)
+            if (gCurrentPinballGame->hatchTileAnimPhase[1] > 0)
             {
-                deltaX = ((gCurrentPinballGame->unk2EC[1] - 180) * 2) + arg0->x;
+                deltaX = ((gCurrentPinballGame->hatchTileShakeOffset[1] - 180) * 2) + arg0->x;
                 deltaY = arg0->y -580;
 
                 if (deltaX <= 71U && deltaY <= 71U)
                 {
-                    *arg1 = 0xFFF0 & gUnknown_08257390[(deltaY * 72) + deltaX];
-                    *arg2 = 0xF & gUnknown_08257390[(deltaY * 72) + deltaX];
+                    *arg1 = 0xFFF0 & gRubyAltEntity1CollisionMap[(deltaY * 72) + deltaX];
+                    *arg2 = 0xF & gRubyAltEntity1CollisionMap[(deltaY * 72) + deltaX];
 
                     if (*arg2 & 1)
                     {
-                        gCurrentPinballGame->unk2E2 = 2;
+                        gCurrentPinballGame->hatchTileHitFlag = 2;
                         *arg2 = 6;
                         return;
                     }
@@ -264,78 +264,78 @@ void CheckRubyPondBumperCollision(struct Vector16* arg0, u16* arg1, u8* arg2)
     }
 }
 
-void sub_153CC(s32 arg0, s16* arg1, u16* arg2)
+void ProcessRubyCollisionEvent(s32 arg0, s16* arg1, u16* arg2)
 {
     s16 absVelY;
 
     switch ((u8)arg0 - 1)
     {
     case 0:
-        if (gCurrentPinballGame->unk26 == 0)
+        if (gCurrentPinballGame->collisionCooldownTimer == 0)
         {
             if (gCurrentPinballGame->ball->positionQ1.x > 359)
             {
                 if (gCurrentPinballGame->ball->positionQ1.y > 199)
-                    gCurrentPinballGame->unk25 = 1;
+                    gCurrentPinballGame->ballCatchState = 1;
                 else
-                    gCurrentPinballGame->unk25 = 3;
+                    gCurrentPinballGame->ballCatchState = 3;
             }
             else
-                gCurrentPinballGame->unk25= 2;
+                gCurrentPinballGame->ballCatchState= 2;
 
-            sub_1A98C();
-            gCurrentPinballGame->unk22 = 7;
+            DispatchCatchModeInit();
+            gCurrentPinballGame->collisionResponseType = 7;
             *arg1 = 1;
             return;
         }
     default:
         return;
     case 1:
-        if (gCurrentPinballGame->unk24 == 0)
+        if (gCurrentPinballGame->boardLayerDepth == 0)
         {
             gCurrentPinballGame->ball->oamPriority = 2;
-            gCurrentPinballGame->unk24 = 2;
+            gCurrentPinballGame->boardLayerDepth = 2;
             break;
         }
 
-        if (gCurrentPinballGame->unk24 == 2)
+        if (gCurrentPinballGame->boardLayerDepth == 2)
         {
             gCurrentPinballGame->ball->oamPriority = 2;
-            gCurrentPinballGame->unk24 = 3;
+            gCurrentPinballGame->boardLayerDepth = 3;
         }
 
         break;
     case 2:
-        if (gCurrentPinballGame->unk24 == 2)
+        if (gCurrentPinballGame->boardLayerDepth == 2)
         {
             gCurrentPinballGame->ball->oamPriority = 3;
-            gCurrentPinballGame->unk24 = 0;
+            gCurrentPinballGame->boardLayerDepth = 0;
         }
-        else if (gCurrentPinballGame->unk24 == 3)
+        else if (gCurrentPinballGame->boardLayerDepth == 3)
         {
             gCurrentPinballGame->ball->oamPriority = 2;
-            gCurrentPinballGame->unk24 = 2;
+            gCurrentPinballGame->boardLayerDepth = 2;
         }
 
-        if (gCurrentPinballGame->unk2FB == 6)
-            gCurrentPinballGame->unk2FB = 7;
+        if (gCurrentPinballGame->nuzleafAnimState == 6)
+            gCurrentPinballGame->nuzleafAnimState = 7;
 
-        if (gCurrentPinballGame->unk2F0 & 0xF0 )
-            gCurrentPinballGame->unk2F0 = 0;
+        if (gCurrentPinballGame->shopDoorTargetFrame & 0xF0 )
+            gCurrentPinballGame->shopDoorTargetFrame = 0;
 
-        if (gCurrentPinballGame->unk1AB & 0xF0)
-            gCurrentPinballGame->unk1AB = 0;
+        if (gCurrentPinballGame->shopDoorOpenLevel & 0xF0)
+            gCurrentPinballGame->shopDoorOpenLevel = 0;
 
         break;
     case 3:
-        if (gCurrentPinballGame->unk600 == 0)
+        if (gCurrentPinballGame->mainBoardCountdownTimer == 0)
         {
             if (gCurrentPinballGame->ball->positionQ0.x > 131)
             {
                 gCurrentPinballGame->scoreAddedInFrame = 1000;
 
-                if (gCurrentPinballGame->unk70E <= 98)
-                    gCurrentPinballGame->unk70E++;
+                if (gCurrentPinballGame->progressLevel <= 98)
+                    gCurrentPinballGame->progressLevel++;
             }
             else if (gCurrentPinballGame->ball->positionQ0.x > 91)
             {
@@ -347,117 +347,117 @@ void sub_153CC(s32 arg0, s16* arg1, u16* arg2)
             {
                 gCurrentPinballGame->scoreAddedInFrame = 1000;
 
-                if (gCurrentPinballGame->unk2B2 == 0)
+                if (gCurrentPinballGame->gauntletBossFlashActive == 0)
                 {
-                    gCurrentPinballGame->unk2B2 = 1;
-                    gCurrentPinballGame->unk2B0 = 0;
+                    gCurrentPinballGame->gauntletBossFlashActive = 1;
+                    gCurrentPinballGame->gauntletBossFlashTimer = 0;
                 }
             }
-            gCurrentPinballGame->unk600 = 45;
+            gCurrentPinballGame->mainBoardCountdownTimer = 45;
 
             m4aSongNumStart(SE_TRIGGER_BUTTON_HIT);
         }
         break;
     case 4:
-        gCurrentPinballGame->unk20 = 1;
-        gCurrentPinballGame->unk165 = 1;
-        gCurrentPinballGame->unk732 = 0;
+        gCurrentPinballGame->ballInLaunchChute = 1;
+        gCurrentPinballGame->sapphireEntityCollisionFlag = 1;
+        gCurrentPinballGame->ballCollisionZone = 0;
         return;
     case 5:
-        if (gCurrentPinballGame->unk5B2 == 0)
+        if (gCurrentPinballGame->ballInLowerHalf == 0)
         {
-            sub_46FD4(1);
-            gCurrentPinballGame->unk29E = 1;
+            SetBoardCollisionConfig(1);
+            gCurrentPinballGame->boardCollisionConfigChanged = 1;
         }
         break;
     case 6:
         if (gCurrentPinballGame->ball->positionQ0.x < 50)
         {
-            if (gCurrentPinballGame->unk2FA == 0)
+            if (gCurrentPinballGame->nuzleafHitFlag == 0)
             {
-                gCurrentPinballGame->unk2FA = 1;
-                gCurrentPinballGame->unk2FB = 1;
-                gCurrentPinballGame->unk23 = 0;
-                gCurrentPinballGame->unk22 = 2;
+                gCurrentPinballGame->nuzleafHitFlag = 1;
+                gCurrentPinballGame->nuzleafAnimState = 1;
+                gCurrentPinballGame->collisionSurfaceType = 0;
+                gCurrentPinballGame->collisionResponseType = 2;
                 *arg2 = 0xB000;
                 *arg1 = 1;
             }
         }
-        else if (gCurrentPinballGame->unk2FA == 1)
+        else if (gCurrentPinballGame->nuzleafHitFlag == 1)
         {
-            gCurrentPinballGame->unk2FA = 2;
-            gCurrentPinballGame->unk2FB = 3;
-            gCurrentPinballGame->unk23 = 0;
-            gCurrentPinballGame->unk22 = 2;
+            gCurrentPinballGame->nuzleafHitFlag = 2;
+            gCurrentPinballGame->nuzleafAnimState = 3;
+            gCurrentPinballGame->collisionSurfaceType = 0;
+            gCurrentPinballGame->collisionResponseType = 2;
             *arg2 = 0xA000;
             *arg1 = 1;
             gCurrentPinballGame->ball->velocity.x = 0;
             gCurrentPinballGame->ball->velocity.y = 0;
 
-            memcpy(&gCurrentPinballGame->unk1334[1], gCurrentPinballGame->unk1334, 0x44U);
+            memcpy(&gCurrentPinballGame->ballStates[1], gCurrentPinballGame->ballStates, 0x44U);
 
-            gCurrentPinballGame->unk1330 = &gCurrentPinballGame->unk1334[1];
-            gCurrentPinballGame->unk1328 = 120;
+            gCurrentPinballGame->secondaryBall = &gCurrentPinballGame->ballStates[1];
+            gCurrentPinballGame->ballLaunchTimer = 120;
         }
 
-        gCurrentPinballGame->unk732 = 14;
+        gCurrentPinballGame->ballCollisionZone = 14;
         return;
     case 7:
         if (gCurrentPinballGame->ball->positionQ0.x <= 50)
         {
-            if (gCurrentPinballGame->unk732 == 8)
+            if (gCurrentPinballGame->ballCollisionZone == 8)
             {
-                if (gCurrentPinballGame->unk13 <= 2 && gCurrentPinballGame->unk72E <= 2)
+                if (gCurrentPinballGame->boardState <= 2 && gCurrentPinballGame->evoArrowProgress <= 2)
                 {
-                    if (gCurrentPinballGame->unk72E == 0)
+                    if (gCurrentPinballGame->evoArrowProgress == 0)
                         gCurrentPinballGame->scoreAddedInFrame = 2000;
-                    else if (gCurrentPinballGame->unk72E == 1)
+                    else if (gCurrentPinballGame->evoArrowProgress == 1)
                         gCurrentPinballGame->scoreAddedInFrame = 5000;
                     else
                         gCurrentPinballGame->scoreAddedInFrame = 10000;
 
-                    gCurrentPinballGame->unk72E++;
+                    gCurrentPinballGame->evoArrowProgress++;
 
                     m4aSongNumStart(SE_UNKNOWN_0x99);
                 }
 
-                gCurrentPinballGame->unk6BC = 1;
+                gCurrentPinballGame->travelRouletteSlotHitType = 1;
             }
-            gCurrentPinballGame->unk732 = 2;
+            gCurrentPinballGame->ballCollisionZone = 2;
             return;
         }
 
         if (gCurrentPinballGame->ball->positionQ0.x <= 100)
         {
-            if (gCurrentPinballGame->unk732 == 7)
+            if (gCurrentPinballGame->ballCollisionZone == 7)
             {
-                gCurrentPinballGame->unk194 = 10;
+                gCurrentPinballGame->coinRewardAmount = 10;
 
-                if(gCurrentPinballGame->unk72B <= 2)
+                if(gCurrentPinballGame->coinRewardLevel <= 2)
                 {
-                    if(gCurrentPinballGame->unk72B == 0)
+                    if(gCurrentPinballGame->coinRewardLevel == 0)
                     {
                         gCurrentPinballGame->scoreAddedInFrame = 2000;
-                        gCurrentPinballGame->unk194 = 1;
+                        gCurrentPinballGame->coinRewardAmount = 1;
                     }
-                    else if(gCurrentPinballGame->unk72B == 1)
+                    else if(gCurrentPinballGame->coinRewardLevel == 1)
                     {
                         gCurrentPinballGame->scoreAddedInFrame = 5000;
-                        gCurrentPinballGame->unk194 = 5;
+                        gCurrentPinballGame->coinRewardAmount = 5;
                     }
                     else
                     {
                         gCurrentPinballGame->scoreAddedInFrame = 10000;
-                        gCurrentPinballGame->unk194 = 10;
+                        gCurrentPinballGame->coinRewardAmount = 10;
                     }
-                    gCurrentPinballGame->unk72B++;
+                    gCurrentPinballGame->coinRewardLevel++;
                 }
 
-                gCurrentPinballGame->unk196 = 0;
-                gCurrentPinballGame->unk72C = 0;
+                gCurrentPinballGame->coinRewardTimer = 0;
+                gCurrentPinballGame->coinRewardLevelTimer = 0;
             }
 
-            gCurrentPinballGame->unk732 = 1;
+            gCurrentPinballGame->ballCollisionZone = 1;
             return;
         }
 
@@ -467,16 +467,16 @@ void sub_153CC(s32 arg0, s16* arg1, u16* arg2)
                 gCurrentPinballGame->scoreAddedInFrame = 1000;
 
             gCurrentPinballGame->ballPowerUpLight[0] = 1;
-            gCurrentPinballGame->unk732 = 3;
+            gCurrentPinballGame->ballCollisionZone = 3;
 
-            if (gCurrentPinballGame->unk71B == 0)
+            if (gCurrentPinballGame->ballPowerUpAnimActive == 0)
             {
                 if (!(gCurrentPinballGame->ballPowerUpLight[1] &
                       gCurrentPinballGame->ballPowerUpLight[2]))
                     return;
 
-                gCurrentPinballGame->unk71B = 1;
-                gCurrentPinballGame->unk71C = 60;
+                gCurrentPinballGame->ballPowerUpAnimActive = 1;
+                gCurrentPinballGame->ballShadowTimer = 60;
                 gCurrentPinballGame->scoreAddedInFrame = 4000;
                 return;
             }
@@ -489,17 +489,17 @@ void sub_153CC(s32 arg0, s16* arg1, u16* arg2)
                     gCurrentPinballGame->scoreAddedInFrame = 1000;
 
                 gCurrentPinballGame->ballPowerUpLight[1] = 1;
-                gCurrentPinballGame->unk732 = 4;
+                gCurrentPinballGame->ballCollisionZone = 4;
 
-                if (gCurrentPinballGame->unk71B != 0)
+                if (gCurrentPinballGame->ballPowerUpAnimActive != 0)
                     return;
 
                 if (!(gCurrentPinballGame->ballPowerUpLight[0] &
                       gCurrentPinballGame->ballPowerUpLight[2]))
                     return;
 
-                gCurrentPinballGame->unk71B = 1;
-                gCurrentPinballGame->unk71C = 60;
+                gCurrentPinballGame->ballPowerUpAnimActive = 1;
+                gCurrentPinballGame->ballShadowTimer = 60;
                 gCurrentPinballGame->scoreAddedInFrame = 4000;
                 return;
             }
@@ -510,66 +510,66 @@ void sub_153CC(s32 arg0, s16* arg1, u16* arg2)
                     gCurrentPinballGame->scoreAddedInFrame = 1000;
 
                 gCurrentPinballGame->ballPowerUpLight[2] = 1;
-                gCurrentPinballGame->unk732 = 5;
+                gCurrentPinballGame->ballCollisionZone = 5;
 
-                if (gCurrentPinballGame->unk71B != 0)
+                if (gCurrentPinballGame->ballPowerUpAnimActive != 0)
                     return;
 
                 if (!(gCurrentPinballGame->ballPowerUpLight[0] &
                       gCurrentPinballGame->ballPowerUpLight[1]))
                     return;
 
-                gCurrentPinballGame->unk71B = 1;
-                gCurrentPinballGame->unk71C = 60;
+                gCurrentPinballGame->ballPowerUpAnimActive = 1;
+                gCurrentPinballGame->ballShadowTimer = 60;
                 gCurrentPinballGame->scoreAddedInFrame = 4000;
                 return;
             }
 
-            if (gCurrentPinballGame->unk732 == 9)
+            if (gCurrentPinballGame->ballCollisionZone == 9)
             {
-                if (gCurrentPinballGame->unk13 <= 2 && gCurrentPinballGame->unk72F <= 2)
+                if (gCurrentPinballGame->boardState <= 2 && gCurrentPinballGame->catchArrowProgress <= 2)
                 {
-                    if (gCurrentPinballGame->unk72F == 0)
+                    if (gCurrentPinballGame->catchArrowProgress == 0)
                         gCurrentPinballGame->scoreAddedInFrame = 2000;
-                    else if (gCurrentPinballGame->unk72F == 1)
+                    else if (gCurrentPinballGame->catchArrowProgress == 1)
                         gCurrentPinballGame->scoreAddedInFrame = 5000;
                     else
                         gCurrentPinballGame->scoreAddedInFrame = 10000;
 
-                    gCurrentPinballGame->unk72F++;
+                    gCurrentPinballGame->catchArrowProgress++;
 
                     MPlayStart(&gMPlayInfo_SE1, &se_unk_99);
 
-                    if (gCurrentPinballGame->unk72F > 1)
-                        gCurrentPinballGame->unk731 = 1;
+                    if (gCurrentPinballGame->catchArrowProgress > 1)
+                        gCurrentPinballGame->catchProgressFlashing = 1;
                 }
 
-                gCurrentPinballGame->unk6BC = 2;
+                gCurrentPinballGame->travelRouletteSlotHitType = 2;
             }
 
-            gCurrentPinballGame->unk732 = 6;
+            gCurrentPinballGame->ballCollisionZone = 6;
             return;
         }
         break;
     case 8:
         if (gCurrentPinballGame->ball->positionQ0.x <= 50)
         {
-            gCurrentPinballGame->unk732 = 8;
+            gCurrentPinballGame->ballCollisionZone = 8;
             return;
         }
 
         if (gCurrentPinballGame->ball->positionQ0.x <= 100)
         {
-            gCurrentPinballGame->unk732 = 7;
+            gCurrentPinballGame->ballCollisionZone = 7;
             return;
         }
 
-        gCurrentPinballGame->unk732 = 9;
+        gCurrentPinballGame->ballCollisionZone = 9;
         return;
     case 9:
         if (gCurrentPinballGame->ball->positionQ0.x <= 46)
         {
-            gCurrentPinballGame->unk732 = 10;
+            gCurrentPinballGame->ballCollisionZone = 10;
 
             if (gCurrentPinballGame->holeIndicators[0] != 0)
                 return;
@@ -577,7 +577,7 @@ void sub_153CC(s32 arg0, s16* arg1, u16* arg2)
             gCurrentPinballGame->scoreAddedInFrame = 1000;
             gCurrentPinballGame->holeIndicators[0] = 1;
 
-            if (gCurrentPinballGame->unk714 != 0)
+            if (gCurrentPinballGame->allHolesLit != 0)
                 return;
 
             if (!(gCurrentPinballGame->holeIndicators[1] &
@@ -585,15 +585,15 @@ void sub_153CC(s32 arg0, s16* arg1, u16* arg2)
                   gCurrentPinballGame->holeIndicators[3]))
                 return;
 
-            gCurrentPinballGame->unk714 = 1;
-            gCurrentPinballGame->unk715 = 126;
+            gCurrentPinballGame->allHolesLit = 1;
+            gCurrentPinballGame->allHolesLitBlinkTimer = 126;
             gCurrentPinballGame->scoreAddedInFrame = 4000;
             return;
         }
 
         if (gCurrentPinballGame->ball->positionQ0.x <= 120)
         {
-            gCurrentPinballGame->unk732 = 11;
+            gCurrentPinballGame->ballCollisionZone = 11;
 
             if (gCurrentPinballGame->holeIndicators[1] != 0)
                 return;
@@ -601,7 +601,7 @@ void sub_153CC(s32 arg0, s16* arg1, u16* arg2)
             gCurrentPinballGame->scoreAddedInFrame = 1000;
             gCurrentPinballGame->holeIndicators[1] = 1;
 
-            if (gCurrentPinballGame->unk714 != 0)
+            if (gCurrentPinballGame->allHolesLit != 0)
                 return;
 
             if (!(gCurrentPinballGame->holeIndicators[0] &
@@ -609,15 +609,15 @@ void sub_153CC(s32 arg0, s16* arg1, u16* arg2)
                   gCurrentPinballGame->holeIndicators[3]))
                 return;
 
-            gCurrentPinballGame->unk714 = 1;
-            gCurrentPinballGame->unk715 = 126;
+            gCurrentPinballGame->allHolesLit = 1;
+            gCurrentPinballGame->allHolesLitBlinkTimer = 126;
             gCurrentPinballGame->scoreAddedInFrame = 4000;
             return;
         }
 
         if (gCurrentPinballGame->ball->positionQ0.x <= 193)
         {
-            gCurrentPinballGame->unk732 = 12;
+            gCurrentPinballGame->ballCollisionZone = 12;
 
             if (gCurrentPinballGame->holeIndicators[2] != 0)
                 return;
@@ -625,7 +625,7 @@ void sub_153CC(s32 arg0, s16* arg1, u16* arg2)
             gCurrentPinballGame->scoreAddedInFrame = 1000;
             gCurrentPinballGame->holeIndicators[2] = 1;
 
-            if (gCurrentPinballGame->unk714 != 0)
+            if (gCurrentPinballGame->allHolesLit != 0)
                 return;
 
             if (!(gCurrentPinballGame->holeIndicators[0] &
@@ -633,13 +633,13 @@ void sub_153CC(s32 arg0, s16* arg1, u16* arg2)
                   gCurrentPinballGame->holeIndicators[3]))
                 return;
 
-            gCurrentPinballGame->unk714 = 1;
-            gCurrentPinballGame->unk715 = 126;
+            gCurrentPinballGame->allHolesLit = 1;
+            gCurrentPinballGame->allHolesLitBlinkTimer = 126;
             gCurrentPinballGame->scoreAddedInFrame = 4000;
             return;
         }
 
-        gCurrentPinballGame->unk732 = 13;
+        gCurrentPinballGame->ballCollisionZone = 13;
 
         if (gCurrentPinballGame->holeIndicators[3] != 0)
             return;
@@ -647,7 +647,7 @@ void sub_153CC(s32 arg0, s16* arg1, u16* arg2)
         gCurrentPinballGame->scoreAddedInFrame = 1000;
         gCurrentPinballGame->holeIndicators[3] = 1;
 
-        if (gCurrentPinballGame->unk714 != 0)
+        if (gCurrentPinballGame->allHolesLit != 0)
             return;
 
         if (!(gCurrentPinballGame->holeIndicators[0] &
@@ -655,115 +655,115 @@ void sub_153CC(s32 arg0, s16* arg1, u16* arg2)
               gCurrentPinballGame->holeIndicators[2]))
             return;
 
-        gCurrentPinballGame->unk714 = 1;
-        gCurrentPinballGame->unk715 = 126;
+        gCurrentPinballGame->allHolesLit = 1;
+        gCurrentPinballGame->allHolesLitBlinkTimer = 126;
         gCurrentPinballGame->scoreAddedInFrame = 4000;
         return;
     case 10:
-        if (gCurrentPinballGame->unk5B2 == 0)
+        if (gCurrentPinballGame->ballInLowerHalf == 0)
         {
             if (gCurrentPinballGame->ball->positionQ0.x > 170)
             {
-                if (gCurrentPinballGame->unk2F0 > 2U)
+                if (gCurrentPinballGame->shopDoorTargetFrame > 2U)
                     return;
 
-                gCurrentPinballGame->unk23 = 0;
-                gCurrentPinballGame->unk22 = 2;
+                gCurrentPinballGame->collisionSurfaceType = 0;
+                gCurrentPinballGame->collisionResponseType = 2;
                 *arg2 = 0xB000;
                 *arg1 = 1;
 
-                if (gCurrentPinballGame->unk13 <= 2 && gCurrentPinballGame->unk1AB <= 2)
+                if (gCurrentPinballGame->boardState <= 2 && gCurrentPinballGame->shopDoorOpenLevel <= 2)
                 {
-                    gCurrentPinballGame->unk1AB = 3;
-                    gCurrentPinballGame->unk2F2 = 5;
+                    gCurrentPinballGame->shopDoorOpenLevel = 3;
+                    gCurrentPinballGame->shopDoorAnimDelay = 5;
                 }
 
                 gCurrentPinballGame->scoreAddedInFrame = 50000;
                 return;
             }
 
-            if (gCurrentPinballGame->unk2FB <= 4)
+            if (gCurrentPinballGame->nuzleafAnimState <= 4)
             {
-                gCurrentPinballGame->unk23 = 0;
-                gCurrentPinballGame->unk22 = 2;
+                gCurrentPinballGame->collisionSurfaceType = 0;
+                gCurrentPinballGame->collisionResponseType = 2;
                 *arg2 = 0xF800;
                 *arg1 = 1;
             }
 
-            if (gCurrentPinballGame->unk2FB == 5)
-                gCurrentPinballGame->unk2FB = 6;
+            if (gCurrentPinballGame->nuzleafAnimState == 5)
+                gCurrentPinballGame->nuzleafAnimState = 6;
 
-            if (gCurrentPinballGame->unk29F == 0)
+            if (gCurrentPinballGame->rubyPondBumperHitFlag == 0)
                 return;
 
-            if (gCurrentPinballGame->unk29F == 1)
-                gCurrentPinballGame->unk286 = 90;
+            if (gCurrentPinballGame->rubyPondBumperHitFlag == 1)
+                gCurrentPinballGame->oneUpAnimTimer = 90;
             else
             {
-                gCurrentPinballGame->unk2F8 = 1;
-                gCurrentPinballGame->unk71B = 1;
-                gCurrentPinballGame->unk71C = 60;
+                gCurrentPinballGame->ballPowerUpOverride = 1;
+                gCurrentPinballGame->ballPowerUpAnimActive = 1;
+                gCurrentPinballGame->ballShadowTimer = 60;
                 m4aSongNumStart(SE_UNKNOWN_0xD8);
             }
 
-            gCurrentPinballGame->unk29F = 0;
-            gCurrentPinballGame->unk2A0 = 600;
+            gCurrentPinballGame->rubyPondBumperHitFlag = 0;
+            gCurrentPinballGame->rubyPondBumperTimer = 600;
             return;
         }
 
-        if (gCurrentPinballGame->unk1C4 != 0)
+        if (gCurrentPinballGame->catchCounterBlinkState != 0)
             return;
 
         if (gCurrentPinballGame->ball->positionQ0.x <= 120)
-            gCurrentPinballGame->unk1C2 = 1;
+            gCurrentPinballGame->outLaneSide = 1;
         else
-            gCurrentPinballGame->unk1C2 = 2;
+            gCurrentPinballGame->outLaneSide = 2;
 
         if (gCurrentPinballGame->outLanePikaPosition <= 1)
         {
-            if (gCurrentPinballGame->outLanePikaPosition != gCurrentPinballGame->unk1C2 - 1)
+            if (gCurrentPinballGame->outLanePikaPosition != gCurrentPinballGame->outLaneSide - 1)
                 return;
             else
-                gCurrentPinballGame->unk1C4 = 120;
+                gCurrentPinballGame->catchCounterBlinkState = 120;
             return;
         }
 
-        gCurrentPinballGame->unk1C4 = 120;
+        gCurrentPinballGame->catchCounterBlinkState = 120;
         return;
 
     case 11:
-        if (gCurrentPinballGame->unk616 != 0)
+        if (gCurrentPinballGame->pikaSpinCooldownTimer != 0)
             return;
 
         absVelY = gCurrentPinballGame->ball->velocity.y;
-        gCurrentPinballGame->unk614 = gCurrentPinballGame->ball->velocity.y;
+        gCurrentPinballGame->pikaSpinMomentum = gCurrentPinballGame->ball->velocity.y;
 
         if (absVelY < 0) {
             absVelY = -absVelY;
         }
 
-        gCurrentPinballGame->unk1C6 += (absVelY) / 3;
+        gCurrentPinballGame->pikaChargeTarget += (absVelY) / 3;
 
-        if (gCurrentPinballGame->unk1C6 > 168)
-            gCurrentPinballGame->unk1C6 = 168;
+        if (gCurrentPinballGame->pikaChargeTarget > 168)
+            gCurrentPinballGame->pikaChargeTarget = 168;
 
-        gCurrentPinballGame->unk616 = 20;
+        gCurrentPinballGame->pikaSpinCooldownTimer = 20;
         return;
     case 12:
-        if (gCurrentPinballGame->unk2D8 == 0)
+        if (gCurrentPinballGame->cyndaquilCollisionEnabled == 0)
             return;
 
-        if (gCurrentPinballGame->unk26 != 0)
+        if (gCurrentPinballGame->collisionCooldownTimer != 0)
             return;
 
-        if (gCurrentPinballGame->unk2DA != 0)
+        if (gCurrentPinballGame->eggCaveState != 0)
             return;
 
-        gCurrentPinballGame->unk2DA++;
+        gCurrentPinballGame->eggCaveState++;
 
-        gCurrentPinballGame->unk2D8 = 0;
-        gCurrentPinballGame->unk23 = 0;
-        gCurrentPinballGame->unk22 = 2;
+        gCurrentPinballGame->cyndaquilCollisionEnabled = 0;
+        gCurrentPinballGame->collisionSurfaceType = 0;
+        gCurrentPinballGame->collisionResponseType = 2;
 
         *arg2 = 0xD000;
         *arg1 = 1;
@@ -772,19 +772,19 @@ void sub_153CC(s32 arg0, s16* arg1, u16* arg2)
         PlayRumble(7);
         return;
     case 13:
-        if (gCurrentPinballGame->unk2D8 == 0)
+        if (gCurrentPinballGame->cyndaquilCollisionEnabled == 0)
             return;
 
-        if (gCurrentPinballGame->unk26 != 0)
+        if (gCurrentPinballGame->collisionCooldownTimer != 0)
             return;
 
-        if (gCurrentPinballGame->unk2DA != 1)
+        if (gCurrentPinballGame->eggCaveState != 1)
             return;
 
-        gCurrentPinballGame->unk2DA++;
-        gCurrentPinballGame->unk2D8 = 0;
-        gCurrentPinballGame->unk23 = 0;
-        gCurrentPinballGame->unk22 = 2;
+        gCurrentPinballGame->eggCaveState++;
+        gCurrentPinballGame->cyndaquilCollisionEnabled = 0;
+        gCurrentPinballGame->collisionSurfaceType = 0;
+        gCurrentPinballGame->collisionResponseType = 2;
         *arg2 = 0xCC00;
         *arg1 = 1;
 
@@ -793,43 +793,43 @@ void sub_153CC(s32 arg0, s16* arg1, u16* arg2)
         PlayRumble(7);
         return;
     case 14:
-        if ((gCurrentPinballGame->unk13 > 2) && (gCurrentPinballGame->unk13 != 5))
+        if ((gCurrentPinballGame->boardState > 2) && (gCurrentPinballGame->boardState != 5))
         {
-            if (gCurrentPinballGame->unk2E0 == 0)
+            if (gCurrentPinballGame->eggCaveExitDelayTimer == 0)
             {
-                if (gCurrentPinballGame->unk2DA == 2)
+                if (gCurrentPinballGame->eggCaveState == 2)
                 {
-                    gCurrentPinballGame->unk23 = 0;
-                    gCurrentPinballGame->unk22 = 2;
+                    gCurrentPinballGame->collisionSurfaceType = 0;
+                    gCurrentPinballGame->collisionResponseType = 2;
                     *arg2 = 0xC800;
                     *arg1 = 1;
-                    gCurrentPinballGame->unk2DA++;
+                    gCurrentPinballGame->eggCaveState++;
 
                     m4aSongNumStart(SE_UNKNOWN_0xB7);
                     gCurrentPinballGame->scoreAddedInFrame = 5000;
                     PlayRumble(7);
                     return;
                 }
-                else if (gCurrentPinballGame->unk2DA == 3)
+                else if (gCurrentPinballGame->eggCaveState == 3)
                 {
-                    gCurrentPinballGame->unk23 = 0;
-                    gCurrentPinballGame->unk22 = 2;
+                    gCurrentPinballGame->collisionSurfaceType = 0;
+                    gCurrentPinballGame->collisionResponseType = 2;
                     *arg2 = 0xC800;
                     *arg1 = 1;
 
                     m4aSongNumStart(SE_UNKNOWN_0xB7);
-                    gCurrentPinballGame->unk2D9 = 1;
+                    gCurrentPinballGame->eggCaveReEntryFlag = 1;
                     PlayRumble(7);
                     return;
                 }
             }
         }
-        else if (gCurrentPinballGame->unk2D8 != 0 && gCurrentPinballGame->unk2DA == 2)
+        else if (gCurrentPinballGame->cyndaquilCollisionEnabled != 0 && gCurrentPinballGame->eggCaveState == 2)
         {
-            gCurrentPinballGame->unk2DA++;
-            gCurrentPinballGame->unk2D8 = 0;
-            gCurrentPinballGame->unk23 = 0;
-            gCurrentPinballGame->unk22 = 2;
+            gCurrentPinballGame->eggCaveState++;
+            gCurrentPinballGame->cyndaquilCollisionEnabled = 0;
+            gCurrentPinballGame->collisionSurfaceType = 0;
+            gCurrentPinballGame->collisionResponseType = 2;
             *arg2 = 0xC800;
             *arg1 = 1;
 
@@ -849,29 +849,29 @@ s16 COLLISION_CHECK_SAPPHIRE_16090(struct Vector16 *arg0, u16* arg1) {
     u16 sp00;
     u8 sp02;
     u16 return_val;
-    s16 unk0;
-    s32 unk1;
-    s32 unk2;
+    s16 collisionTileIndex;
+    s32 tileMapPage;
+    s32 boardLayer;
 
     u32 some_enum;
     u8 switch_enum;
 
     return_val = 0;
-    gCurrentPinballGame->ball->unk4 = 0;
+    gCurrentPinballGame->ball->spinAcceleration = 0;
 
     vec1.x = arg0->x / 8;
     vec1.y = arg0->y / 8;
     vec2.x = arg0->x % 8;
     vec2.y = arg0->y % 8;
-    unk1 = vec1.y / 64;
-    unk2 = gCurrentPinballGame->unk24;
+    tileMapPage = vec1.y / 64;
+    boardLayer = gCurrentPinballGame->boardLayerDepth;
     vec1.y %= 64;
 
-    unk0 = gUnknown_02031520.unk14.unk38[unk2 + unk1][vec1.y * 64 + vec1.x];
-    sp00 = gUnknown_02031520.unk14.unk48[unk2 + unk1][unk0 * 64 + vec2.y * 8 + vec2.x];
-    sp02 = gUnknown_02031520.unk14.unk58[unk2 + unk1][unk0 * 64 + vec2.y * 8 + vec2.x];
+    collisionTileIndex = gBoardConfig.fieldLayout.collisionTileMap[boardLayer + tileMapPage][vec1.y * 64 + vec1.x];
+    sp00 = gBoardConfig.fieldLayout.collisionAngleMap[boardLayer + tileMapPage][collisionTileIndex * 64 + vec2.y * 8 + vec2.x];
+    sp02 = gBoardConfig.fieldLayout.collisionTypeMap[boardLayer + tileMapPage][collisionTileIndex * 64 + vec2.y * 8 + vec2.x];
 
-    sub_162B8(arg0, &sp00, &sp02);
+    CheckSapphireBumperCollision(arg0, &sp00, &sp02);
 
     switch_enum = sp02 & 0xF;
     some_enum = sp02 >> 4;
@@ -880,20 +880,20 @@ s16 COLLISION_CHECK_SAPPHIRE_16090(struct Vector16 *arg0, u16* arg1) {
     {
     case 1:
     case 4:
-        gCurrentPinballGame->unk23 = switch_enum - 1;
-        gCurrentPinballGame->unk22 = 1;
+        gCurrentPinballGame->collisionSurfaceType = switch_enum - 1;
+        gCurrentPinballGame->collisionResponseType = 1;
         *arg1 = sp00;
         if (*arg1 >= 0x3FF0 && *arg1 <= 0x4010)
         {
-            if (gCurrentPinballGame->ball->positionQ0.x < gUnknown_02031520.unk14.unk26 - 8 ||
-                gCurrentPinballGame->ball->positionQ0.y < gUnknown_02031520.unk14.unk28 - 8)
+            if (gCurrentPinballGame->ball->positionQ0.x < gBoardConfig.fieldLayout.ballSpawnX - 8 ||
+                gCurrentPinballGame->ball->positionQ0.y < gBoardConfig.fieldLayout.ballSpawnY - 8)
             {
 
-                if (gCurrentPinballGame->ball->unk6 > 0)
+                if (gCurrentPinballGame->ball->spinSpeed > 0)
                 {
                     *arg1 = 0x3E00;
                 }
-                else if (gCurrentPinballGame->ball->unk6 != 0)
+                else if (gCurrentPinballGame->ball->spinSpeed != 0)
                 {
                     *arg1 = 0x4100;
                 }
@@ -901,14 +901,14 @@ s16 COLLISION_CHECK_SAPPHIRE_16090(struct Vector16 *arg0, u16* arg1) {
                 {
                     if (gMain.systemFrameCount & 1)
                     {
-                        gCurrentPinballGame->ball->unk4 = 0x28;
-                        gCurrentPinballGame->ball->unk6 = 1;
+                        gCurrentPinballGame->ball->spinAcceleration = 0x28;
+                        gCurrentPinballGame->ball->spinSpeed = 1;
                         *arg1 = 0x3E00;
                     }
                     else
                     {
-                        gCurrentPinballGame->ball->unk4 = 0xFFD8;
-                        gCurrentPinballGame->ball->unk6 = 0xFFFF;
+                        gCurrentPinballGame->ball->spinAcceleration = 0xFFD8;
+                        gCurrentPinballGame->ball->spinSpeed = 0xFFFF;
                         *arg1 = 0x4100;
                     }
                 }
@@ -919,18 +919,18 @@ s16 COLLISION_CHECK_SAPPHIRE_16090(struct Vector16 *arg0, u16* arg1) {
         break;
     case 3:
     case 2:
-        gCurrentPinballGame->unk23 = switch_enum - 1;
-        gCurrentPinballGame->unk22 = 2;
+        gCurrentPinballGame->collisionSurfaceType = switch_enum - 1;
+        gCurrentPinballGame->collisionResponseType = 2;
         *arg1 = sp00 & 0x0000FFF0;
         return_val = 1;
         break;
     }
 
-    sub_1642C((s32) some_enum, &return_val, arg1);
+    ProcessSapphireCollisionEvent((s32) some_enum, &return_val, arg1);
     return return_val;
 }
 
-void sub_162B8(struct Vector16 *arg0, s16 *arg1, u8 *arg2) {
+void CheckSapphireBumperCollision(struct Vector16 *arg0, s16 *arg1, u8 *arg2) {
 
     s16 deltaX;
     s16 deltaY;
@@ -938,9 +938,9 @@ void sub_162B8(struct Vector16 *arg0, s16 *arg1, u8 *arg2) {
     u8 lowerNibble = 0;
     s32 ix = 0;
 
-    if (gCurrentPinballGame->unk5B2 == 0)
+    if (gCurrentPinballGame->ballInLowerHalf == 0)
     {
-        if (gCurrentPinballGame->unk24 != 0)
+        if (gCurrentPinballGame->boardLayerDepth != 0)
             return;
 
         deltaX = arg0->x + gCurrentPinballGame->rubyBumperCollisionPosition[0].x;
@@ -948,8 +948,8 @@ void sub_162B8(struct Vector16 *arg0, s16 *arg1, u8 *arg2) {
 
         if (deltaX <= 63U && deltaY <= 63U)
         {
-            maskedResult = 0xFFF0 & gUnknown_08252B10[(deltaY * 64) + deltaX];
-            lowerNibble = 0xF & gUnknown_08252B10[(deltaY * 64) + deltaX];
+            maskedResult = 0xFFF0 & gSharedBumperCollisionMap[(deltaY * 64) + deltaX];
+            lowerNibble = 0xF & gSharedBumperCollisionMap[(deltaY * 64) + deltaX];
             ix = 0;
         }
          if (lowerNibble == 0)
@@ -959,8 +959,8 @@ void sub_162B8(struct Vector16 *arg0, s16 *arg1, u8 *arg2) {
 
             if (deltaX <= 63U && deltaY <= 63U)
             {
-                maskedResult = 0xFFF0 & gUnknown_08252B10[(deltaY * 64) + deltaX];
-                lowerNibble = 0xF & gUnknown_08252B10[(deltaY * 64) + deltaX];
+                maskedResult = 0xFFF0 & gSharedBumperCollisionMap[(deltaY * 64) + deltaX];
+                lowerNibble = 0xF & gSharedBumperCollisionMap[(deltaY * 64) + deltaX];
                 ix = 1;
             }
 
@@ -971,8 +971,8 @@ void sub_162B8(struct Vector16 *arg0, s16 *arg1, u8 *arg2) {
 
                 if (deltaX <= 63U && deltaY <= 63U)
                 {
-                    maskedResult = 0xFFF0 & gUnknown_08252B10[(deltaY * 64) + deltaX];
-                    lowerNibble = 0xF & gUnknown_08252B10[(deltaY * 64) + deltaX];
+                    maskedResult = 0xFFF0 & gSharedBumperCollisionMap[(deltaY * 64) + deltaX];
+                    lowerNibble = 0xF & gSharedBumperCollisionMap[(deltaY * 64) + deltaX];
                     ix = 2;
                 }
 
@@ -980,7 +980,7 @@ void sub_162B8(struct Vector16 *arg0, s16 *arg1, u8 *arg2) {
                     return;
             }
         }
-        gCurrentPinballGame->unk170[ix] = 6;
+        gCurrentPinballGame->pondBumperStates[ix] = 6;
 
         *arg1 = maskedResult;
         *arg2 = lowerNibble;
@@ -991,7 +991,7 @@ void sub_162B8(struct Vector16 *arg0, s16 *arg1, u8 *arg2) {
 }
 
 
-void sub_1642C(u8 arg0, u16* arg1, u16* arg2)
+void ProcessSapphireCollisionEvent(u8 arg0, u16* arg1, u16* arg2)
 {
     s16 absVelY;
     s16 x0Position;
@@ -1003,103 +1003,103 @@ void sub_1642C(u8 arg0, u16* arg1, u16* arg2)
     switch (arg0)
     {
     case 1:
-        if (gCurrentPinballGame->unk26 == 0)
+        if (gCurrentPinballGame->collisionCooldownTimer == 0)
         {
             if (gCurrentPinballGame->ball->positionQ1.x >= 200)
-                gCurrentPinballGame->unk25 = 1;
+                gCurrentPinballGame->ballCatchState = 1;
             else
-                gCurrentPinballGame->unk25 = 3;
+                gCurrentPinballGame->ballCatchState = 3;
 
-            sub_32914();
-            gCurrentPinballGame->unk22 = 7;
+            DispatchSapphireCatchModeInit();
+            gCurrentPinballGame->collisionResponseType = 7;
             *arg1 = 1;
         }
         break;
     case 2:
-        if (gCurrentPinballGame->unk24 == 0)
+        if (gCurrentPinballGame->boardLayerDepth == 0)
         {
             gCurrentPinballGame->ball->oamPriority = 2;
-            gCurrentPinballGame->unk24 = 2;
+            gCurrentPinballGame->boardLayerDepth = 2;
         }
-        else if (gCurrentPinballGame->unk24 == 2)
+        else if (gCurrentPinballGame->boardLayerDepth == 2)
         {
             gCurrentPinballGame->ball->oamPriority = 2;
-            gCurrentPinballGame->unk24 = 3;
+            gCurrentPinballGame->boardLayerDepth = 3;
         }
-        else if (gCurrentPinballGame->unk24 == 3)
+        else if (gCurrentPinballGame->boardLayerDepth == 3)
         {
             gCurrentPinballGame->ball->oamPriority = 1;
         }
         break;
     case 3:
-        if (gCurrentPinballGame->unk24 == 2)
+        if (gCurrentPinballGame->boardLayerDepth == 2)
         {
             gCurrentPinballGame->ball->oamPriority = 3;
-            gCurrentPinballGame->unk24 = 0;
+            gCurrentPinballGame->boardLayerDepth = 0;
         }
-        else if (gCurrentPinballGame->unk24 == 3)
+        else if (gCurrentPinballGame->boardLayerDepth == 3)
         {
             gCurrentPinballGame->ball->oamPriority = 2;
-            gCurrentPinballGame->unk24 = 2;
+            gCurrentPinballGame->boardLayerDepth = 2;
         }
         break;
     case 4:
-        if (gCurrentPinballGame->unk600 == 0)
+        if (gCurrentPinballGame->mainBoardCountdownTimer == 0)
         {
             if (gCurrentPinballGame->ball->positionQ0.y < 260)
             {
                 if (gCurrentPinballGame->ball->positionQ0.x < 74)
                 {
-                    if (gCurrentPinballGame->unk13 < 3 && gCurrentPinballGame->unk36A[1] < 3)
+                    if (gCurrentPinballGame->boardState < 3 && gCurrentPinballGame->sapphireBumperState[1] < 3)
                     {
-                        if (gCurrentPinballGame->unk36A[1] == 1)
-                            gCurrentPinballGame->unk36C[1] = 6;
+                        if (gCurrentPinballGame->sapphireBumperState[1] == 1)
+                            gCurrentPinballGame->sapphireBumperAnimKeyframe[1] = 6;
                         else
-                            gCurrentPinballGame->unk36C[1] = 4;
+                            gCurrentPinballGame->sapphireBumperAnimKeyframe[1] = 4;
 
-                        gCurrentPinballGame->unk36E[1] = 0;
-                        gCurrentPinballGame->unk36A[1] = 1;
+                        gCurrentPinballGame->sapphireBumperAnimSubTimer[1] = 0;
+                        gCurrentPinballGame->sapphireBumperState[1] = 1;
                         PlayRumble(7);
 
                         gCurrentPinballGame->ball->velocity.x /= 2;
                         gCurrentPinballGame->ball->velocity.y /= 2;
 
-                        memcpy(&gCurrentPinballGame->unk1334[1], &gCurrentPinballGame->unk1334[0], sizeof(*gCurrentPinballGame->unk1334));
+                        memcpy(&gCurrentPinballGame->ballStates[1], &gCurrentPinballGame->ballStates[0], sizeof(*gCurrentPinballGame->ballStates));
 
-                        gCurrentPinballGame->unk1330 = &gCurrentPinballGame->unk1334[1];
-                        gCurrentPinballGame->unk1328 = 25;
+                        gCurrentPinballGame->secondaryBall = &gCurrentPinballGame->ballStates[1];
+                        gCurrentPinballGame->ballLaunchTimer = 25;
                     }
                 }
                 else if (gCurrentPinballGame->ball->positionQ0.x < 116)
                 {
-                    if (gCurrentPinballGame->unk13 < 3 && gCurrentPinballGame->unk36A[0] < 3)
+                    if (gCurrentPinballGame->boardState < 3 && gCurrentPinballGame->sapphireBumperState[0] < 3)
                     {
-                        if (gCurrentPinballGame->unk36A[0] == 1)
-                            gCurrentPinballGame->unk36C[0] = 6;
+                        if (gCurrentPinballGame->sapphireBumperState[0] == 1)
+                            gCurrentPinballGame->sapphireBumperAnimKeyframe[0] = 6;
                         else
-                            gCurrentPinballGame->unk36C[0] = 4;
+                            gCurrentPinballGame->sapphireBumperAnimKeyframe[0] = 4;
 
-                        gCurrentPinballGame->unk36E[0] = 0;
-                        gCurrentPinballGame->unk36A[0] = 1;
+                        gCurrentPinballGame->sapphireBumperAnimSubTimer[0] = 0;
+                        gCurrentPinballGame->sapphireBumperState[0] = 1;
 
                         PlayRumble(7);
 
                         gCurrentPinballGame->ball->velocity.x /= 2;
                         gCurrentPinballGame->ball->velocity.y /= 2;
 
-                        memcpy(&gCurrentPinballGame->unk1334[1], &gCurrentPinballGame->unk1334[0], sizeof(*gCurrentPinballGame->unk1334));
+                        memcpy(&gCurrentPinballGame->ballStates[1], &gCurrentPinballGame->ballStates[0], sizeof(*gCurrentPinballGame->ballStates));
 
-                        gCurrentPinballGame->unk1330 = &gCurrentPinballGame->unk1334[1];
-                        gCurrentPinballGame->unk1328 = 25;
+                        gCurrentPinballGame->secondaryBall = &gCurrentPinballGame->ballStates[1];
+                        gCurrentPinballGame->ballLaunchTimer = 25;
                     }
                 }
                 else
                 {
-                    gCurrentPinballGame->unk30C = 1800;
-                    gCurrentPinballGame->unk306 = 1;
+                    gCurrentPinballGame->pelliperFrameTimer = 1800;
+                    gCurrentPinballGame->pelliperState = 1;
 
-                    if (gCurrentPinballGame->unk70E < 99)
-                        gCurrentPinballGame->unk70E++;
+                    if (gCurrentPinballGame->progressLevel < 99)
+                        gCurrentPinballGame->progressLevel++;
 
                     gCurrentPinballGame->scoreAddedInFrame = 5000;
                 }
@@ -1108,30 +1108,30 @@ void sub_1642C(u8 arg0, u16* arg1, u16* arg2)
             {
                 if (gCurrentPinballGame->ball->positionQ0.x < 110)
                 {
-                    gCurrentPinballGame->unk328 = 1;
+                    gCurrentPinballGame->seedotCollisionTrigger = 1;
                     gCurrentPinballGame->ball->velocity.y /= 2;
                 }
                 else
                 {
-                    if (gCurrentPinballGame->unk378 == 0)
-                        gCurrentPinballGame->unk378 = 1;
+                    if (gCurrentPinballGame->zigzagoonState == 0)
+                        gCurrentPinballGame->zigzagoonState = 1;
                     else
-                        gCurrentPinballGame->unk378 = 0;
+                        gCurrentPinballGame->zigzagoonState = 0;
 
                     gCurrentPinballGame->ball->velocity.y /=2;
                     gCurrentPinballGame->scoreAddedInFrame = 3000;
                 }
             }
 
-            gCurrentPinballGame->unk600 = 45;
+            gCurrentPinballGame->mainBoardCountdownTimer = 45;
             m4aSongNumStart(SE_TRIGGER_BUTTON_HIT);
         }
         break;
     case 5:
-        gCurrentPinballGame->unk165 = 1;
-        gCurrentPinballGame->unk20 = 1;
-        gCurrentPinballGame->unk732 = 0;
-        gCurrentPinballGame->unk342 = 0;
+        gCurrentPinballGame->sapphireEntityCollisionFlag = 1;
+        gCurrentPinballGame->ballInLaunchChute = 1;
+        gCurrentPinballGame->ballCollisionZone = 0;
+        gCurrentPinballGame->sapphireDiverterActive = 0;
         break;
     case 6:
         if (gCurrentPinballGame->ball->positionQ0.x < 120)
@@ -1149,75 +1149,75 @@ void sub_1642C(u8 arg0, u16* arg1, u16* arg2)
             }
         }
         else
-            gCurrentPinballGame->unk342 = 1;
+            gCurrentPinballGame->sapphireDiverterActive = 1;
         break;
     case 7:
-        if (gCurrentPinballGame->unk366 != 3)
+        if (gCurrentPinballGame->shopShockWallAnimState != 3)
         {
-            gCurrentPinballGame->unk368 = 17;
-            gCurrentPinballGame->unk23 = 0;
-            gCurrentPinballGame->unk22 = 2;
+            gCurrentPinballGame->shopBumperHitTimer = 17;
+            gCurrentPinballGame->collisionSurfaceType = 0;
+            gCurrentPinballGame->collisionResponseType = 2;
             *arg2 = 0xD800;
             *arg1 = 1;
         }
         break;
     case 8:
         x0Position = gCurrentPinballGame->ball->positionQ0.x;
-        if (gCurrentPinballGame->unk24 > 0)
+        if (gCurrentPinballGame->boardLayerDepth > 0)
         {
-            if (gCurrentPinballGame->unk732 == 7)
+            if (gCurrentPinballGame->ballCollisionZone == 7)
             {
-                gCurrentPinballGame->unk194 = 10;
-                if (gCurrentPinballGame->unk72B < 3)
+                gCurrentPinballGame->coinRewardAmount = 10;
+                if (gCurrentPinballGame->coinRewardLevel < 3)
                 {
-                    if (gCurrentPinballGame->unk72B == 0)
+                    if (gCurrentPinballGame->coinRewardLevel == 0)
                     {
                         gCurrentPinballGame->scoreAddedInFrame = 2000;
-                        gCurrentPinballGame->unk194 = 1;
+                        gCurrentPinballGame->coinRewardAmount = 1;
                     }
-                    else if (gCurrentPinballGame->unk72B == 1)
+                    else if (gCurrentPinballGame->coinRewardLevel == 1)
                     {
                         gCurrentPinballGame->scoreAddedInFrame = 5000;
-                        gCurrentPinballGame->unk194 = 5;
+                        gCurrentPinballGame->coinRewardAmount = 5;
                     }
                     else
                     {
                         gCurrentPinballGame->scoreAddedInFrame = 10000;
-                        gCurrentPinballGame->unk194 = 10;
+                        gCurrentPinballGame->coinRewardAmount = 10;
                     }
 
-                    gCurrentPinballGame->unk72B++;
+                    gCurrentPinballGame->coinRewardLevel++;
                 }
 
-                gCurrentPinballGame->unk196 = 0;
-                gCurrentPinballGame->unk72C = 0;
+                gCurrentPinballGame->coinRewardTimer = 0;
+                gCurrentPinballGame->coinRewardLevelTimer = 0;
             }
 
-            gCurrentPinballGame->unk732 = 1;
+            gCurrentPinballGame->ballCollisionZone = 1;
         }
         else
         {
             if (x0Position <= 72)
             {
-                if (gCurrentPinballGame->unk732 == 8)
+                if (gCurrentPinballGame->ballCollisionZone == 8)
                 {
-                    if (gCurrentPinballGame->unk13 < 3 && gCurrentPinballGame->unk72E < 3)
+                    if (gCurrentPinballGame->boardState < 3 && gCurrentPinballGame->evoArrowProgress < 3)
                     {
-                        if (gCurrentPinballGame->unk72E == 0)
+                        if (gCurrentPinballGame->evoArrowProgress == 0)
                             gCurrentPinballGame->scoreAddedInFrame = 2000;
-                        else if (gCurrentPinballGame->unk72E == 1)
+                        else if (gCurrentPinballGame->evoArrowProgress == 1)
                             gCurrentPinballGame->scoreAddedInFrame = 5000;
                         else
                             gCurrentPinballGame->scoreAddedInFrame = 10000;
                         
-                        gCurrentPinballGame->unk72E++;
+                        gCurrentPinballGame->evoArrowProgress++;
                         m4aSongNumStart(SE_UNKNOWN_0x99);
                     }
 
-                    gCurrentPinballGame->unk6BC = 1;
+                    gCurrentPinballGame->travelRouletteSlotHitType = 1;
                 }
 
-                gCurrentPinballGame->unk732 = 2;
+                gCurrentPinballGame->ballCollisionZone = 2;
             }
             else if (x0Position <= 98)
             {
@@ -1225,12 +1225,12 @@ void sub_1642C(u8 arg0, u16* arg1, u16* arg2)
                     gCurrentPinballGame->scoreAddedInFrame = 1000;
                 
                 gCurrentPinballGame->ballPowerUpLight[0] = 1;
-                gCurrentPinballGame->unk732 = 3;
+                gCurrentPinballGame->ballCollisionZone = 3;
 
-                if (gCurrentPinballGame->unk71B == 0 && (gCurrentPinballGame->ballPowerUpLight[1] & gCurrentPinballGame->ballPowerUpLight[2]))
+                if (gCurrentPinballGame->ballPowerUpAnimActive == 0 && (gCurrentPinballGame->ballPowerUpLight[1] & gCurrentPinballGame->ballPowerUpLight[2]))
                 {
-                    gCurrentPinballGame->unk71B = 1;
-                    gCurrentPinballGame->unk71C = 60;
+                    gCurrentPinballGame->ballPowerUpAnimActive = 1;
+                    gCurrentPinballGame->ballShadowTimer = 60;
                     gCurrentPinballGame->scoreAddedInFrame = 4000;
                 }
             }
@@ -1240,12 +1240,12 @@ void sub_1642C(u8 arg0, u16* arg1, u16* arg2)
                     gCurrentPinballGame->scoreAddedInFrame = 1000;
                 
                 gCurrentPinballGame->ballPowerUpLight[1] = 1;
-                gCurrentPinballGame->unk732 = 4;
+                gCurrentPinballGame->ballCollisionZone = 4;
 
-                if (gCurrentPinballGame->unk71B == 0 && (gCurrentPinballGame->ballPowerUpLight[0] & gCurrentPinballGame->ballPowerUpLight[2]))
+                if (gCurrentPinballGame->ballPowerUpAnimActive == 0 && (gCurrentPinballGame->ballPowerUpLight[0] & gCurrentPinballGame->ballPowerUpLight[2]))
                 {
-                    gCurrentPinballGame->unk71B = 1;
-                    gCurrentPinballGame->unk71C = 60;
+                    gCurrentPinballGame->ballPowerUpAnimActive = 1;
+                    gCurrentPinballGame->ballShadowTimer = 60;
                     gCurrentPinballGame->scoreAddedInFrame = 4000;
                 }
             }
@@ -1255,189 +1255,189 @@ void sub_1642C(u8 arg0, u16* arg1, u16* arg2)
                     gCurrentPinballGame->scoreAddedInFrame = 1000;
                 
                 gCurrentPinballGame->ballPowerUpLight[2] = 1;
-                gCurrentPinballGame->unk732 = 5;
+                gCurrentPinballGame->ballCollisionZone = 5;
 
-                if (gCurrentPinballGame->unk71B == 0 && (gCurrentPinballGame->ballPowerUpLight[0] & gCurrentPinballGame->ballPowerUpLight[1]))
+                if (gCurrentPinballGame->ballPowerUpAnimActive == 0 && (gCurrentPinballGame->ballPowerUpLight[0] & gCurrentPinballGame->ballPowerUpLight[1]))
                 {
-                    gCurrentPinballGame->unk71B = 1;
-                    gCurrentPinballGame->unk71C = 60;
+                    gCurrentPinballGame->ballPowerUpAnimActive = 1;
+                    gCurrentPinballGame->ballShadowTimer = 60;
                     gCurrentPinballGame->scoreAddedInFrame = 4000;
                 }
             }
             else
             {
-                if (gCurrentPinballGame->unk732 == 9)
+                if (gCurrentPinballGame->ballCollisionZone == 9)
                 {
-                    if (gCurrentPinballGame->unk13 <= 2 && gCurrentPinballGame->unk72F < 3)
+                    if (gCurrentPinballGame->boardState <= 2 && gCurrentPinballGame->catchArrowProgress < 3)
                     {
-                        if (gCurrentPinballGame->unk72F == 0)
+                        if (gCurrentPinballGame->catchArrowProgress == 0)
                             gCurrentPinballGame->scoreAddedInFrame = 2000;
-                        else if (gCurrentPinballGame->unk72F == 1)
+                        else if (gCurrentPinballGame->catchArrowProgress == 1)
                             gCurrentPinballGame->scoreAddedInFrame = 5000;
                         else
                             gCurrentPinballGame->scoreAddedInFrame = 10000;
                         
-                        gCurrentPinballGame->unk72F++;
+                        gCurrentPinballGame->catchArrowProgress++;
 
-                        if (gCurrentPinballGame->unk1CA == 13)
+                        if (gCurrentPinballGame->catchCounterValue == 13)
                             m4aSongNumStart(SE_UNKNOWN_0x99);
 
-                        if (gCurrentPinballGame->unk72F > 1)
-                            gCurrentPinballGame->unk731 = 1;
+                        if (gCurrentPinballGame->catchArrowProgress > 1)
+                            gCurrentPinballGame->catchProgressFlashing = 1;
                     }
 
-                    gCurrentPinballGame->unk6BC = 2;
+                    gCurrentPinballGame->travelRouletteSlotHitType = 2;
                 }
 
-                gCurrentPinballGame->unk732 = 6;
+                gCurrentPinballGame->ballCollisionZone = 6;
             }
         }
         break;
     case 9:
         x0Position = gCurrentPinballGame->ball->positionQ0.x;
-        if (gCurrentPinballGame->unk24 > 0)
-            gCurrentPinballGame->unk732 = 7;
+        if (gCurrentPinballGame->boardLayerDepth > 0)
+            gCurrentPinballGame->ballCollisionZone = 7;
         else if (x0Position <= 50)
-            gCurrentPinballGame->unk732 = 8;
+            gCurrentPinballGame->ballCollisionZone = 8;
         else
-            gCurrentPinballGame->unk732 = 9;
+            gCurrentPinballGame->ballCollisionZone = 9;
         break;
     case 10:
         if (gCurrentPinballGame->ball->positionQ0.x <= 46)
         {
-            gCurrentPinballGame->unk732 = 10;
+            gCurrentPinballGame->ballCollisionZone = 10;
             if (gCurrentPinballGame->holeIndicators[0] == 0)
             {
                 gCurrentPinballGame->scoreAddedInFrame = 1000;
                 gCurrentPinballGame->holeIndicators[0] = 1;
-                if (gCurrentPinballGame->unk714 == 0 && (
+                if (gCurrentPinballGame->allHolesLit == 0 && (
                     gCurrentPinballGame->holeIndicators[1] &
                     gCurrentPinballGame->holeIndicators[2] &
                     gCurrentPinballGame->holeIndicators[3]))
                 {
-                    gCurrentPinballGame->unk714 = 1;
-                    gCurrentPinballGame->unk715 = 126;
+                    gCurrentPinballGame->allHolesLit = 1;
+                    gCurrentPinballGame->allHolesLitBlinkTimer = 126;
                     gCurrentPinballGame->scoreAddedInFrame = 4000;
                 }
             }
         }
         else if (gCurrentPinballGame->ball->positionQ0.x <= 120)
         {
-            gCurrentPinballGame->unk732 = 11;
+            gCurrentPinballGame->ballCollisionZone = 11;
 
             if (gCurrentPinballGame->holeIndicators[1] == 0)
             {
                 gCurrentPinballGame->scoreAddedInFrame = 1000;
                 gCurrentPinballGame->holeIndicators[1] = 1; 
-                if (gCurrentPinballGame->unk714 == 0 && (
+                if (gCurrentPinballGame->allHolesLit == 0 && (
                     gCurrentPinballGame->holeIndicators[0] &
                     gCurrentPinballGame->holeIndicators[2] &
                     gCurrentPinballGame->holeIndicators[3]))
                 {
-                    gCurrentPinballGame->unk714 = 1;
-                    gCurrentPinballGame->unk715 = 126;
+                    gCurrentPinballGame->allHolesLit = 1;
+                    gCurrentPinballGame->allHolesLitBlinkTimer = 126;
                     gCurrentPinballGame->scoreAddedInFrame = 4000;
                 }
             }
         }
         else if (gCurrentPinballGame->ball->positionQ0.x <= 193)
         {
-            gCurrentPinballGame->unk732 = 12;
+            gCurrentPinballGame->ballCollisionZone = 12;
             if (gCurrentPinballGame->holeIndicators[2] == 0)
             {
                 gCurrentPinballGame->scoreAddedInFrame = 1000;
                 gCurrentPinballGame->holeIndicators[2] = 1;
 
-                if (gCurrentPinballGame->unk714 == 0 && (
+                if (gCurrentPinballGame->allHolesLit == 0 && (
                     gCurrentPinballGame->holeIndicators[0] &
                     gCurrentPinballGame->holeIndicators[1] &
                     gCurrentPinballGame->holeIndicators[3]))
                 {
-                    gCurrentPinballGame->unk714 = 1;
-                    gCurrentPinballGame->unk715 = 126;
+                    gCurrentPinballGame->allHolesLit = 1;
+                    gCurrentPinballGame->allHolesLitBlinkTimer = 126;
                     gCurrentPinballGame->scoreAddedInFrame = 4000;
                 }
             }
         }
         else
         {
-            gCurrentPinballGame->unk732 = 13;
+            gCurrentPinballGame->ballCollisionZone = 13;
             if (gCurrentPinballGame->holeIndicators[3] == 0)
             {
                 gCurrentPinballGame->scoreAddedInFrame = 1000;
                 gCurrentPinballGame->holeIndicators[3] = 1;
-                if (gCurrentPinballGame->unk714 == 0 && (
+                if (gCurrentPinballGame->allHolesLit == 0 && (
                     gCurrentPinballGame->holeIndicators[0] &
                     gCurrentPinballGame->holeIndicators[1] &
                     gCurrentPinballGame->holeIndicators[2]))
                 {
-                    gCurrentPinballGame->unk714 = 1;
-                    gCurrentPinballGame->unk715 = 126;
+                    gCurrentPinballGame->allHolesLit = 1;
+                    gCurrentPinballGame->allHolesLitBlinkTimer = 126;
                     gCurrentPinballGame->scoreAddedInFrame = 4000;
                 }
             }
         }
         break;
     case 11:
-        if (gCurrentPinballGame->unk1C4 == 0)
+        if (gCurrentPinballGame->catchCounterBlinkState == 0)
         {
             if (gCurrentPinballGame->ball->positionQ0.x <= 120)
-                gCurrentPinballGame->unk1C2 = 1;
+                gCurrentPinballGame->outLaneSide = 1;
             else
-                gCurrentPinballGame->unk1C2 = 2;
+                gCurrentPinballGame->outLaneSide = 2;
 
             if (gCurrentPinballGame->outLanePikaPosition < 2)
             {
-                if (gCurrentPinballGame->outLanePikaPosition == gCurrentPinballGame->unk1C2 - 1)
-                    gCurrentPinballGame->unk1C4 = 120;
+                if (gCurrentPinballGame->outLanePikaPosition == gCurrentPinballGame->outLaneSide - 1)
+                    gCurrentPinballGame->catchCounterBlinkState = 120;
             }
             else
             {
-                gCurrentPinballGame->unk1C4 = 120;
+                gCurrentPinballGame->catchCounterBlinkState = 120;
             }
         }
         break;
     case 12:
-        if (gCurrentPinballGame->unk616 == 0)
+        if (gCurrentPinballGame->pikaSpinCooldownTimer == 0)
         {
             absVelY = gCurrentPinballGame->ball->velocity.y;
-            gCurrentPinballGame->unk614 = absVelY;
+            gCurrentPinballGame->pikaSpinMomentum = absVelY;
             if (absVelY < 0)
                 absVelY = -absVelY;
 
-            gCurrentPinballGame->unk1C6 = gCurrentPinballGame->unk1C6 + (absVelY / 3);
-            if (gCurrentPinballGame->unk1C6 > 168)
-                gCurrentPinballGame->unk1C6 = 168;
+            gCurrentPinballGame->pikaChargeTarget = gCurrentPinballGame->pikaChargeTarget + (absVelY / 3);
+            if (gCurrentPinballGame->pikaChargeTarget > 168)
+                gCurrentPinballGame->pikaChargeTarget = 168;
 
-            gCurrentPinballGame->unk616 = 20;
+            gCurrentPinballGame->pikaSpinCooldownTimer = 20;
         }
         break;
     case 13:
-        if (gCurrentPinballGame->unk732 != 14)
+        if (gCurrentPinballGame->ballCollisionZone != 14)
         {
-            gCurrentPinballGame->unk732 = 14;
-            index = gUnknown_086ACE70[gCurrentPinballGame->unk34A];
-            gCurrentPinballGame->unk34B[index] = 10;
-            gCurrentPinballGame->unk34A++;
-            if (gCurrentPinballGame->unk34A == 3)
+            gCurrentPinballGame->ballCollisionZone = 14;
+            index = gSapphireTargetBumperIndexMap[gCurrentPinballGame->targetBumperHitCounter];
+            gCurrentPinballGame->targetBumperAnimTimers[index] = 10;
+            gCurrentPinballGame->targetBumperHitCounter++;
+            if (gCurrentPinballGame->targetBumperHitCounter == 3)
             {
-                memcpy(&gCurrentPinballGame->unk1334[1], &gCurrentPinballGame->unk1334[0], sizeof(*gCurrentPinballGame->unk1334));
-                gCurrentPinballGame->unk1330 = &gCurrentPinballGame->unk1334[1];
-                if (gCurrentPinballGame->unk342)
-                    gCurrentPinballGame->unk344 = 1;
+                memcpy(&gCurrentPinballGame->ballStates[1], &gCurrentPinballGame->ballStates[0], sizeof(*gCurrentPinballGame->ballStates));
+                gCurrentPinballGame->secondaryBall = &gCurrentPinballGame->ballStates[1];
+                if (gCurrentPinballGame->sapphireDiverterActive)
+                    gCurrentPinballGame->holeLetterNewHit = 1;
             }
 
-            if (gCurrentPinballGame->unk34A == 11)
-                gCurrentPinballGame->unk1330 = gCurrentPinballGame->unk1334;
+            if (gCurrentPinballGame->targetBumperHitCounter == 11)
+                gCurrentPinballGame->secondaryBall = gCurrentPinballGame->ballStates;
 
-            modRes = (gCurrentPinballGame->unk34A - 1) % 4;
+            modRes = (gCurrentPinballGame->targetBumperHitCounter - 1) % 4;
             gMain.spriteGroups[modRes + 47].available = 1;
-            gCurrentPinballGame->unk355[modRes] = 0;
-            gCurrentPinballGame->unk35E[modRes] = 0;
-            gCurrentPinballGame->unk359[modRes] = gCurrentPinballGame->unk34A - 1;
+            gCurrentPinballGame->splashEffectFrameIndex[modRes] = 0;
+            gCurrentPinballGame->splashEffectFrameTimer[modRes] = 0;
+            gCurrentPinballGame->splashEffectPositionIndex[modRes] = gCurrentPinballGame->targetBumperHitCounter - 1;
 
-            if (gCurrentPinballGame->unk34A > 12)
-                gCurrentPinballGame->unk34A = 0;
+            if (gCurrentPinballGame->targetBumperHitCounter > 12)
+                gCurrentPinballGame->targetBumperHitCounter = 0;
 
             if (index == 0 && gCurrentPinballGame->ball->velocity.y > -120)
                 gCurrentPinballGame->ball->velocity.y = -120;
@@ -1447,18 +1447,18 @@ void sub_1642C(u8 arg0, u16* arg1, u16* arg2)
         }
         break;
     case 14:
-        if (gCurrentPinballGame->unk732 != 15)
+        if (gCurrentPinballGame->ballCollisionZone != 15)
         {
-            gCurrentPinballGame->unk732 = 15;
-            index = gUnknown_086ACE70[gCurrentPinballGame->unk34A];
-            gCurrentPinballGame->unk34B[index] = 10;
-            gCurrentPinballGame->unk34A++;
+            gCurrentPinballGame->ballCollisionZone = 15;
+            index = gSapphireTargetBumperIndexMap[gCurrentPinballGame->targetBumperHitCounter];
+            gCurrentPinballGame->targetBumperAnimTimers[index] = 10;
+            gCurrentPinballGame->targetBumperHitCounter++;
 
-            modRes = (gCurrentPinballGame->unk34A -1) % 4;
+            modRes = (gCurrentPinballGame->targetBumperHitCounter -1) % 4;
             gMain.spriteGroups[modRes + 47].available = 1;
-            gCurrentPinballGame->unk355[modRes] = 0;
-            gCurrentPinballGame->unk35E[modRes] = 0;
-            gCurrentPinballGame->unk359[modRes] = gCurrentPinballGame->unk34A - 1;
+            gCurrentPinballGame->splashEffectFrameIndex[modRes] = 0;
+            gCurrentPinballGame->splashEffectFrameTimer[modRes] = 0;
+            gCurrentPinballGame->splashEffectPositionIndex[modRes] = gCurrentPinballGame->targetBumperHitCounter - 1;
             if (index == 1 && gCurrentPinballGame->ball->velocity.y > -150)
                 gCurrentPinballGame->ball->velocity.y = -150;
         }
@@ -1466,15 +1466,15 @@ void sub_1642C(u8 arg0, u16* arg1, u16* arg2)
     case 15:
         if (gCurrentPinballGame->ball->positionQ0.y < 80)
         {
-            if (gCurrentPinballGame->unk306 == 1)
-                gCurrentPinballGame->unk306 = 2;
+            if (gCurrentPinballGame->pelliperState == 1)
+                gCurrentPinballGame->pelliperState = 2;
         }
         else
         {
-            if (gCurrentPinballGame->unk306 == 2)
+            if (gCurrentPinballGame->pelliperState == 2)
             {
-                gCurrentPinballGame->unk306 = 3;
-                gCurrentPinballGame->unk30C = 0;
+                gCurrentPinballGame->pelliperState = 3;
+                gCurrentPinballGame->pelliperFrameTimer = 0;
             }
         }
 
@@ -1488,26 +1488,26 @@ s16 COLLISION_CHECK_DUSCLOPS_171C8(struct Vector16* arg0, u16* arg1) {
     u16 sp00;
     u8 sp02;
     u16 return_val;
-    s16 unk0;
-    s32 unk1;
-    s32 unk2;
+    s16 collisionTileIndex;
+    s32 tileMapPage;
+    s32 boardLayer;
 
     u32 some_enum;
     u32 switch_enum;
 
     return_val = 0;
-    gCurrentPinballGame->ball->unk4 = 0;
+    gCurrentPinballGame->ball->spinAcceleration = 0;
 
     vec1.x = arg0->x / 8;
     vec1.y = arg0->y / 8;
     vec2.x = arg0->x % 8;
     vec2.y = arg0->y % 8;
-    unk1 = vec1.y / 64;
-    unk2 = gCurrentPinballGame->unk24;
+    tileMapPage = vec1.y / 64;
+    boardLayer = gCurrentPinballGame->boardLayerDepth;
     vec1.y %= 64;
-    unk0 = gUnknown_02031520.unk14.unk38[unk2 + unk1][vec1.y * 64 + vec1.x];
-    sp00 = gUnknown_02031520.unk14.unk48[unk2 + unk1][unk0 * 64 + vec2.y * 8 + vec2.x];
-    sp02 = gUnknown_02031520.unk14.unk58[unk2 + unk1][unk0 * 64 + vec2.y * 8 + vec2.x];
+    collisionTileIndex = gBoardConfig.fieldLayout.collisionTileMap[boardLayer + tileMapPage][vec1.y * 64 + vec1.x];
+    sp00 = gBoardConfig.fieldLayout.collisionAngleMap[boardLayer + tileMapPage][collisionTileIndex * 64 + vec2.y * 8 + vec2.x];
+    sp02 = gBoardConfig.fieldLayout.collisionTypeMap[boardLayer + tileMapPage][collisionTileIndex * 64 + vec2.y * 8 + vec2.x];
 
     CheckDusclopsEntitiesCollision(arg0, &sp00, &sp02);
     switch_enum = sp02 & 0xF;
@@ -1518,20 +1518,20 @@ s16 COLLISION_CHECK_DUSCLOPS_171C8(struct Vector16* arg0, u16* arg1) {
     case 1:
     case 4:
     case 6:
-        gCurrentPinballGame->unk23 = switch_enum - 1;
-        gCurrentPinballGame->unk22 = 1;
+        gCurrentPinballGame->collisionSurfaceType = switch_enum - 1;
+        gCurrentPinballGame->collisionResponseType = 1;
         *arg1 = sp00;
         if (*arg1 >= 0x3FF0 && *arg1 <= 0x4010)
         {
-            if (gCurrentPinballGame->ball->positionQ0.x < gUnknown_02031520.unk14.unk26 - 8 ||
-                gCurrentPinballGame->ball->positionQ0.y < gUnknown_02031520.unk14.unk28 - 8)
+            if (gCurrentPinballGame->ball->positionQ0.x < gBoardConfig.fieldLayout.ballSpawnX - 8 ||
+                gCurrentPinballGame->ball->positionQ0.y < gBoardConfig.fieldLayout.ballSpawnY - 8)
             {
 
-                if (gCurrentPinballGame->ball->unk6 > 0)
+                if (gCurrentPinballGame->ball->spinSpeed > 0)
                 {
                     *arg1 = 0x3E00;
                 }
-                else if (gCurrentPinballGame->ball->unk6 != 0)
+                else if (gCurrentPinballGame->ball->spinSpeed != 0)
                 {
                     *arg1 = 0x4100;
                 }
@@ -1539,14 +1539,14 @@ s16 COLLISION_CHECK_DUSCLOPS_171C8(struct Vector16* arg0, u16* arg1) {
                 {
                     if (gMain.systemFrameCount & 1)
                     {
-                        gCurrentPinballGame->ball->unk4 = 0x28;
-                        gCurrentPinballGame->ball->unk6 = 1;
+                        gCurrentPinballGame->ball->spinAcceleration = 0x28;
+                        gCurrentPinballGame->ball->spinSpeed = 1;
                         *arg1 = 0x3E00;
                     }
                     else
                     {
-                        gCurrentPinballGame->ball->unk4 = 0xFFD8;
-                        gCurrentPinballGame->ball->unk6 = 0xFFFF;
+                        gCurrentPinballGame->ball->spinAcceleration = 0xFFD8;
+                        gCurrentPinballGame->ball->spinSpeed = 0xFFFF;
                         *arg1 = 0x4100;
                     }
                 }
@@ -1557,8 +1557,8 @@ s16 COLLISION_CHECK_DUSCLOPS_171C8(struct Vector16* arg0, u16* arg1) {
         break;
     case 2:
     case 3:
-        gCurrentPinballGame->unk23 = switch_enum - 1;
-        gCurrentPinballGame->unk22 = 2;
+        gCurrentPinballGame->collisionSurfaceType = switch_enum - 1;
+        gCurrentPinballGame->collisionResponseType = 2;
         *arg1 = sp00 & 0x0000FFF0;
         return_val = 1;
         break;
@@ -1586,26 +1586,26 @@ void CheckDusclopsEntitiesCollision(struct Vector16 *arg0, s16* arg1, u8* arg2) 
         if (*arg2 != 0)
             return;
 
-        deltaX = arg0->x -gCurrentPinballGame->unk3F0;
-        deltaY = arg0->y -gCurrentPinballGame->unk3F2;
+        deltaX = arg0->x -gCurrentPinballGame->bossCollisionX;
+        deltaY = arg0->y -gCurrentPinballGame->bossCollisionY;
 
         if (deltaX > 95U || deltaY > 119U)
             return;
 
-        maskedResult = 0xFFF0 & gUnknown_083071D4[(deltaY * 96 ) + deltaX];
-        lowerNibble = 0xF & gUnknown_083071D4[(deltaY * 96 ) + deltaX];
+        maskedResult = 0xFFF0 & gDusclopsBodyCollisionMap[(deltaY * 96 ) + deltaX];
+        lowerNibble = 0xF & gDusclopsBodyCollisionMap[(deltaY * 96 ) + deltaX];
 
         if (lowerNibble == 0)
             return;
 
         //Can be hit when ready to absorb (2) or when walking (3)
-        temp = gCurrentPinballGame->unk3DC -3;
+        temp = gCurrentPinballGame->bossEntityState -3;
         if (temp <= 1U)
             *arg2 = 1;
         else
             *arg2 = lowerNibble;
 
-        gCurrentPinballGame->unk3DC = DUSCLOPS_ENTITY_STATE_HIT;
+        gCurrentPinballGame->bossEntityState = DUSCLOPS_ENTITY_STATE_HIT;
         *arg1 = maskedResult;
 
         return;
@@ -1623,8 +1623,8 @@ void CheckDusclopsEntitiesCollision(struct Vector16 *arg0, s16* arg1, u8* arg2) 
 
             if (deltaX < 64U && deltaY < 64U)
             {
-                maskedResult = 0xFFF0 & gUnknown_08252B10[deltaY * 64 + deltaX];
-                lowerNibble = 0xF & gUnknown_08252B10[deltaY * 64 + deltaX];
+                maskedResult = 0xFFF0 & gSharedBumperCollisionMap[deltaY * 64 + deltaX];
+                lowerNibble = 0xF & gSharedBumperCollisionMap[deltaY * 64 + deltaX];
 
                 if (lowerNibble != 0)
                     gCurrentPinballGame->minionState[0] = DUSKULL_ENTITY_STATE_HIT;
@@ -1640,8 +1640,8 @@ void CheckDusclopsEntitiesCollision(struct Vector16 *arg0, s16* arg1, u8* arg2) 
 
                 if (deltaX < 64U && deltaY < 64U)
                 {
-                    maskedResult = 0xFFF0 & gUnknown_08252B10[deltaY * 64 + deltaX];
-                    lowerNibble = 0xF & gUnknown_08252B10[deltaY * 64 + deltaX];
+                    maskedResult = 0xFFF0 & gSharedBumperCollisionMap[deltaY * 64 + deltaX];
+                    lowerNibble = 0xF & gSharedBumperCollisionMap[deltaY * 64 + deltaX];
 
                     if (lowerNibble != 0)
                         gCurrentPinballGame->minionState[1] = DUSKULL_ENTITY_STATE_HIT;
@@ -1658,8 +1658,8 @@ void CheckDusclopsEntitiesCollision(struct Vector16 *arg0, s16* arg1, u8* arg2) 
 
                 if (deltaX < 64U && deltaY < 64U)
                 {
-                    maskedResult = 0xFFF0 & gUnknown_08252B10[deltaY * 64 + deltaX];
-                    lowerNibble = 0xF & gUnknown_08252B10[deltaY * 64 + deltaX];
+                    maskedResult = 0xFFF0 & gSharedBumperCollisionMap[deltaY * 64 + deltaX];
+                    lowerNibble = 0xF & gSharedBumperCollisionMap[deltaY * 64 + deltaX];
 
                     if (lowerNibble != 0)
                     {
@@ -1687,8 +1687,8 @@ void CheckDusclopsAbzorbZoneHit(u8 arg0, u16 *arg1, u16 *arg2)
     case 3:
         break;
     case 4:
-        gCurrentPinballGame->unk3DC = DUSCLOPS_ENTITY_STATE_HIT_ABSORB_ZONE;
-        gCurrentPinballGame->unk1F = 1;
+        gCurrentPinballGame->bossEntityState = DUSCLOPS_ENTITY_STATE_HIT_ABSORB_ZONE;
+        gCurrentPinballGame->ballFrozenState = 1;
         gCurrentPinballGame->boardEntityCollisionMode = DUSCLOPS_ENTITY_COLLISION_MODE_NONE;
         break;
     case 5:
@@ -1713,28 +1713,28 @@ s16 COLLISION_CHECK_KECLEON_176B0(struct Vector16 *arg0, u16 *arg1)
     u16 sp00;
     u8 sp02;
     u16 return_val;
-    s16 unk0;
-    s32 unk1;
-    s32 unk2;
+    s16 collisionTileIndex;
+    s32 tileMapPage;
+    s32 boardLayer;
 
     u32 some_enum;
     u32 switch_enum;
 
     return_val = 0;
-    gCurrentPinballGame->ball->unk4 = 0;
+    gCurrentPinballGame->ball->spinAcceleration = 0;
 
     vec1.x = arg0->x / 8;
     vec1.y = arg0->y / 8;
     vec2.x = arg0->x % 8;
     vec2.y = arg0->y % 8;
-    unk1 = vec1.y / 64;
-    unk2 = gCurrentPinballGame->unk24;
+    tileMapPage = vec1.y / 64;
+    boardLayer = gCurrentPinballGame->boardLayerDepth;
     vec1.y %= 64;
-    unk0 = gUnknown_02031520.unk14.unk38[unk2 + unk1][vec1.y * 64 + vec1.x];
-    sp00 = gUnknown_02031520.unk14.unk48[unk2 + unk1][unk0 * 64 + vec2.y * 8 + vec2.x];
-    sp02 = gUnknown_02031520.unk14.unk58[unk2 + unk1][unk0 * 64 + vec2.y * 8 + vec2.x];
+    collisionTileIndex = gBoardConfig.fieldLayout.collisionTileMap[boardLayer + tileMapPage][vec1.y * 64 + vec1.x];
+    sp00 = gBoardConfig.fieldLayout.collisionAngleMap[boardLayer + tileMapPage][collisionTileIndex * 64 + vec2.y * 8 + vec2.x];
+    sp02 = gBoardConfig.fieldLayout.collisionTypeMap[boardLayer + tileMapPage][collisionTileIndex * 64 + vec2.y * 8 + vec2.x];
 
-    sub_17898(arg0, &sp00, &sp02);
+    CheckKecleonEntityCollision(arg0, &sp00, &sp02);
     switch_enum = sp02 & 0xF;
     some_enum = sp02 >> 4;
 
@@ -1743,38 +1743,38 @@ s16 COLLISION_CHECK_KECLEON_176B0(struct Vector16 *arg0, u16 *arg1)
     case 1:
     case 4:
     case 6:
-        gCurrentPinballGame->unk23 = switch_enum - 1;
-        gCurrentPinballGame->unk22 = 1;
+        gCurrentPinballGame->collisionSurfaceType = switch_enum - 1;
+        gCurrentPinballGame->collisionResponseType = 1;
         *arg1 = sp00;
         return_val = 1;
         break;
     case 2:
     case 3:
-        gCurrentPinballGame->unk23 = 0;
-        gCurrentPinballGame->unk22 = 1;
+        gCurrentPinballGame->collisionSurfaceType = 0;
+        gCurrentPinballGame->collisionResponseType = 1;
         *arg1 = sp00 & 0x0000FFF0;
         return_val = 1;
-        if (gCurrentPinballGame->unk404 == 0)
+        if (gCurrentPinballGame->kecleonHitState == 0)
         {
-            s32 unk3 = gCurrentPinballGame->unk406;
-            if (unk3 == 0)
+            s32 kecleonActive = gCurrentPinballGame->kecleonTargetActive;
+            if (kecleonActive == 0)
             {
-                gCurrentPinballGame->unk404 = 1;
-                gCurrentPinballGame->unk40A = unk3;
+                gCurrentPinballGame->kecleonHitState = 1;
+                gCurrentPinballGame->kecleonCollisionX = kecleonActive;
             }
         }
-        gCurrentPinballGame->unk40C = 40;
+        gCurrentPinballGame->kecleonCollisionY = 40;
         break;
     case 5:
         some_enum = 4;
         break;
     }
 
-    sub_179D0(some_enum, &return_val, arg1);
+    ProcessKecleonCollisionEvent(some_enum, &return_val, arg1);
     return return_val;
 }
 
-void sub_17898(struct Vector16 *arg0, u16 *arg1, u8 *arg2)
+void CheckKecleonEntityCollision(struct Vector16 *arg0, u16 *arg1, u8 *arg2)
 {
     s16 deltaX;
     s16 deltaY;
@@ -1785,22 +1785,22 @@ void sub_17898(struct Vector16 *arg0, u16 *arg1, u8 *arg2)
         if (*arg2 & 0xF)
             return;
 
-        deltaX = arg0->x - gCurrentPinballGame->unk3F0;
-        deltaY = arg0->y - gCurrentPinballGame->unk3F2;
+        deltaX = arg0->x - gCurrentPinballGame->bossCollisionX;
+        deltaY = arg0->y - gCurrentPinballGame->bossCollisionY;
 
         if ((deltaX < 0 || deltaX > 0x3F) || (deltaY < 0 || deltaY > 0x57))
             return;
 
-        arrayValue = (u8)(gUnknown_0832D604[(deltaY * 0x40) + deltaX]) & 0xF;
+        arrayValue = (u8)(gKecleonTongueCollisionMap[(deltaY * 0x40) + deltaX]) & 0xF;
 
         if (arrayValue == 0)
             return;
-        if (gCurrentPinballGame->ball->unk0 != 0)
+        if (gCurrentPinballGame->ball->ballHidden != 0)
             return;
-        if (gCurrentPinballGame->unk3DC > 8)
+        if (gCurrentPinballGame->bossEntityState > 8)
             return;
 
-        gCurrentPinballGame->unk3DC = 9;
+        gCurrentPinballGame->bossEntityState = 9;
     }
     else if (gCurrentPinballGame->boardEntityCollisionMode == 2)
     {
@@ -1809,29 +1809,29 @@ void sub_17898(struct Vector16 *arg0, u16 *arg1, u8 *arg2)
         if (*arg2 & 0xF)
             return;
 
-        deltaX = arg0->x - gCurrentPinballGame->unk3F0;
-        deltaY = arg0->y - gCurrentPinballGame->unk3F2;
+        deltaX = arg0->x - gCurrentPinballGame->bossCollisionX;
+        deltaY = arg0->y - gCurrentPinballGame->bossCollisionY;
 
         if ((deltaX < 0 || deltaX > 0x57) || (deltaY < 0 || deltaY > 0x3F))
             return;
 
-        maskedResult = gUnknown_08330204[(deltaY * 0x58) + deltaX] & 0xFFF0;
-        arrayValue = gUnknown_08330204[(deltaY * 0x58) + deltaX] & 0xF;
+        maskedResult = gKecleonBodyCollisionMap[(deltaY * 0x58) + deltaX] & 0xFFF0;
+        arrayValue = gKecleonBodyCollisionMap[(deltaY * 0x58) + deltaX] & 0xF;
 
         if (arrayValue == 0)
             return;
-        if (gCurrentPinballGame->ball->unk0 != 0)
+        if (gCurrentPinballGame->ball->ballHidden != 0)
             return;
-        if (gCurrentPinballGame->unk3DC == 12)
+        if (gCurrentPinballGame->bossEntityState == 12)
             return;
 
-        gCurrentPinballGame->unk3DC = 11;
+        gCurrentPinballGame->bossEntityState = 11;
         *arg1 = maskedResult;
         *arg2 = 6;
     }
 }
 
-void sub_179D0(u8 arg0, u16 *arg1, u16 *arg2)
+void ProcessKecleonCollisionEvent(u8 arg0, u16 *arg1, u16 *arg2)
 {
     s16 x, y;
     x = gCurrentPinballGame->ball->positionQ0.x;
@@ -1855,24 +1855,24 @@ void sub_179D0(u8 arg0, u16 *arg1, u16 *arg2)
         {
             if (y <= 0x38)
             {
-                if (gCurrentPinballGame->unk41C[0] <= 0)
-                    gCurrentPinballGame->unk41C[0] = 0x18;
+                if (gCurrentPinballGame->kecleonBerryLargeFlashTimer[0] <= 0)
+                    gCurrentPinballGame->kecleonBerryLargeFlashTimer[0] = 0x18;
             }
             else
             {
-                if (gCurrentPinballGame->unk41C[1] <= 0)
-                    gCurrentPinballGame->unk41C[1] = 0x18;
+                if (gCurrentPinballGame->kecleonBerryLargeFlashTimer[1] <= 0)
+                    gCurrentPinballGame->kecleonBerryLargeFlashTimer[1] = 0x18;
             }
         }
         else if (y <= 0x63)
         {
-            if (gCurrentPinballGame->unk41C[3] <= 0)
-                gCurrentPinballGame->unk41C[3] = 0x18;
+            if (gCurrentPinballGame->kecleonBerryLargeFlashTimer[3] <= 0)
+                gCurrentPinballGame->kecleonBerryLargeFlashTimer[3] = 0x18;
         }
         else
         {
-            if (gCurrentPinballGame->unk41C[2] <= 0)
-                gCurrentPinballGame->unk41C[2] = 0x18;
+            if (gCurrentPinballGame->kecleonBerryLargeFlashTimer[2] <= 0)
+                gCurrentPinballGame->kecleonBerryLargeFlashTimer[2] = 0x18;
         }
         break;
     case 9:
@@ -1880,50 +1880,50 @@ void sub_179D0(u8 arg0, u16 *arg1, u16 *arg2)
         {
             if (y <= 0x45)
             {
-                if (gCurrentPinballGame->unk420[7] <= 0)
-                    gCurrentPinballGame->unk420[7] = 0x18;
+                if (gCurrentPinballGame->kecleonBerrySmallFlashTimer[7] <= 0)
+                    gCurrentPinballGame->kecleonBerrySmallFlashTimer[7] = 0x18;
             }
             else
             {
-                if (gCurrentPinballGame->unk420[5] <= 0)
-                    gCurrentPinballGame->unk420[5] = 0x18;
+                if (gCurrentPinballGame->kecleonBerrySmallFlashTimer[5] <= 0)
+                    gCurrentPinballGame->kecleonBerrySmallFlashTimer[5] = 0x18;
             }
         }
         else if (y <= 0x45)
         {
-            if (gCurrentPinballGame->unk420[8] <= 0)
-                gCurrentPinballGame->unk420[8] = 0x18;
+            if (gCurrentPinballGame->kecleonBerrySmallFlashTimer[8] <= 0)
+                gCurrentPinballGame->kecleonBerrySmallFlashTimer[8] = 0x18;
         }
         else
         {
-            if (gCurrentPinballGame->unk420[0] <= 0)
-                gCurrentPinballGame->unk420[0] = 0x18;
+            if (gCurrentPinballGame->kecleonBerrySmallFlashTimer[0] <= 0)
+                gCurrentPinballGame->kecleonBerrySmallFlashTimer[0] = 0x18;
         }
         break;
     case 10:
-        if (gCurrentPinballGame->unk410 == 0)
+        if (gCurrentPinballGame->kecleonHitboxX == 0)
         {
-            gCurrentPinballGame->unk42A[0] = 0xB;
-            gCurrentPinballGame->unkD0[0].x = gCurrentPinballGame->ball->positionQ0.x - 7;
-            gCurrentPinballGame->unkD0[0].y = gCurrentPinballGame->ball->positionQ0.y - 7;
+            gCurrentPinballGame->kecleonHitSparkTimer[0] = 0xB;
+            gCurrentPinballGame->ballTrailPosition[0].x = gCurrentPinballGame->ball->positionQ0.x - 7;
+            gCurrentPinballGame->ballTrailPosition[0].y = gCurrentPinballGame->ball->positionQ0.y - 7;
         }
-        else if (gCurrentPinballGame->unk410 == 3)
+        else if (gCurrentPinballGame->kecleonHitboxX == 3)
         {
-            gCurrentPinballGame->unk42A[1] = 0xB;
-            gCurrentPinballGame->unkD0[1].x = gCurrentPinballGame->ball->positionQ0.x - 7;
-            gCurrentPinballGame->unkD0[1].y = gCurrentPinballGame->ball->positionQ0.y - 7;
+            gCurrentPinballGame->kecleonHitSparkTimer[1] = 0xB;
+            gCurrentPinballGame->ballTrailPosition[1].x = gCurrentPinballGame->ball->positionQ0.x - 7;
+            gCurrentPinballGame->ballTrailPosition[1].y = gCurrentPinballGame->ball->positionQ0.y - 7;
         }
-        else if (gCurrentPinballGame->unk410 == 6)
+        else if (gCurrentPinballGame->kecleonHitboxX == 6)
         {
-            gCurrentPinballGame->unk42A[2] = 0xB;
-            gCurrentPinballGame->unkD0[2].x = gCurrentPinballGame->ball->positionQ0.x - 7;
-            gCurrentPinballGame->unkD0[2].y = gCurrentPinballGame->ball->positionQ0.y - 7;
+            gCurrentPinballGame->kecleonHitSparkTimer[2] = 0xB;
+            gCurrentPinballGame->ballTrailPosition[2].x = gCurrentPinballGame->ball->positionQ0.x - 7;
+            gCurrentPinballGame->ballTrailPosition[2].y = gCurrentPinballGame->ball->positionQ0.y - 7;
         }
-        else if (gCurrentPinballGame->unk410 == 9)
+        else if (gCurrentPinballGame->kecleonHitboxX == 9)
         {
-            gCurrentPinballGame->unk42A[3] = 0xB;
-            gCurrentPinballGame->unkD0[3].x = gCurrentPinballGame->ball->positionQ0.x - 7;
-            gCurrentPinballGame->unkD0[3].y = gCurrentPinballGame->ball->positionQ0.y - 7;
+            gCurrentPinballGame->kecleonHitSparkTimer[3] = 0xB;
+            gCurrentPinballGame->ballTrailPosition[3].x = gCurrentPinballGame->ball->positionQ0.x - 7;
+            gCurrentPinballGame->ballTrailPosition[3].y = gCurrentPinballGame->ball->positionQ0.y - 7;
         }
         break;
     case 11:
@@ -1931,69 +1931,69 @@ void sub_179D0(u8 arg0, u16 *arg1, u16 *arg2)
         {
             if (y <= 0x45)
             {
-                if (gCurrentPinballGame->unk420[9] <= 0)
-                    gCurrentPinballGame->unk420[9] = 0x18;
+                if (gCurrentPinballGame->kecleonBerrySmallFlashTimer[9] <= 0)
+                    gCurrentPinballGame->kecleonBerrySmallFlashTimer[9] = 0x18;
             }
             else
             {
-                if (gCurrentPinballGame->unk420[2] <= 0)
-                    gCurrentPinballGame->unk420[2] = 0x18;
+                if (gCurrentPinballGame->kecleonBerrySmallFlashTimer[2] <= 0)
+                    gCurrentPinballGame->kecleonBerrySmallFlashTimer[2] = 0x18;
             }
         }
         else if (y <= 0x45)
         {
-            if (gCurrentPinballGame->unk420[6] <= 0)
-                gCurrentPinballGame->unk420[6] = 0x18;
+            if (gCurrentPinballGame->kecleonBerrySmallFlashTimer[6] <= 0)
+                gCurrentPinballGame->kecleonBerrySmallFlashTimer[6] = 0x18;
         }
         else
         {
-            if (gCurrentPinballGame->unk420[1] <= 0)
-                gCurrentPinballGame->unk420[1] = 0x18;
+            if (gCurrentPinballGame->kecleonBerrySmallFlashTimer[1] <= 0)
+                gCurrentPinballGame->kecleonBerrySmallFlashTimer[1] = 0x18;
         }
         break;
     case 12:
         if (x <= 0x72)
         {
-            if (gCurrentPinballGame->unk420[4] <= 0)
-                gCurrentPinballGame->unk420[4] = 0x18;
+            if (gCurrentPinballGame->kecleonBerrySmallFlashTimer[4] <= 0)
+                gCurrentPinballGame->kecleonBerrySmallFlashTimer[4] = 0x18;
         }
         else
         {
-            if (gCurrentPinballGame->unk420[3] <= 0)
-                gCurrentPinballGame->unk420[3] = 0x18;
+            if (gCurrentPinballGame->kecleonBerrySmallFlashTimer[3] <= 0)
+                gCurrentPinballGame->kecleonBerrySmallFlashTimer[3] = 0x18;
         }
         break;
     }
 }
 
-void sub_17C1C(struct Vector16 *arg0)
+void CheckKecleonProjectileCollision(struct Vector16 *arg0)
 {
     struct Vector16 vec1;
     struct Vector16 vec2;
     s16 x, y;
     u16 sp00;
     u8 sp02;
-    s16 unk0;
-    s32 unk1;
-    s32 unk2;
+    s16 collisionTileIndex;
+    s32 tileMapPage;
+    s32 boardLayer;
     u32 some_enum;
 
-    gCurrentPinballGame->unk3F8 = 1;
+    gCurrentPinballGame->kecleonCollisionEnabled = 1;
     vec1.x = arg0->x / 8;
     vec1.y = arg0->y / 8;
     vec2.x = arg0->x % 8;
     vec2.y = arg0->y % 8;
-    unk1 = vec1.y / 64;
-    unk2 = gCurrentPinballGame->unk24;
+    tileMapPage = vec1.y / 64;
+    boardLayer = gCurrentPinballGame->boardLayerDepth;
     vec1.y %= 64;
-    unk0 = gUnknown_02031520.unk14.unk38[unk2 + unk1][vec1.y * 64 + vec1.x];
-    sp00 = gUnknown_02031520.unk14.unk48[unk2 + unk1][unk0 * 64 + vec2.y * 8 + vec2.x];
-    sp02 = gUnknown_02031520.unk14.unk58[unk2 + unk1][unk0 * 64 + vec2.y * 8 + vec2.x];
+    collisionTileIndex = gBoardConfig.fieldLayout.collisionTileMap[boardLayer + tileMapPage][vec1.y * 64 + vec1.x];
+    sp00 = gBoardConfig.fieldLayout.collisionAngleMap[boardLayer + tileMapPage][collisionTileIndex * 64 + vec2.y * 8 + vec2.x];
+    sp02 = gBoardConfig.fieldLayout.collisionTypeMap[boardLayer + tileMapPage][collisionTileIndex * 64 + vec2.y * 8 + vec2.x];
 
     some_enum = (sp02 >> 2) >> 2;
 
-    x = gCurrentPinballGame->unk400.x;
-    y = gCurrentPinballGame->unk400.y;
+    x = gCurrentPinballGame->kecleonCollisionPos.x;
+    y = gCurrentPinballGame->kecleonCollisionPos.y;
 
     switch (some_enum)
     {
@@ -2002,24 +2002,24 @@ void sub_17C1C(struct Vector16 *arg0)
         {
             if (y <= 0x38)
             {
-                if (gCurrentPinballGame->unk41C[0] <= 0)
-                    gCurrentPinballGame->unk41C[0] = 0x18;
+                if (gCurrentPinballGame->kecleonBerryLargeFlashTimer[0] <= 0)
+                    gCurrentPinballGame->kecleonBerryLargeFlashTimer[0] = 0x18;
             }
             else
             {
-                if (gCurrentPinballGame->unk41C[1] <= 0)
-                    gCurrentPinballGame->unk41C[1] = 0x18;
+                if (gCurrentPinballGame->kecleonBerryLargeFlashTimer[1] <= 0)
+                    gCurrentPinballGame->kecleonBerryLargeFlashTimer[1] = 0x18;
             }
         }
         else if (y <= 0x63)
         {
-            if (gCurrentPinballGame->unk41C[3] <= 0)
-                gCurrentPinballGame->unk41C[3] = 0x18;
+            if (gCurrentPinballGame->kecleonBerryLargeFlashTimer[3] <= 0)
+                gCurrentPinballGame->kecleonBerryLargeFlashTimer[3] = 0x18;
         }
         else
         {
-            if (gCurrentPinballGame->unk41C[2] <= 0)
-                gCurrentPinballGame->unk41C[2] = 0x18;
+            if (gCurrentPinballGame->kecleonBerryLargeFlashTimer[2] <= 0)
+                gCurrentPinballGame->kecleonBerryLargeFlashTimer[2] = 0x18;
         }
         break;
     case 9:
@@ -2027,53 +2027,53 @@ void sub_17C1C(struct Vector16 *arg0)
         {
             if (y <= 0x45)
             {
-                if (gCurrentPinballGame->unk420[7] <= 0)
-                    gCurrentPinballGame->unk420[7] = 0x18;
+                if (gCurrentPinballGame->kecleonBerrySmallFlashTimer[7] <= 0)
+                    gCurrentPinballGame->kecleonBerrySmallFlashTimer[7] = 0x18;
             }
             else
             {
-                if (gCurrentPinballGame->unk420[5] <= 0)
-                    gCurrentPinballGame->unk420[5] = 0x18;
+                if (gCurrentPinballGame->kecleonBerrySmallFlashTimer[5] <= 0)
+                    gCurrentPinballGame->kecleonBerrySmallFlashTimer[5] = 0x18;
             }
         }
         else if (y <= 0x45)
         {
-            if (gCurrentPinballGame->unk420[8] <= 0)
-                gCurrentPinballGame->unk420[8] = 0x18;
+            if (gCurrentPinballGame->kecleonBerrySmallFlashTimer[8] <= 0)
+                gCurrentPinballGame->kecleonBerrySmallFlashTimer[8] = 0x18;
         }
         else
         {
-            if (gCurrentPinballGame->unk420[0] <= 0)
-                gCurrentPinballGame->unk420[0] = 0x18;
+            if (gCurrentPinballGame->kecleonBerrySmallFlashTimer[0] <= 0)
+                gCurrentPinballGame->kecleonBerrySmallFlashTimer[0] = 0x18;
         }
         break;
     case 10:
-        gCurrentPinballGame->unk3F8 = 0;
-        if (gCurrentPinballGame->unk412 == 0)
+        gCurrentPinballGame->kecleonCollisionEnabled = 0;
+        if (gCurrentPinballGame->kecleonHitboxY == 0)
         {
-            if (gCurrentPinballGame->unk400.x != gCurrentPinballGame->unk434[0].x || gCurrentPinballGame->unk400.y != gCurrentPinballGame->unk434[0].y)
+            if (gCurrentPinballGame->kecleonCollisionPos.x != gCurrentPinballGame->kecleonBerryHitPosition[0].x || gCurrentPinballGame->kecleonCollisionPos.y != gCurrentPinballGame->kecleonBerryHitPosition[0].y)
             {
-                gCurrentPinballGame->unk42A[4] = 0x11;
-                gCurrentPinballGame->unk434[0].x = gCurrentPinballGame->unk400.x;
-                gCurrentPinballGame->unk434[0].y = gCurrentPinballGame->unk400.y;
+                gCurrentPinballGame->kecleonHitSparkTimer[4] = 0x11;
+                gCurrentPinballGame->kecleonBerryHitPosition[0].x = gCurrentPinballGame->kecleonCollisionPos.x;
+                gCurrentPinballGame->kecleonBerryHitPosition[0].y = gCurrentPinballGame->kecleonCollisionPos.y;
             }
         }
-        else if (gCurrentPinballGame->unk412 == 8)
+        else if (gCurrentPinballGame->kecleonHitboxY == 8)
         {
-            if (gCurrentPinballGame->unk400.x != gCurrentPinballGame->unk434[1].x || gCurrentPinballGame->unk400.y != gCurrentPinballGame->unk434[1].y)
+            if (gCurrentPinballGame->kecleonCollisionPos.x != gCurrentPinballGame->kecleonBerryHitPosition[1].x || gCurrentPinballGame->kecleonCollisionPos.y != gCurrentPinballGame->kecleonBerryHitPosition[1].y)
             {
-                gCurrentPinballGame->unk42A[5] = 0x11;
-                gCurrentPinballGame->unk434[1].x = gCurrentPinballGame->unk400.x;
-                gCurrentPinballGame->unk434[1].y = gCurrentPinballGame->unk400.y;
+                gCurrentPinballGame->kecleonHitSparkTimer[5] = 0x11;
+                gCurrentPinballGame->kecleonBerryHitPosition[1].x = gCurrentPinballGame->kecleonCollisionPos.x;
+                gCurrentPinballGame->kecleonBerryHitPosition[1].y = gCurrentPinballGame->kecleonCollisionPos.y;
             }
         }
-        else if (gCurrentPinballGame->unk412 == 16)
+        else if (gCurrentPinballGame->kecleonHitboxY == 16)
         {
-            if (gCurrentPinballGame->unk400.x != gCurrentPinballGame->unk434[2].x || gCurrentPinballGame->unk400.y != gCurrentPinballGame->unk434[2].y)
+            if (gCurrentPinballGame->kecleonCollisionPos.x != gCurrentPinballGame->kecleonBerryHitPosition[2].x || gCurrentPinballGame->kecleonCollisionPos.y != gCurrentPinballGame->kecleonBerryHitPosition[2].y)
             {
-                gCurrentPinballGame->unk42A[6] = 0x11;
-                gCurrentPinballGame->unk434[2].x = gCurrentPinballGame->unk400.x;
-                gCurrentPinballGame->unk434[2].y = gCurrentPinballGame->unk400.y;
+                gCurrentPinballGame->kecleonHitSparkTimer[6] = 0x11;
+                gCurrentPinballGame->kecleonBerryHitPosition[2].x = gCurrentPinballGame->kecleonCollisionPos.x;
+                gCurrentPinballGame->kecleonBerryHitPosition[2].y = gCurrentPinballGame->kecleonCollisionPos.y;
             }
         }
         break;
@@ -2082,36 +2082,36 @@ void sub_17C1C(struct Vector16 *arg0)
         {
             if (y <= 0x45)
             {
-                if (gCurrentPinballGame->unk420[9] <= 0)
-                    gCurrentPinballGame->unk420[9] = 0x18;
+                if (gCurrentPinballGame->kecleonBerrySmallFlashTimer[9] <= 0)
+                    gCurrentPinballGame->kecleonBerrySmallFlashTimer[9] = 0x18;
             }
             else
             {
-                if (gCurrentPinballGame->unk420[2] <= 0)
-                    gCurrentPinballGame->unk420[2] = 0x18;
+                if (gCurrentPinballGame->kecleonBerrySmallFlashTimer[2] <= 0)
+                    gCurrentPinballGame->kecleonBerrySmallFlashTimer[2] = 0x18;
             }
         }
         else if (y <= 0x45)
         {
-            if (gCurrentPinballGame->unk420[6] <= 0)
-                gCurrentPinballGame->unk420[6] = 0x18;
+            if (gCurrentPinballGame->kecleonBerrySmallFlashTimer[6] <= 0)
+                gCurrentPinballGame->kecleonBerrySmallFlashTimer[6] = 0x18;
         }
         else
         {
-            if (gCurrentPinballGame->unk420[1] <= 0)
-                gCurrentPinballGame->unk420[1] = 0x18;
+            if (gCurrentPinballGame->kecleonBerrySmallFlashTimer[1] <= 0)
+                gCurrentPinballGame->kecleonBerrySmallFlashTimer[1] = 0x18;
         }
         break;
     case 12:
         if (x <= 0x72)
         {
-            if (gCurrentPinballGame->unk420[4] <= 0)
-                gCurrentPinballGame->unk420[4] = 0x18;
+            if (gCurrentPinballGame->kecleonBerrySmallFlashTimer[4] <= 0)
+                gCurrentPinballGame->kecleonBerrySmallFlashTimer[4] = 0x18;
         }
         else
         {
-            if (gCurrentPinballGame->unk420[3] <= 0)
-                gCurrentPinballGame->unk420[3] = 0x18;
+            if (gCurrentPinballGame->kecleonBerrySmallFlashTimer[3] <= 0)
+                gCurrentPinballGame->kecleonBerrySmallFlashTimer[3] = 0x18;
         }
         break;
     }
@@ -2124,27 +2124,27 @@ s16 COLLISION_CHECK_KYOGRE_17F28(struct Vector16 *arg0, u16 *arg1)
     u16 sp00;
     u8 sp02;
     u16 return_val;
-    s16 unk0;
-    s32 unk1;
-    s32 unk2;
+    s16 collisionTileIndex;
+    s32 tileMapPage;
+    s32 boardLayer;
 
     u32 some_enum;
     u32 switch_enum;
 
     return_val = 0;
-    gCurrentPinballGame->ball->unk4 = 0;
+    gCurrentPinballGame->ball->spinAcceleration = 0;
     if (arg0->y < 0x200)
     {
         vec1.x = arg0->x / 8;
         vec1.y = arg0->y / 8;
         vec2.x = arg0->x % 8;
         vec2.y = arg0->y % 8;
-        unk1 = vec1.y / 64;
-        unk2 = gCurrentPinballGame->unk24;
+        tileMapPage = vec1.y / 64;
+        boardLayer = gCurrentPinballGame->boardLayerDepth;
         vec1.y %= 64;
-        unk0 = gUnknown_02031520.unk14.unk38[unk2 + unk1][vec1.y * 64 + vec1.x];
-        sp00 = gUnknown_02031520.unk14.unk48[unk2 + unk1][unk0 * 64 + vec2.y * 8 + vec2.x];
-        sp02 = gUnknown_02031520.unk14.unk58[unk2 + unk1][unk0 * 64 + vec2.y * 8 + vec2.x];
+        collisionTileIndex = gBoardConfig.fieldLayout.collisionTileMap[boardLayer + tileMapPage][vec1.y * 64 + vec1.x];
+        sp00 = gBoardConfig.fieldLayout.collisionAngleMap[boardLayer + tileMapPage][collisionTileIndex * 64 + vec2.y * 8 + vec2.x];
+        sp02 = gBoardConfig.fieldLayout.collisionTypeMap[boardLayer + tileMapPage][collisionTileIndex * 64 + vec2.y * 8 + vec2.x];
     }
     else
     {
@@ -2152,7 +2152,7 @@ s16 COLLISION_CHECK_KYOGRE_17F28(struct Vector16 *arg0, u16 *arg1)
         sp02 = 0;
     }
 
-    sub_18180(arg0, &sp00, &sp02);
+    CheckKyogreEntityCollision(arg0, &sp00, &sp02);
     switch_enum = sp02 & 0xF;
     some_enum = sp02 >> 4;
 
@@ -2161,20 +2161,20 @@ s16 COLLISION_CHECK_KYOGRE_17F28(struct Vector16 *arg0, u16 *arg1)
     case 1:
     case 4:
     case 6:
-        gCurrentPinballGame->unk23 = switch_enum - 1;
-        gCurrentPinballGame->unk22 = 1;
+        gCurrentPinballGame->collisionSurfaceType = switch_enum - 1;
+        gCurrentPinballGame->collisionResponseType = 1;
         *arg1 = sp00;
         if (*arg1 >= 0x3FF0 && *arg1 <= 0x4010)
         {
-            if (gCurrentPinballGame->ball->positionQ0.x < gUnknown_02031520.unk14.unk26 - 8 ||
-                gCurrentPinballGame->ball->positionQ0.y < gUnknown_02031520.unk14.unk28 - 8)
+            if (gCurrentPinballGame->ball->positionQ0.x < gBoardConfig.fieldLayout.ballSpawnX - 8 ||
+                gCurrentPinballGame->ball->positionQ0.y < gBoardConfig.fieldLayout.ballSpawnY - 8)
             {
 
-                if (gCurrentPinballGame->ball->unk6 > 0)
+                if (gCurrentPinballGame->ball->spinSpeed > 0)
                 {
                     *arg1 = 0x3E00;
                 }
-                else if (gCurrentPinballGame->ball->unk6 != 0)
+                else if (gCurrentPinballGame->ball->spinSpeed != 0)
                 {
                     *arg1 = 0x4100;
                 }
@@ -2182,14 +2182,14 @@ s16 COLLISION_CHECK_KYOGRE_17F28(struct Vector16 *arg0, u16 *arg1)
                 {
                     if (gMain.systemFrameCount & 1)
                     {
-                        gCurrentPinballGame->ball->unk4 = 0x28;
-                        gCurrentPinballGame->ball->unk6 = 1;
+                        gCurrentPinballGame->ball->spinAcceleration = 0x28;
+                        gCurrentPinballGame->ball->spinSpeed = 1;
                         *arg1 = 0x3E00;
                     }
                     else
                     {
-                        gCurrentPinballGame->ball->unk4 = 0xFFD8;
-                        gCurrentPinballGame->ball->unk6 = 0xFFFF;
+                        gCurrentPinballGame->ball->spinAcceleration = 0xFFD8;
+                        gCurrentPinballGame->ball->spinSpeed = 0xFFFF;
                         *arg1 = 0x4100;
                     }
                 }
@@ -2200,8 +2200,8 @@ s16 COLLISION_CHECK_KYOGRE_17F28(struct Vector16 *arg0, u16 *arg1)
         break;
     case 2:
     case 3:
-        gCurrentPinballGame->unk23 = switch_enum - 1;
-        gCurrentPinballGame->unk22 = 2;
+        gCurrentPinballGame->collisionSurfaceType = switch_enum - 1;
+        gCurrentPinballGame->collisionResponseType = 2;
         *arg1 = sp00 & 0x0000FFF0;
         return_val = 1;
         break;
@@ -2210,11 +2210,11 @@ s16 COLLISION_CHECK_KYOGRE_17F28(struct Vector16 *arg0, u16 *arg1)
         break;
     }
 
-    sub_182B4(some_enum, &return_val, arg1);
+    ProcessKyogreCollisionEvent(some_enum, &return_val, arg1);
     return return_val;
 }
 
-void sub_18180(struct Vector16 *arg0, u16 *arg1, u8 *arg2)
+void CheckKyogreEntityCollision(struct Vector16 *arg0, u16 *arg1, u8 *arg2)
 {
     s16 deltaX;
     s16 deltaY;
@@ -2226,19 +2226,19 @@ void sub_18180(struct Vector16 *arg0, u16 *arg1, u8 *arg2)
         if (*arg2 & 0xF)
             return;
 
-        deltaX = arg0->x - gCurrentPinballGame->unk3F0;
-        deltaY = arg0->y - gCurrentPinballGame->unk3F2;
+        deltaX = arg0->x - gCurrentPinballGame->bossCollisionX;
+        deltaY = arg0->y - gCurrentPinballGame->bossCollisionY;
 
         if ((deltaX < 0 || deltaX >= 0x78) || (deltaY < 0 || deltaY >= 0x98))
             return;
 
-        maskedResult = gUnknown_08340B58[(deltaY * 0x78) + deltaX] & 0xFFF0;
-        arrayValue = gUnknown_08340B58[(deltaY * 0x78) + deltaX] & 0xF;
+        maskedResult = gKyogreForm1CollisionMap[(deltaY * 0x78) + deltaX] & 0xFFF0;
+        arrayValue = gKyogreForm1CollisionMap[(deltaY * 0x78) + deltaX] & 0xF;
 
         if (arrayValue == 0)
             return;
 
-        gCurrentPinballGame->unk452 = 8;
+        gCurrentPinballGame->bossHitFlashTimer = 8;
         *arg1 = maskedResult;
         *arg2 = 6;
     }
@@ -2247,19 +2247,19 @@ void sub_18180(struct Vector16 *arg0, u16 *arg1, u8 *arg2)
         if (*arg2 & 0xF)
             return;
 
-        deltaX = arg0->x - gCurrentPinballGame->unk3F0;
-        deltaY = arg0->y - gCurrentPinballGame->unk3F2;
+        deltaX = arg0->x - gCurrentPinballGame->bossCollisionX;
+        deltaY = arg0->y - gCurrentPinballGame->bossCollisionY;
 
         if ((deltaX < 0 || deltaX >= 0x60) || (deltaY < 0 || deltaY >= 0x58))
             return;
 
-        maskedResult = gUnknown_083499D8[(deltaY * 0x60) + deltaX] & 0xFFF0;
-        arrayValue = gUnknown_083499D8[(deltaY * 0x60) + deltaX] & 0xF;
+        maskedResult = gKyogreForm2CollisionMap[(deltaY * 0x60) + deltaX] & 0xFFF0;
+        arrayValue = gKyogreForm2CollisionMap[(deltaY * 0x60) + deltaX] & 0xF;
 
         if (arrayValue == 0)
             return;
 
-        gCurrentPinballGame->unk452 = 8;
+        gCurrentPinballGame->bossHitFlashTimer = 8;
         *arg1 = maskedResult;
         *arg2 = 6;
     }
@@ -2268,25 +2268,25 @@ void sub_18180(struct Vector16 *arg0, u16 *arg1, u8 *arg2)
         if (*arg2 & 0xF)
             return;
 
-        deltaX = arg0->x - gCurrentPinballGame->unk3F0;
-        deltaY = arg0->y - gCurrentPinballGame->unk3F2;
+        deltaX = arg0->x - gCurrentPinballGame->bossCollisionX;
+        deltaY = arg0->y - gCurrentPinballGame->bossCollisionY;
 
         if ((deltaX < 0 || deltaX >= 0x60) || (deltaY < 0 || deltaY >= 0x68))
             return;
 
-        maskedResult = gUnknown_0834DBD8[(deltaY * 0x60) + deltaX] & 0xFFF0;
-        arrayValue = gUnknown_0834DBD8[(deltaY * 0x60) + deltaX] & 0xF;
+        maskedResult = gKyogreForm3CollisionMap[(deltaY * 0x60) + deltaX] & 0xFFF0;
+        arrayValue = gKyogreForm3CollisionMap[(deltaY * 0x60) + deltaX] & 0xF;
 
         if (arrayValue == 0)
             return;
 
-        gCurrentPinballGame->unk452 = 8;
+        gCurrentPinballGame->bossHitFlashTimer = 8;
         *arg1 = maskedResult;
         *arg2 = 6;
     }
 }
 
-void sub_182B4(u8 arg0, u16 *arg1, u16 *arg2)
+void ProcessKyogreCollisionEvent(u8 arg0, u16 *arg1, u16 *arg2)
 {
     switch (arg0)
     {
@@ -2295,8 +2295,8 @@ void sub_182B4(u8 arg0, u16 *arg1, u16 *arg2)
     case 3:
         break;
     case 4:
-        gCurrentPinballGame->unk3DC = 6;
-        gCurrentPinballGame->unk1F = 1;
+        gCurrentPinballGame->bossEntityState = 6;
+        gCurrentPinballGame->ballFrozenState = 1;
         break;
     case 5:
     case 6:
@@ -2324,23 +2324,23 @@ s16 COLLISION_CHECK_GROUDON_18324(struct Vector16 *arg0, u16 *arg1)
     u32 switch_enum;
 
     return_val = 0;
-    gCurrentPinballGame->ball->unk4 = 0;
+    gCurrentPinballGame->ball->spinAcceleration = 0;
 
     if (arg0->y < 0x200)
     {
         s16 r2;
-        s32 unk1;
-        s32 unk2;
+        s32 tileMapPage;
+        s32 boardLayer;
         vec1.x = arg0->x / 8;
         vec1.y = arg0->y / 8;
         vec2.x = arg0->x % 8;
         vec2.y = arg0->y % 8;
-        unk1 = vec1.y / 64;
-        unk2 = gCurrentPinballGame->unk24;
+        tileMapPage = vec1.y / 64;
+        boardLayer = gCurrentPinballGame->boardLayerDepth;
         vec1.y %= 64;
-        r2 = gUnknown_02031520.unk14.unk38[unk2 + unk1][vec1.y * 64 + vec1.x];
-        sp00 = gUnknown_02031520.unk14.unk48[unk2 + unk1][r2 * 64 + vec2.y * 8 + vec2.x];
-        sp02 = gUnknown_02031520.unk14.unk58[unk2 + unk1][r2 * 64 + vec2.y * 8 + vec2.x];
+        r2 = gBoardConfig.fieldLayout.collisionTileMap[boardLayer + tileMapPage][vec1.y * 64 + vec1.x];
+        sp00 = gBoardConfig.fieldLayout.collisionAngleMap[boardLayer + tileMapPage][r2 * 64 + vec2.y * 8 + vec2.x];
+        sp02 = gBoardConfig.fieldLayout.collisionTypeMap[boardLayer + tileMapPage][r2 * 64 + vec2.y * 8 + vec2.x];
     }
     else
     {
@@ -2348,7 +2348,7 @@ s16 COLLISION_CHECK_GROUDON_18324(struct Vector16 *arg0, u16 *arg1)
         sp02 = 0;
     }
 
-    sub_1857C(arg0, &sp00, &sp02);
+    CheckGroudonEntityCollision(arg0, &sp00, &sp02);
     switch_enum = sp02 & 0xF;
     some_enum = sp02 >> 4;
 
@@ -2357,18 +2357,18 @@ s16 COLLISION_CHECK_GROUDON_18324(struct Vector16 *arg0, u16 *arg1)
     case 1:
     case 4:
     case 6:
-        gCurrentPinballGame->unk23 = switch_enum - 1;
-        gCurrentPinballGame->unk22 = 1;
+        gCurrentPinballGame->collisionSurfaceType = switch_enum - 1;
+        gCurrentPinballGame->collisionResponseType = 1;
         *arg1 = sp00;
         if (*arg1 >= 0x3FF0 && *arg1 <= 0x4010)
         {
-            if (gCurrentPinballGame->ball->positionQ0.x < (gUnknown_02031520.unk14.unk26 - 8) || gCurrentPinballGame->ball->positionQ0.y < gUnknown_02031520.unk14.unk28 - 8)
+            if (gCurrentPinballGame->ball->positionQ0.x < (gBoardConfig.fieldLayout.ballSpawnX - 8) || gCurrentPinballGame->ball->positionQ0.y < gBoardConfig.fieldLayout.ballSpawnY - 8)
             {
-                if (gCurrentPinballGame->ball->unk6 > 0)
+                if (gCurrentPinballGame->ball->spinSpeed > 0)
                 {
                     *arg1 = 0x3E00;
                 }
-                else if (gCurrentPinballGame->ball->unk6 != 0)
+                else if (gCurrentPinballGame->ball->spinSpeed != 0)
                 {
                     *arg1 = 0x4100;
                 }
@@ -2376,14 +2376,14 @@ s16 COLLISION_CHECK_GROUDON_18324(struct Vector16 *arg0, u16 *arg1)
                 {
                     if (gMain.systemFrameCount & 1)
                     {
-                        gCurrentPinballGame->ball->unk4 = 40;
-                        gCurrentPinballGame->ball->unk6 = 1;
+                        gCurrentPinballGame->ball->spinAcceleration = 40;
+                        gCurrentPinballGame->ball->spinSpeed = 1;
                         *arg1 = 0x3E00;
                     }
                     else
                     {
-                        gCurrentPinballGame->ball->unk4 = -40;
-                        gCurrentPinballGame->ball->unk6 = -1;
+                        gCurrentPinballGame->ball->spinAcceleration = -40;
+                        gCurrentPinballGame->ball->spinSpeed = -1;
                         *arg1 = 0x4100;
                     }
                 }
@@ -2393,8 +2393,8 @@ s16 COLLISION_CHECK_GROUDON_18324(struct Vector16 *arg0, u16 *arg1)
         break;
     case 2:
     case 3:
-        gCurrentPinballGame->unk23 = switch_enum - 1;
-        gCurrentPinballGame->unk22 = 2;
+        gCurrentPinballGame->collisionSurfaceType = switch_enum - 1;
+        gCurrentPinballGame->collisionResponseType = 2;
         *arg1 = sp00 & 0xFFF0;
         return_val = 1;
         break;
@@ -2403,11 +2403,11 @@ s16 COLLISION_CHECK_GROUDON_18324(struct Vector16 *arg0, u16 *arg1)
         break;
     }
 
-    sub_18784(some_enum, &return_val, arg1);
+    ProcessGroudonCollisionEvent(some_enum, &return_val, arg1);
     return return_val;
 }
 
-void sub_1857C(struct Vector16 *arg0, u16 *arg1, u8 *arg2)
+void CheckGroudonEntityCollision(struct Vector16 *arg0, u16 *arg1, u8 *arg2)
 {
     s16 deltaX;
     s16 deltaY;
@@ -2420,18 +2420,18 @@ void sub_1857C(struct Vector16 *arg0, u16 *arg1, u8 *arg2)
     {
         if ((*arg2 & 0xF) == 0)
         {
-            deltaX = arg0->x - gCurrentPinballGame->unk3F0;
-            deltaY = arg0->y - gCurrentPinballGame->unk3F2;
+            deltaX = arg0->x - gCurrentPinballGame->bossCollisionX;
+            deltaY = arg0->y - gCurrentPinballGame->bossCollisionY;
 
             if ((deltaX >= 0 && deltaX < 0x70) && (deltaY >= 0 && deltaY < 0x80))
             {
-                resultFromArray = gUnknown_083579C8[(deltaY * 0x70) + deltaX];
+                resultFromArray = gGroudonBodyCollisionMap[(deltaY * 0x70) + deltaX];
                 maskedResult = resultFromArray & 0xFFF0;
                 lowerNibble = resultFromArray & 0xF;
                 if (lowerNibble != 0)
                 {
-                    if (gCurrentPinballGame->unk452 == 0)
-                        gCurrentPinballGame->unk452 = 0x27;
+                    if (gCurrentPinballGame->bossHitFlashTimer == 0)
+                        gCurrentPinballGame->bossHitFlashTimer = 0x27;
 
                     *arg1 = maskedResult;
                     *arg2 = lowerNibble;
@@ -2441,53 +2441,53 @@ void sub_1857C(struct Vector16 *arg0, u16 *arg1, u8 *arg2)
     }
     for (i = 0; i < 3; i++)
     {
-        if (gCurrentPinballGame->unk4F8[i].x <= 0)
+        if (gCurrentPinballGame->boulderCollisionPos[i].x <= 0)
             continue;
         if ((*arg2 & 0xF) != 0)
             continue;
 
-        deltaX = arg0->x - gCurrentPinballGame->unk4F8[i].x;
-        deltaY = arg0->y - gCurrentPinballGame->unk4F8[i].y;
+        deltaX = arg0->x - gCurrentPinballGame->boulderCollisionPos[i].x;
+        deltaY = arg0->y - gCurrentPinballGame->boulderCollisionPos[i].y;
 
         if ((deltaX < 0 || deltaX >= 0x50) || (deltaY < 0 || deltaY >= 0x50))
             continue;
 
-        maskedResult = gUnknown_0835E9C8[(deltaY * 0x50) + deltaX] & 0xFFF0;
-        lowerNibble = gUnknown_0835E9C8[(deltaY * 0x50) + deltaX] & 0xF;
+        maskedResult = gGroudonProjectileCollisionMap[(deltaY * 0x50) + deltaX] & 0xFFF0;
+        lowerNibble = gGroudonProjectileCollisionMap[(deltaY * 0x50) + deltaX] & 0xF;
 
         if (lowerNibble == 0)
             continue;
 
         *arg1 = maskedResult;
         *arg2 = 6;
-        gCurrentPinballGame->unk4D5[i] = 1;
+        gCurrentPinballGame->boulderHitFlag[i] = 1;
     }
     for (i = 0; i < 4; i++)
     {
-        if (gCurrentPinballGame->unk4B4[i].x <= 0)
+        if (gCurrentPinballGame->firePillarCollisionPos[i].x <= 0)
             continue;
         if ((*arg2 & 0xF) != 0)
             continue;
 
-        deltaX = arg0->x - gCurrentPinballGame->unk4B4[i].x;
-        deltaY = arg0->y - gCurrentPinballGame->unk4B4[i].y;
+        deltaX = arg0->x - gCurrentPinballGame->firePillarCollisionPos[i].x;
+        deltaY = arg0->y - gCurrentPinballGame->firePillarCollisionPos[i].y;
 
         if ((deltaX < 0 || deltaX >= 0x50) || (deltaY < 0 || deltaY >= 0x50))
             continue;
 
-        maskedResult = gUnknown_0835E9C8[(deltaY * 0x50) + deltaX] & 0xFFF0;
-        lowerNibble = gUnknown_0835E9C8[(deltaY * 0x50) + deltaX] & 0xF;
+        maskedResult = gGroudonProjectileCollisionMap[(deltaY * 0x50) + deltaX] & 0xFFF0;
+        lowerNibble = gGroudonProjectileCollisionMap[(deltaY * 0x50) + deltaX] & 0xF;
 
         if (lowerNibble == 0)
             continue;
 
         *arg1 = maskedResult;
         *arg2 = 6;
-        gCurrentPinballGame->unk4A4[i] = 8;
+        gCurrentPinballGame->firePillarHitTimer[i] = 8;
     }
 }
 
-void sub_18784(u8 arg0, u16 *arg1, u16 *arg2)
+void ProcessGroudonCollisionEvent(u8 arg0, u16 *arg1, u16 *arg2)
 {
     switch (arg0)
     {
@@ -2496,8 +2496,8 @@ void sub_18784(u8 arg0, u16 *arg1, u16 *arg2)
     case 3:
         break;
     case 4:
-        gCurrentPinballGame->unk3DC = 6;
-        gCurrentPinballGame->unk1F = 1;
+        gCurrentPinballGame->bossEntityState = 6;
+        gCurrentPinballGame->ballFrozenState = 1;
         break;
     case 5:
     case 6:
@@ -2526,23 +2526,23 @@ s16 COLLISION_CHECK_RAYQUAZA_187F4(struct Vector16 *arg0, u16 *arg1)
     u32 switch_enum;
 
     return_val = 0;
-    gCurrentPinballGame->ball->unk4 = 0;
+    gCurrentPinballGame->ball->spinAcceleration = 0;
 
     if (arg0->y < 0x200)
     {
         s16 r2;
-        s32 unk1;
-        s32 unk2;
+        s32 tileMapPage;
+        s32 boardLayer;
         vec1.x = arg0->x / 8;
         vec1.y = arg0->y / 8;
         vec2.x = arg0->x % 8;
         vec2.y = arg0->y % 8;
-        unk1 = vec1.y / 64;
-        unk2 = gCurrentPinballGame->unk24;
+        tileMapPage = vec1.y / 64;
+        boardLayer = gCurrentPinballGame->boardLayerDepth;
         vec1.y %= 64;
-        r2 = gUnknown_02031520.unk14.unk38[unk2 + unk1][vec1.y * 64 + vec1.x];
-        sp00 = gUnknown_02031520.unk14.unk48[unk2 + unk1][r2 * 64 + vec2.y * 8 + vec2.x];
-        sp02 = gUnknown_02031520.unk14.unk58[unk2 + unk1][r2 * 64 + vec2.y * 8 + vec2.x];
+        r2 = gBoardConfig.fieldLayout.collisionTileMap[boardLayer + tileMapPage][vec1.y * 64 + vec1.x];
+        sp00 = gBoardConfig.fieldLayout.collisionAngleMap[boardLayer + tileMapPage][r2 * 64 + vec2.y * 8 + vec2.x];
+        sp02 = gBoardConfig.fieldLayout.collisionTypeMap[boardLayer + tileMapPage][r2 * 64 + vec2.y * 8 + vec2.x];
     }
     else
     {
@@ -2550,7 +2550,7 @@ s16 COLLISION_CHECK_RAYQUAZA_187F4(struct Vector16 *arg0, u16 *arg1)
         sp02 = 0;
     }
 
-    sub_18A4C(arg0, &sp00, &sp02);
+    CheckRayquazaEntityCollision(arg0, &sp00, &sp02);
     switch_enum = sp02 & 0xF;
     some_enum = sp02 >> 4;
 
@@ -2559,18 +2559,18 @@ s16 COLLISION_CHECK_RAYQUAZA_187F4(struct Vector16 *arg0, u16 *arg1)
     case 1:
     case 4:
     case 6:
-        gCurrentPinballGame->unk23 = switch_enum - 1;
-        gCurrentPinballGame->unk22 = 1;
+        gCurrentPinballGame->collisionSurfaceType = switch_enum - 1;
+        gCurrentPinballGame->collisionResponseType = 1;
         *arg1 = sp00;
         if (*arg1 >= 0x3FF0 && *arg1 <= 0x4010)
         {
-            if (gCurrentPinballGame->ball->positionQ0.x < (gUnknown_02031520.unk14.unk26 - 8) || gCurrentPinballGame->ball->positionQ0.y < gUnknown_02031520.unk14.unk28 - 8)
+            if (gCurrentPinballGame->ball->positionQ0.x < (gBoardConfig.fieldLayout.ballSpawnX - 8) || gCurrentPinballGame->ball->positionQ0.y < gBoardConfig.fieldLayout.ballSpawnY - 8)
             {
-                if (gCurrentPinballGame->ball->unk6 > 0)
+                if (gCurrentPinballGame->ball->spinSpeed > 0)
                 {
                     *arg1 = 0x3E00;
                 }
-                else if (gCurrentPinballGame->ball->unk6 != 0)
+                else if (gCurrentPinballGame->ball->spinSpeed != 0)
                 {
                     *arg1 = 0x4100;
                 }
@@ -2578,14 +2578,14 @@ s16 COLLISION_CHECK_RAYQUAZA_187F4(struct Vector16 *arg0, u16 *arg1)
                 {
                     if (gMain.systemFrameCount & 1)
                     {
-                        gCurrentPinballGame->ball->unk4 = 40;
-                        gCurrentPinballGame->ball->unk6 = 1;
+                        gCurrentPinballGame->ball->spinAcceleration = 40;
+                        gCurrentPinballGame->ball->spinSpeed = 1;
                         *arg1 = 0x3E00;
                     }
                     else
                     {
-                        gCurrentPinballGame->ball->unk4 = -40;
-                        gCurrentPinballGame->ball->unk6 = -1;
+                        gCurrentPinballGame->ball->spinAcceleration = -40;
+                        gCurrentPinballGame->ball->spinSpeed = -1;
                         *arg1 = 0x4100;
                     }
                 }
@@ -2595,8 +2595,8 @@ s16 COLLISION_CHECK_RAYQUAZA_187F4(struct Vector16 *arg0, u16 *arg1)
         break;
     case 2:
     case 3:
-        gCurrentPinballGame->unk23 = switch_enum - 1;
-        gCurrentPinballGame->unk22 = 2;
+        gCurrentPinballGame->collisionSurfaceType = switch_enum - 1;
+        gCurrentPinballGame->collisionResponseType = 2;
         *arg1 = sp00 & 0xFFF0;
         return_val = 1;
         break;
@@ -2605,11 +2605,11 @@ s16 COLLISION_CHECK_RAYQUAZA_187F4(struct Vector16 *arg0, u16 *arg1)
         break;
     }
 
-    sub_18AE0(some_enum, &return_val, arg1);
+    ProcessRayquazaCollisionEvent(some_enum, &return_val, arg1);
     return return_val;
 }
 
-void sub_18A4C(struct Vector16 *arg0, u16 *arg1, u8 *arg2)
+void CheckRayquazaEntityCollision(struct Vector16 *arg0, u16 *arg1, u8 *arg2)
 {
     s16 deltaX;
     s16 deltaY;
@@ -2621,24 +2621,24 @@ void sub_18A4C(struct Vector16 *arg0, u16 *arg1, u8 *arg2)
     if (*arg2 & 0xF)
         return;
 
-    deltaX = arg0->x - gCurrentPinballGame->unk3F0;
-    deltaY = arg0->y - gCurrentPinballGame->unk3F2;
+    deltaX = arg0->x - gCurrentPinballGame->bossCollisionX;
+    deltaY = arg0->y - gCurrentPinballGame->bossCollisionY;
 
     if ((deltaX < 0 || deltaX >= 0x80) || (deltaY < 0 || deltaY >= 0x80))
         return;
 
-    maskedResult = gUnknown_083722E8[(deltaY * 0x80) + deltaX] & 0xFFF0;
-    lowerNibble = gUnknown_083722E8[(deltaY * 0x80) + deltaX] & 0xF;
+    maskedResult = gRayquazaBodyCollisionMap[(deltaY * 0x80) + deltaX] & 0xFFF0;
+    lowerNibble = gRayquazaBodyCollisionMap[(deltaY * 0x80) + deltaX] & 0xF;
 
     if (lowerNibble == 0)
         return;
 
-    gCurrentPinballGame->unk452 = 9;
+    gCurrentPinballGame->bossHitFlashTimer = 9;
     *arg1 = maskedResult;
     *arg2 = lowerNibble;
 }
 
-void sub_18AE0(u8 arg0, u16 *arg1, u16 *arg2)
+void ProcessRayquazaCollisionEvent(u8 arg0, u16 *arg1, u16 *arg2)
 {
     switch (arg0)
     {
@@ -2647,8 +2647,8 @@ void sub_18AE0(u8 arg0, u16 *arg1, u16 *arg2)
     case 3:
         break;
     case 4:
-        gCurrentPinballGame->unk3DC = 6;
-        gCurrentPinballGame->unk1F = 1;
+        gCurrentPinballGame->bossEntityState = 6;
+        gCurrentPinballGame->ballFrozenState = 1;
         break;
     case 5:
     case 6:
@@ -2673,27 +2673,27 @@ s16 COLLISION_CHECK_SPHEAL_18B50(struct Vector16 *arg0, u16 *arg1)
 
     struct Vector16 div_result;
     struct Vector16 div_remainder;
-    s32 unk1;
-    s32 unk2;
-    s16 unk3;
+    s32 tileMapPage;
+    s32 boardLayer;
+    s16 collisionTileIndex;
     u8 enum1, enum2;
 
     sp4_return = 0;
-    gCurrentPinballGame->ball->unk4 = 0;
+    gCurrentPinballGame->ball->spinAcceleration = 0;
 
     div_result.x = arg0->x / 8;
     div_result.y = arg0->y / 8;
     div_remainder.x = arg0->x % 8;
     div_remainder.y = arg0->y % 8;
-    unk1 = div_result.y / 64;
-    unk2 = gCurrentPinballGame->unk24;
+    tileMapPage = div_result.y / 64;
+    boardLayer = gCurrentPinballGame->boardLayerDepth;
     div_result.y %= 64;
 
-    unk3 = gUnknown_02031520.unk14.unk38[unk2 + unk1][div_result.y * 64 + div_result.x];
-    sp0 = gUnknown_02031520.unk14.unk48[unk2 + unk1][unk3 * 64 + div_remainder.y * 8 + div_remainder.x];
-    sp2 = gUnknown_02031520.unk14.unk58[unk2 + unk1][unk3 * 64 + div_remainder.y * 8 + div_remainder.x];
+    collisionTileIndex = gBoardConfig.fieldLayout.collisionTileMap[boardLayer + tileMapPage][div_result.y * 64 + div_result.x];
+    sp0 = gBoardConfig.fieldLayout.collisionAngleMap[boardLayer + tileMapPage][collisionTileIndex * 64 + div_remainder.y * 8 + div_remainder.x];
+    sp2 = gBoardConfig.fieldLayout.collisionTypeMap[boardLayer + tileMapPage][collisionTileIndex * 64 + div_remainder.y * 8 + div_remainder.x];
 
-    sub_18DAC(arg0, &sp0, &sp2);
+    CheckSphealEntityCollision(arg0, &sp0, &sp2);
 
     enum1 = sp2 & 0xF;
     enum2 = sp2 >> 4;
@@ -2702,19 +2702,19 @@ s16 COLLISION_CHECK_SPHEAL_18B50(struct Vector16 *arg0, u16 *arg1)
     case 1:
     case 4:
     case 6:
-        gCurrentPinballGame->unk23 = enum1 - 1;
-        gCurrentPinballGame->unk22 = 1;
+        gCurrentPinballGame->collisionSurfaceType = enum1 - 1;
+        gCurrentPinballGame->collisionResponseType = 1;
         *arg1 = sp0;
         if (*arg1 >= 0x3FF0 && *arg1 <= 0x4010)
         {
-            if (gCurrentPinballGame->ball->positionQ0.x < (gUnknown_02031520.unk14.unk26 - 8) ||
-                gCurrentPinballGame->ball->positionQ0.y < (gUnknown_02031520.unk14.unk28 - 8))
+            if (gCurrentPinballGame->ball->positionQ0.x < (gBoardConfig.fieldLayout.ballSpawnX - 8) ||
+                gCurrentPinballGame->ball->positionQ0.y < (gBoardConfig.fieldLayout.ballSpawnY - 8))
             {
-                if (gCurrentPinballGame->ball->unk6 > 0)
+                if (gCurrentPinballGame->ball->spinSpeed > 0)
                 {
                     *arg1 = 0x3E00;
                 }
-                else if (gCurrentPinballGame->ball->unk6 != 0)
+                else if (gCurrentPinballGame->ball->spinSpeed != 0)
                 {
                     *arg1 = 0x4100;
                 }
@@ -2722,14 +2722,14 @@ s16 COLLISION_CHECK_SPHEAL_18B50(struct Vector16 *arg0, u16 *arg1)
                 {
                     if (gMain.systemFrameCount & 1)
                     {
-                        gCurrentPinballGame->ball->unk4 = 40;
-                        gCurrentPinballGame->ball->unk6 = 1;
+                        gCurrentPinballGame->ball->spinAcceleration = 40;
+                        gCurrentPinballGame->ball->spinSpeed = 1;
                         *arg1 = 0x3E00;
                     }
                     else
                     {
-                        gCurrentPinballGame->ball->unk4 = -40;
-                        gCurrentPinballGame->ball->unk6 = -1;
+                        gCurrentPinballGame->ball->spinAcceleration = -40;
+                        gCurrentPinballGame->ball->spinSpeed = -1;
                         *arg1 = 0x4100;
                     }
                 }
@@ -2739,14 +2739,14 @@ s16 COLLISION_CHECK_SPHEAL_18B50(struct Vector16 *arg0, u16 *arg1)
         break;
     case 2:
     case 3:
-        gCurrentPinballGame->unk23 = 0;
-        gCurrentPinballGame->unk22 = 1;
+        gCurrentPinballGame->collisionSurfaceType = 0;
+        gCurrentPinballGame->collisionResponseType = 1;
         *arg1 = sp0 & 0x0000FFF0;
 
         if (gCurrentPinballGame->ball->positionQ0.x < 120)
-            gCurrentPinballGame->unk548[0] = 24;
+            gCurrentPinballGame->minionHitFlashTimer[0] = 24;
         else
-            gCurrentPinballGame->unk548[1] = 24;
+            gCurrentPinballGame->minionHitFlashTimer[1] = 24;
 
         sp4_return = 1;
         break;
@@ -2755,11 +2755,11 @@ s16 COLLISION_CHECK_SPHEAL_18B50(struct Vector16 *arg0, u16 *arg1)
         break;
     }
 
-    sub_18F38(enum2, &sp4_return, arg1);
+    ProcessSphealCollisionEvent(enum2, &sp4_return, arg1);
     return sp4_return;
 }
 
-void sub_18DAC(struct Vector16 *arg0, u16 *arg1, u8 *arg2)
+void CheckSphealEntityCollision(struct Vector16 *arg0, u16 *arg1, u8 *arg2)
 {
     s16 i;
     s16 deltaX, deltaY;
@@ -2768,80 +2768,80 @@ void sub_18DAC(struct Vector16 *arg0, u16 *arg1, u8 *arg2)
     for (i = 0; i < 2; i++)
     {
 
-        if (gCurrentPinballGame->unk54F[i] == 1)
+        if (gCurrentPinballGame->flyingEnemyCollisionType[i] == 1)
         {
             if ((arg2[0] & 0xf) != 0)
                 continue;
 
-            deltaX = arg0->x - gCurrentPinballGame->unk570[i].x;
-            deltaY = arg0->y - gCurrentPinballGame->unk570[i].y;
+            deltaX = arg0->x - gCurrentPinballGame->flyingEnemyCollisionPos[i].x;
+            deltaY = arg0->y - gCurrentPinballGame->flyingEnemyCollisionPos[i].y;
             if ((deltaX >= 64 || deltaX < 0) || (deltaY >= 64 || deltaY < 0))
                 continue;
 
-            upperReadFromRom = gUnknown_08393A4C[(deltaY * 64) + deltaX] & 0xFFF0;
-            lowerReadFromRom = gUnknown_08393A4C[(deltaY * 64) + deltaX] & 0xF;
+            upperReadFromRom = gSphealFrozenIceCollisionMap[(deltaY * 64) + deltaX] & 0xFFF0;
+            lowerReadFromRom = gSphealFrozenIceCollisionMap[(deltaY * 64) + deltaX] & 0xF;
             if (lowerReadFromRom == 0)
                 continue;
 
-            if (gCurrentPinballGame->unk388 != 0)
+            if (gCurrentPinballGame->ballRespawnState != 0)
                 continue;
 
             arg1[0] = upperReadFromRom;
             arg2[0] = lowerReadFromRom;
             arg2[0] = 6;
-            gCurrentPinballGame->unk553[i] = 4;
+            gCurrentPinballGame->flyingEnemyState[i] = 4;
         }
-        else if (gCurrentPinballGame->unk54F[i] != 0)
+        else if (gCurrentPinballGame->flyingEnemyCollisionType[i] != 0)
         {
             if ((arg2[0] & 0xf) != 0)
                 continue;
 
-            deltaX = arg0->x - gCurrentPinballGame->unk570[i].x;
-            deltaY = arg0->y - gCurrentPinballGame->unk570[i].y;
+            deltaX = arg0->x - gCurrentPinballGame->flyingEnemyCollisionPos[i].x;
+            deltaY = arg0->y - gCurrentPinballGame->flyingEnemyCollisionPos[i].y;
             if ((deltaX >= 64 || deltaX < 0) || (deltaY >= 64 || deltaY < 0))
                 continue;
 
-            upperReadFromRom = gUnknown_08391A4C[(deltaY * 64) + deltaX] & 0xFFF0;
-            lowerReadFromRom = gUnknown_08391A4C[(deltaY * 64) + deltaX] & 0xF;
+            upperReadFromRom = gSphealCrackedIceCollisionMap[(deltaY * 64) + deltaX] & 0xFFF0;
+            lowerReadFromRom = gSphealCrackedIceCollisionMap[(deltaY * 64) + deltaX] & 0xF;
             if (lowerReadFromRom == 0)
                 continue;
 
             arg1[0] = upperReadFromRom;
             arg2[0] = lowerReadFromRom;
             arg2[0] = 6;
-            if (gCurrentPinballGame->unk54F[i] == 2)
+            if (gCurrentPinballGame->flyingEnemyCollisionType[i] == 2)
             {
-                gCurrentPinballGame->unk553[i] = 4;
+                gCurrentPinballGame->flyingEnemyState[i] = 4;
             }
             else
             {
-                gCurrentPinballGame->unk54D[i] = 24;
+                gCurrentPinballGame->flyingEnemyHitCooldown[i] = 24;
             }
         }
     }
 }
 
-void sub_18F38(u8 arg0_enum, u16 *arg1, u16 *arg2)
+void ProcessSphealCollisionEvent(u8 arg0_enum, u16 *arg1, u16 *arg2)
 {
     switch (arg0_enum)
     {
     case 2:
-        gCurrentPinballGame->unk530[2] = 0;
-        gCurrentPinballGame->unk536[2] = 2;
+        gCurrentPinballGame->knockdownTargetIndex[2] = 0;
+        gCurrentPinballGame->knockdownPhase[2] = 2;
         break;
     case 3:
-        gCurrentPinballGame->unk530[2] = 1;
-        gCurrentPinballGame->unk536[2] = 2;
+        gCurrentPinballGame->knockdownTargetIndex[2] = 1;
+        gCurrentPinballGame->knockdownPhase[2] = 2;
         break;
     case 8:
-        gCurrentPinballGame->unk530[2] = 0;
-        gCurrentPinballGame->unk536[2] = 1;
-        gCurrentPinballGame->unk53C[2] = 100;
+        gCurrentPinballGame->knockdownTargetIndex[2] = 0;
+        gCurrentPinballGame->knockdownPhase[2] = 1;
+        gCurrentPinballGame->knockdownStunTimer[2] = 100;
         break;
     case 9:
-        gCurrentPinballGame->unk530[2] = 1;
-        gCurrentPinballGame->unk536[2] = 1;
-        gCurrentPinballGame->unk53C[2] = 100;
+        gCurrentPinballGame->knockdownTargetIndex[2] = 1;
+        gCurrentPinballGame->knockdownPhase[2] = 1;
+        gCurrentPinballGame->knockdownStunTimer[2] = 100;
         break;
     case 1:
     case 4:

@@ -6,7 +6,7 @@
  *   0 if captured via ball
  *   1 if evolved
 */
-void sub_31CF8(s16 evolved)
+void RegisterCaptureOrEvolution(s16 evolved)
 {
     s16 i;
 

@@ -58,16 +58,16 @@ static void PlayCryInternal(u16 speciesRS, s8 pan, s8 volume, u8 priority, int u
     switch (table)
     {
     case 0:
-        SetPokemonCryTone(&gUnknown_08532D6C[index]);
+        SetPokemonCryTone(&gPokemonCryToneBank0[index]);
         break;
     case 1:
-        SetPokemonCryTone(&gUnknown_08533360[index]);
+        SetPokemonCryTone(&gPokemonCryToneBank1[index]);
         break;
     case 2:
-        SetPokemonCryTone(&gUnknown_08533960[index]);
+        SetPokemonCryTone(&gPokemonCryToneBank2[index]);
         break;
     case 3:
-        SetPokemonCryTone(&gUnknown_08533F60[index]);
+        SetPokemonCryTone(&gPokemonCryToneBank3[index]);
         break;
     }
 }

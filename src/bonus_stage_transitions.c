@@ -13,42 +13,42 @@ extern const u8 gRayquazaBonusClear_Gfx[];
 
 void FadeToMainBoard(void)
 {
-    gCurrentPinballGame->unk1100 = 1;
-    switch (gCurrentPinballGame->unk17)
+    gCurrentPinballGame->startButtonDisabled = 1;
+    switch (gCurrentPinballGame->boardSubState)
     {
     case 0:
-        gCurrentPinballGame->unk18 = 65;
-        gCurrentPinballGame->unk17 = 1;
+        gCurrentPinballGame->stageTimer = 65;
+        gCurrentPinballGame->boardSubState = 1;
         gMain.blendControl = 0x9F;
         break;
     case 1:
-        if (gCurrentPinballGame->unk18)
+        if (gCurrentPinballGame->stageTimer)
         {
-            gCurrentPinballGame->unk18--;
-            gMain.blendBrightness = 16 - gCurrentPinballGame->unk18 / 4;
-            if (gCurrentPinballGame->unk18 == 0)
-                gCurrentPinballGame->unk17++;
+            gCurrentPinballGame->stageTimer--;
+            gMain.blendBrightness = 16 - gCurrentPinballGame->stageTimer / 4;
+            if (gCurrentPinballGame->stageTimer == 0)
+                gCurrentPinballGame->boardSubState++;
         }
         break;
     case 2:
-        if (gCurrentPinballGame->unk18 < 30)
+        if (gCurrentPinballGame->stageTimer < 30)
         {
-            gCurrentPinballGame->unk18++;
+            gCurrentPinballGame->stageTimer++;
         }
         else
         {
-            gCurrentPinballGame->unk18 = 0;
-            gCurrentPinballGame->unk17 = 0;
+            gCurrentPinballGame->stageTimer = 0;
+            gCurrentPinballGame->boardSubState = 0;
             gMain.spriteGroups[6].available = 0;
             gMain.spriteGroups[5].available = 0;
-            if (gMain.unk5 != gMain.selectedField)
+            if (gMain.tempField != gMain.selectedField)
             {
-                sub_357B8();
+                TransitionFromBonusToMainBoard();
             }
             else
             {
                 ResetSomeGraphicsRelatedStuff();
-                gCurrentPinballGame->unk1D = 2;
+                gCurrentPinballGame->fadeSubState = 2;
             }
         }
         break;
@@ -68,48 +68,48 @@ void ProceessBonusBannerAndScoring(void)
     var0 = 8;
     var1 = 0;
     group = &gMain.spriteGroups[6];
-    if (gCurrentPinballGame->unk394 > 0)
+    if (gCurrentPinballGame->bannerSlideYOffset > 0)
     {
-        gCurrentPinballGame->unk394 -= 6;
-        if (gCurrentPinballGame->unk394 < 0)
-            gCurrentPinballGame->unk394 = 0;
+        gCurrentPinballGame->bannerSlideYOffset -= 6;
+        if (gCurrentPinballGame->bannerSlideYOffset < 0)
+            gCurrentPinballGame->bannerSlideYOffset = 0;
     }
 
     switch (gMain.selectedField)
     {
     case FIELD_DUSCLOPS:
-        if (gCurrentPinballGame->unk13 == 5 && gCurrentPinballGame->unk18 < 180)
-            var0 = (gCurrentPinballGame->unk18 % 24) / 12 + 8;
+        if (gCurrentPinballGame->boardState == 5 && gCurrentPinballGame->stageTimer < 180)
+            var0 = (gCurrentPinballGame->stageTimer % 24) / 12 + 8;
         var1 = 30000000;
         break;
     case FIELD_KECLEON:
-        if (gCurrentPinballGame->unk13 == 3 && gCurrentPinballGame->unk18 < 180)
-            var0 = (gCurrentPinballGame->unk18 % 24) / 12 + 8;
+        if (gCurrentPinballGame->boardState == 3 && gCurrentPinballGame->stageTimer < 180)
+            var0 = (gCurrentPinballGame->stageTimer % 24) / 12 + 8;
         var1 = 30000000;
         break;
     case FIELD_KYOGRE:
-        if (gCurrentPinballGame->unk13 == 3 && gCurrentPinballGame->unk18 < 180)
-            var0 = (gCurrentPinballGame->unk18 % 24) / 12 + 8;
+        if (gCurrentPinballGame->boardState == 3 && gCurrentPinballGame->stageTimer < 180)
+            var0 = (gCurrentPinballGame->stageTimer % 24) / 12 + 8;
         var1 = 50000000;
         break;
     case FIELD_GROUDON:
-        if (gCurrentPinballGame->unk13 == 3 && gCurrentPinballGame->unk18 < 180)
-            var0 = (gCurrentPinballGame->unk18 % 24) / 12 + 8;
+        if (gCurrentPinballGame->boardState == 3 && gCurrentPinballGame->stageTimer < 180)
+            var0 = (gCurrentPinballGame->stageTimer % 24) / 12 + 8;
         var1 = 50000000;
         break;
     case FIELD_RAYQUAZA:
-        if (gCurrentPinballGame->unk13 == 3 && gCurrentPinballGame->unk18 < 180)
-            var0 = (gCurrentPinballGame->unk18 % 24) / 12 + 8;
+        if (gCurrentPinballGame->boardState == 3 && gCurrentPinballGame->stageTimer < 180)
+            var0 = (gCurrentPinballGame->stageTimer % 24) / 12 + 8;
         var1 = 99999999;
         break;
     }
 
-    DmaCopy16(3, gUnknown_02031520.unk14.unk2C[0] + var0 * 0x20, (void *)0x05000300, 0x20);
+    DmaCopy16(3, gBoardConfig.fieldLayout.objPaletteSets[0] + var0 * 0x20, (void *)0x05000300, 0x20);
 
     if (group->available)
     {
         group->baseX = 120;
-        group->baseY = gCurrentPinballGame->unk394 + 50;
+        group->baseY = gCurrentPinballGame->bannerSlideYOffset + 50;
         for (i = 0; i < 3; i++)
         {
             oamSimple = &group->oam[i];
@@ -119,7 +119,7 @@ void ProceessBonusBannerAndScoring(void)
 
         group = &gMain.spriteGroups[5];
         group->baseX = 120;
-        group->baseY = gCurrentPinballGame->unk394 + 50;
+        group->baseY = gCurrentPinballGame->bannerSlideYOffset + 50;
         for (i = 0; i < 18; i++)
         {
             oamSimple = &group->oam[i];
@@ -182,14 +182,14 @@ void ProceessBonusBannerAndScoring(void)
     }
 }
 
-void sub_356A0(void)
+void RenderBonusStageOverlaySprites(void)
 {
     s16 i;
     struct SpriteGroup *group;
     struct OamDataSimple *oamSimple;
 
     group = &gMain_spriteGroups_14;
-    switch (gCurrentPinballGame->unk3DC)
+    switch (gCurrentPinballGame->bossEntityState)
     {
     case 0:
     case 1:
@@ -205,7 +205,7 @@ void sub_356A0(void)
         gOamBuffer[oamSimple->oamId].y = oamSimple->yOffset + group->baseY;
         break;
     case 2:
-        if (gCurrentPinballGame->unk3E6 <= 0)
+        if (gCurrentPinballGame->bossAnimLoopCount <= 0)
             break;
 
         if (!group->available)
@@ -240,31 +240,31 @@ void sub_356A0(void)
     }
 }
 
-void sub_357B8(void)
+void TransitionFromBonusToMainBoard(void)
 {
     u8 temp;
 
     m4aMPlayAllStop();
-    sub_0D10();
+    DisableVBlankInterrupts();
 
-    temp = gMain.unk5;
-    gMain.unk5 = gMain.selectedField;
+    temp = gMain.tempField;
+    gMain.tempField = gMain.selectedField;
     gMain.selectedField = temp;
-    gMain.unk6 = 0;
+    gMain.isBonusField = 0;
     gMain.modeChangeFlags = MODE_CHANGE_NONE;
     gCurrentPinballGame->eventTimer = 0;
-    gCurrentPinballGame->unk294 = 0;
+    gCurrentPinballGame->boardModeType = 0;
     if (gCurrentPinballGame->numCompletedBonusStages > 4)
         gMain.eReaderBonuses[EREADER_ENCOUNTER_RATE_UP_CARD] = 1;
 
     gMain.subState = 0;
-    gCurrentPinballGame->unk15 = 3;
-    gCurrentPinballGame->unk13 = 1;
-    gCurrentPinballGame->unk16 = 0;
-    gCurrentPinballGame->unk5FA = 0;
-    gCurrentPinballGame->unkE6 = 0;
-    sub_1C7F4(0, 0);
-    gCurrentPinballGame->unk6C4 = 0;
-    if (gCurrentPinballGame->unk714)
-        gCurrentPinballGame->unk6EE = 120;
+    gCurrentPinballGame->prevBoardState = 3;
+    gCurrentPinballGame->boardState = 1;
+    gCurrentPinballGame->boardTransitionPhase = 0;
+    gCurrentPinballGame->boardEntityActive = 0;
+    gCurrentPinballGame->cameraYAdjust = 0;
+    LoadPortraitGraphics(0, 0);
+    gCurrentPinballGame->portraitDisplayState = 0;
+    if (gCurrentPinballGame->allHolesLit)
+        gCurrentPinballGame->allHolesLitDelayTimer = 120;
 }

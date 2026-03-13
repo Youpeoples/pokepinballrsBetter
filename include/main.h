@@ -30,7 +30,7 @@ struct SaveData
     /*0x158*/ struct HighScoreEntry highScores[2][NUM_HIGH_SCORES];
     /*0x2D8*/ s8 signature[10];
               u16 checksum;
-              u32 unk2E4;
+              u32 saveChangeCounter;
 };
 
 struct Main
@@ -39,12 +39,12 @@ struct Main
     /*0x02*/ u8 mainState;
     /*0x03*/ u8 subState;
     /*0x04*/ u8 selectedField;
-    /*0x05*/ u8 unk5; // tempField (?)
-    /*0x06*/ u8 unk6; // isBonusField (?)
+    /*0x05*/ u8 tempField;
+    /*0x06*/ u8 isBonusField;
     /*0x07*/ s8 eReaderBonuses[NUM_EREADER_CARDS];
-    /*0x0C*/ u8 unkC;
-    /*0x0D*/ u8 unkD;
-    /*0x0E*/ u8 unkE;
+    /*0x0C*/ u8 sramError;
+    /*0x0D*/ u8 continueFromSave;
+    /*0x0E*/ u8 gameExitState;
 
     // UnkF hold a Bitmask for the following:
     // x1 mode start banner Evo/Catch/Travel, 
@@ -57,10 +57,10 @@ struct Main
     // x80 Bonus Score banner
     // Most cause a board state transition once conditions are met.
     /*0x0F*/ u8 modeChangeFlags;   
-    /*0x10*/ u8 unk10;
-    /*0x11*/ u8 unk11;
-    /*0x12*/ u16 unk12;
-    /*0x14*/ u16 unk14;
+    /*0x10*/ u8 debugMenuCursorIndex;
+    /*0x11*/ u8 pendingModeChangeType;
+    /*0x12*/ u16 animationTimer;
+    /*0x14*/ u16 modeChangeDelayTimer;
     /*0x16*/ u16 dispcntBackup;
     /*0x18*/ u16 newKeys;
     /*0x1A*/ u16 releasedKeys;
@@ -69,23 +69,23 @@ struct Main
     /*0x20*/ u16 unk20;
     /*0x22*/ u8 filler22[0x4];
     /*0x26*/ s16 vCount;
-    /*0x28*/ s16 unk28;
-    /*0x2A*/ s16 unk2A;
-    /*0x2C*/ s16 unk2C;
-    /*0x2E*/ s16 unk2E;
-    /*0x30*/ u16 unk30;
+    /*0x28*/ s16 shopPanelActive;
+    /*0x2A*/ s16 shopPanelSlideOffset;
+    /*0x2C*/ s16 scoreOverlayActive;
+    /*0x2E*/ s16 kecleonOverlayHeight;
+    /*0x30*/ u16 idleDemoVariant;
     /*0x32*/ u8 filler32[0x4];
-    /*0x36*/ u8 unk36;
+    /*0x36*/ u8 blendEnabled;
     /*0x38*/ volatile u16 blendControl;
     /*0x3A*/ volatile u16 blendAlpha;
     /*0x3C*/ volatile u16 blendBrightness;
              // may be a sub-struct. possibly for saved game?
     /*0x40*/ int hasSavedGame;
-    /*0x44*/ struct SpriteGroup **unk44;
+    /*0x44*/ struct SpriteGroup **fieldSpriteGroups;
     /*0x48*/ int rngValue;
     /*0x4C*/ u32 systemFrameCount;
     /*0x50*/ u32 fieldFrameCount;
-    /*0x54*/ u32 unk54;
+    /*0x54*/ u32 idleFrameCounter;
     /*0x58*/ u32 finalScoreLo;
     /*0x5C*/ u32 finalScoreHi;
 
@@ -128,40 +128,40 @@ extern u32 IntrMain_Buffer[0x200];
 extern u32 IntrMain[];
 extern IntrFunc *gVBlankIntrFuncPtr;
 extern IntrFunc *gVCountIntrFuncPtr;
-extern int gUnknown_02019BE4;
-extern int gUnknown_02019BE8;
-extern int gUnknown_02019BEC;
-extern u32 gUnknown_02019BF0;
-extern int gUnknown_02019BF4;
-extern int gUnknown_02019BF8;
-extern int gUnknown_02019BFC;
-extern int gUnknown_02019C00;
-extern int gUnknown_02019C04;
-extern int gUnknown_02019C08;
+extern int gRumbleLoopCounter;
+extern int gRumbleFrameCounter;
+extern int gRumbleMotorMode;
+extern u32 gSio32ReconnectTimer;
+extern int gSio32SerialEnabled;
+extern int gRumblePatternIndex;
+extern int gRumblePatternPosition;
+extern int gRumbleCommand;
+extern int gRumblePaused;
+extern int gRumbleSpeedMode;
 extern int gGameBoyPlayerEnabled;
-extern u8 gUnknown_02019C10;
+extern u8 gSio32CommState;
 extern u8 gGbPlayerTilemapBuffer[];
 #define INTR_COUNT 14
 extern IntrFunc gIntrTable[14];
 extern void (*gMainCallback)(void);
-extern void (*gUnknown_0200FBA0)(void);
-extern void (*gUnknown_02017BD0)(void);
-extern void (*gUnknown_02017BD4)(void);
+extern void (*gVCountIntrFuncShadow)(void);
+extern void (*gVBlankIntrFuncShadow)(void);
+extern void (*gMainCallbackShadow)(void);
 extern StateFunc gMainFuncs[];
 extern struct OamData gOamBuffer[128];
 
-void sub_024C(void);
-void sub_02B4(void);
+void FadeInScreen(void);
+void FadeOutScreen(void);
 void ClearGraphicsMemory(void);
-void sub_0518(void);
+void ClearBgTilemapAndOffsets(void);
 void ClearSprites(void);
 u32 Random(void);
 void VBlankIntr(void);
 void VCountIntr(void);
 void SerialIntr(void);
 void Timer3Intr(void);
-void sub_0CBC(void);
-void sub_0D10(void);
+void EnableVBlankInterrupts(void);
+void DisableVBlankInterrupts(void);
 void MainLoopIter(void);
 void DefaultMainCallback(void);
 

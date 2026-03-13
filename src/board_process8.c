@@ -3,9 +3,9 @@
 #include "main.h"
 #include "constants/bg_music.h"
 
-extern const u8 gUnknown_086B0884[];
-extern const u8 gUnknown_081C0064[];
-extern const u8 gUnknown_086B08A4[];
+extern const u8 gTimerWarningPalette_Fast[];
+extern const u8 gDefaultBallPalette[];
+extern const u8 gTimerWarningPalette_Slow[];
 
 void AllBoardProcess_8A_4CEA8(void)
 {
@@ -18,7 +18,7 @@ void AllBoardProcess_8B_4CEB4(void)
     s16 sp0[12];
     u32 value;
 
-    sub_4D3D0();
+    ProcessEventTimer();
     gCurrentPinballGame->scoreAdditionAccumulator += (gCurrentPinballGame->ballUpgradeType + 1) * gCurrentPinballGame->scoreAddedInFrame;
     if (gCurrentPinballGame->scoreCounterAnimationEnabled)
     {
@@ -97,8 +97,8 @@ void AllBoardProcess_8B_4CEB4(void)
     }
     for (j = i; j < 12; j++)
     {
-        gUnknown_03005C00[0x7C1 + (j - i)] = sp0[j] * 2 - 0x3EA0;
-        gUnknown_03005C00[0x7E1 + (j - i)] = sp0[j] * 2 - 0x3E9F;
+        gBG0TilemapBuffer[0x7C1 + (j - i)] = sp0[j] * 2 - 0x3EA0;
+        gBG0TilemapBuffer[0x7E1 + (j - i)] = sp0[j] * 2 - 0x3E9F;
     }
 
     if (gCurrentPinballGame->caughtMonCount > 999)
@@ -106,71 +106,71 @@ void AllBoardProcess_8B_4CEB4(void)
     sp0[2] = gCurrentPinballGame->caughtMonCount / 100;
     sp0[1] = (gCurrentPinballGame->caughtMonCount % 100) / 10;
     sp0[0] = gCurrentPinballGame->caughtMonCount % 10;
-    gUnknown_03005C00[0x7D1] = 0xC17E;
-    gUnknown_03005C00[0x7F1] = 0xC17F;
-    gUnknown_03005C00[0x7D2] = (sp0[2] + 5) * 2 - 0x3EA0;
-    gUnknown_03005C00[0x7F2] = (sp0[2] + 5) * 2 - 0x3E9F;
-    gUnknown_03005C00[0x7D3] = (sp0[1] + 5) * 2 - 0x3EA0;
-    gUnknown_03005C00[0x7F3] = (sp0[1] + 5) * 2 - 0x3E9F;
-    gUnknown_03005C00[0x7D4] = (sp0[0] + 5) * 2 - 0x3EA0;
-    gUnknown_03005C00[0x7F4] = (sp0[0] + 5) * 2 - 0x3E9F;
+    gBG0TilemapBuffer[0x7D1] = 0xC17E;
+    gBG0TilemapBuffer[0x7F1] = 0xC17F;
+    gBG0TilemapBuffer[0x7D2] = (sp0[2] + 5) * 2 - 0x3EA0;
+    gBG0TilemapBuffer[0x7F2] = (sp0[2] + 5) * 2 - 0x3E9F;
+    gBG0TilemapBuffer[0x7D3] = (sp0[1] + 5) * 2 - 0x3EA0;
+    gBG0TilemapBuffer[0x7F3] = (sp0[1] + 5) * 2 - 0x3E9F;
+    gBG0TilemapBuffer[0x7D4] = (sp0[0] + 5) * 2 - 0x3EA0;
+    gBG0TilemapBuffer[0x7F4] = (sp0[0] + 5) * 2 - 0x3E9F;
 
     if (gCurrentPinballGame->coins > 99)
         gCurrentPinballGame->coins = 99;
     sp0[1] = gCurrentPinballGame->coins / 10;
     sp0[0] = gCurrentPinballGame->coins % 10;
-    gUnknown_03005C00[0x7D6] = 0xC19C;
-    gUnknown_03005C00[0x7F6] = 0xC19D;
-    gUnknown_03005C00[0x7D7] = (sp0[1] + 5) * 2 - 0x3EA0;
-    gUnknown_03005C00[0x7F7] = (sp0[1] + 5) * 2 - 0x3E9F;
-    gUnknown_03005C00[0x7D8] = (sp0[0] + 5) * 2 - 0x3EA0;
-    gUnknown_03005C00[0x7F8] = (sp0[0] + 5) * 2 - 0x3E9F;
+    gBG0TilemapBuffer[0x7D6] = 0xC19C;
+    gBG0TilemapBuffer[0x7F6] = 0xC19D;
+    gBG0TilemapBuffer[0x7D7] = (sp0[1] + 5) * 2 - 0x3EA0;
+    gBG0TilemapBuffer[0x7F7] = (sp0[1] + 5) * 2 - 0x3E9F;
+    gBG0TilemapBuffer[0x7D8] = (sp0[0] + 5) * 2 - 0x3EA0;
+    gBG0TilemapBuffer[0x7F8] = (sp0[0] + 5) * 2 - 0x3E9F;
 
     if (gCurrentPinballGame->numLives > 9)
         gCurrentPinballGame->numLives = 9;
-    gUnknown_03005C00[0x7DA] = 0xC180;
-    gUnknown_03005C00[0x7FA] = 0xC181;
-    gUnknown_03005C00[0x7DB] = (gCurrentPinballGame->numLives + 5) * 2 - 0x3EA0;
-    gUnknown_03005C00[0x7FB] = (gCurrentPinballGame->numLives + 5) * 2 - 0x3E9F;
+    gBG0TilemapBuffer[0x7DA] = 0xC180;
+    gBG0TilemapBuffer[0x7FA] = 0xC181;
+    gBG0TilemapBuffer[0x7DB] = (gCurrentPinballGame->numLives + 5) * 2 - 0x3EA0;
+    gBG0TilemapBuffer[0x7FB] = (gCurrentPinballGame->numLives + 5) * 2 - 0x3E9F;
 
-    if (gCurrentPinballGame->unk1CA == 13)
+    if (gCurrentPinballGame->catchCounterValue == 13)
     {
-        if (gCurrentPinballGame->unk1DC & 0x8)
+        if (gCurrentPinballGame->catchCounterBlinkTimer & 0x8)
         {
-            gUnknown_03005C00[0x7DD] = 0xC19A;
-            gUnknown_03005C00[0x7FD] = 0xC19B;
+            gBG0TilemapBuffer[0x7DD] = 0xC19A;
+            gBG0TilemapBuffer[0x7FD] = 0xC19B;
         }
         else
         {
-            gUnknown_03005C00[0x7DD] = 0xC182;
-            gUnknown_03005C00[0x7FD] = 0xC183;
+            gBG0TilemapBuffer[0x7DD] = 0xC182;
+            gBG0TilemapBuffer[0x7FD] = 0xC183;
         }
 
-        if (gCurrentPinballGame->unk1DC)
-            gCurrentPinballGame->unk1DC--;
+        if (gCurrentPinballGame->catchCounterBlinkTimer)
+            gCurrentPinballGame->catchCounterBlinkTimer--;
     }
     else
     {
-        gUnknown_03005C00[0x7DD] = 0xC19E;
-        gUnknown_03005C00[0x7FD] = 0xC19F;
+        gBG0TilemapBuffer[0x7DD] = 0xC19E;
+        gBG0TilemapBuffer[0x7FD] = 0xC19F;
     }
 
-    DmaCopy16(3, &gUnknown_03005C00[0x7C0], (void *)0x06002F80, 0x80);
+    DmaCopy16(3, &gBG0TilemapBuffer[0x7C0], (void *)0x06002F80, 0x80);
 }
 
-void sub_4D3D0(void)
+void ProcessEventTimer(void)
 {
     s16 i;
     s16 sp0[4];
     s16 var2;
 
-    if (gCurrentPinballGame->unk294 == 0)
+    if (gCurrentPinballGame->boardModeType == 0)
         return;
 
     if (gCurrentPinballGame->eventTimer == 0)
         return;
 
-    if (gCurrentPinballGame->unk294 == 2 && gMain.modeChangeFlags == MODE_CHANGE_NONE)
+    if (gCurrentPinballGame->boardModeType == 2 && gMain.modeChangeFlags == MODE_CHANGE_NONE)
         gCurrentPinballGame->eventTimer--;
 
     sp0[0] = gCurrentPinballGame->eventTimer / 3600;
@@ -179,44 +179,44 @@ void sub_4D3D0(void)
     sp0[2] = var2 / 600;
     var2 %= 600;
     sp0[3] = var2 / 60;
-    if (gCurrentPinballGame->unk294 == 3)
+    if (gCurrentPinballGame->boardModeType == 3)
     {
         for (i = 0; i < 4; i++)
         {
-            gUnknown_03005C00[0x179 + i] = 0x1FF;
-            gUnknown_03005C00[0x199 + i] = 0x1FF;
+            gBG0TilemapBuffer[0x179 + i] = 0x1FF;
+            gBG0TilemapBuffer[0x199 + i] = 0x1FF;
         }
 
-        DmaCopy16(3, &gUnknown_03005C00[0x160], (void *)0x060022C0, 0x80);
-        gCurrentPinballGame->unk294 = 0;
+        DmaCopy16(3, &gBG0TilemapBuffer[0x160], (void *)0x060022C0, 0x80);
+        gCurrentPinballGame->boardModeType = 0;
         gCurrentPinballGame->eventTimer = 0;
     }
     else
     {
         if (gCurrentPinballGame->eventTimer == 0)
         {
-            sub_4D648();
+            ResetEventState();
         }
         else
         {
             for (i = 0; i < 4; i++)
             {
-                gUnknown_03005C00[i + 0x179] = sp0[i] * 2 - 0x3EC0;
-                gUnknown_03005C00[i + 0x199] = sp0[i] * 2 - 0x3EBF;
+                gBG0TilemapBuffer[i + 0x179] = sp0[i] * 2 - 0x3EC0;
+                gBG0TilemapBuffer[i + 0x199] = sp0[i] * 2 - 0x3EBF;
             }
         }
-        DmaCopy16(3, &gUnknown_03005C00[0x160], (void *)0x060022C0, 0x80);
+        DmaCopy16(3, &gBG0TilemapBuffer[0x160], (void *)0x060022C0, 0x80);
     }
 
     if (gCurrentPinballGame->eventTimer <= 900)
     {
         if (gCurrentPinballGame->eventTimer & 0x8)
         {
-            DmaCopy16(3, gUnknown_086B0884, (void *)0x05000180, 0x20);
+            DmaCopy16(3, gTimerWarningPalette_Fast, (void *)0x05000180, 0x20);
         }
         else
         {
-            DmaCopy16(3, gUnknown_081C0064, (void *)0x05000180, 0x20);
+            DmaCopy16(3, gDefaultBallPalette, (void *)0x05000180, 0x20);
         }
 
         if (gCurrentPinballGame->eventTimer == 900)
@@ -226,26 +226,26 @@ void sub_4D3D0(void)
     {
         if ((gCurrentPinballGame->eventTimer % 22) / 11)
         {
-            DmaCopy16(3, gUnknown_086B08A4, (void *)0x05000180, 0x20);
+            DmaCopy16(3, gTimerWarningPalette_Slow, (void *)0x05000180, 0x20);
         }
         else
         {
-            DmaCopy16(3, gUnknown_081C0064, (void *)0x05000180, 0x20);
+            DmaCopy16(3, gDefaultBallPalette, (void *)0x05000180, 0x20);
         }
     }
 }
 
-void sub_4D648(void)
+void ResetEventState(void)
 {
     s16 i;
 
-    gCurrentPinballGame->unk294 = 0;
+    gCurrentPinballGame->boardModeType = 0;
     gCurrentPinballGame->eventTimer = 0;
     for (i = 0; i < 4; i++)
     {
-        gUnknown_03005C00[0x179 + i] = 0x1FF;
-        gUnknown_03005C00[0x199 + i] = 0x1FF;
+        gBG0TilemapBuffer[0x179 + i] = 0x1FF;
+        gBG0TilemapBuffer[0x199 + i] = 0x1FF;
     }
 
-    DmaCopy16(3, &gUnknown_03005C00[0x160], (void *)0x060022C0, 0x80);
+    DmaCopy16(3, &gBG0TilemapBuffer[0x160], (void *)0x060022C0, 0x80);
 }

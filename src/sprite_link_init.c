@@ -3,13 +3,13 @@
 #include "main.h"
 #include "variables.h"
 
-extern u32 gUnknown_0202ADD0;
-extern s16 gUnknown_0201A444;
-extern u32 gUnknown_0202BDF0;
-extern u8 gUnknown_0201C1AC;
-extern u8 gUnknown_0202ADDC;
+extern u32 gLinkStatusResult;
+extern s16 gLinkTimeoutCounter;
+extern u32 gLinkConnectionState;
+extern u8 gLinkPlayerCount;
+extern u8 gLinkNegotiationFlags;
 
-s16 sub_2414(const struct SpriteSet *const *spriteSets, u16 numSpriteSets, struct SpriteGroup *spriteGroups)
+s16 LoadSpriteSetsWithCpuCopy(const struct SpriteSet *const *spriteSets, u16 numSpriteSets, struct SpriteGroup *spriteGroups)
 {
     struct SpriteGroup *spriteGroup;
     struct OamDataSimple *simple;
@@ -46,7 +46,7 @@ void nullsub_16(void)
 {
 }
 
-void sub_24DC(void)
+void ResetSerialIO(void)
 {
     REG_RCNT = 0;
     REG_SIOCNT = 0;
@@ -62,7 +62,7 @@ void sub_24DC(void)
     REG_SIOMULTI3 = 0;
 }
 
-void sub_250C(void)
+void SetupDefaultInterrupts(void)
 {
     REG_IME = 0;
     REG_IE = INTR_FLAG_GAMEPAK | INTR_FLAG_VBLANK;
@@ -70,18 +70,18 @@ void sub_250C(void)
     REG_IME = 1;
 }
 
-void sub_2538(void)
+void ResetLinkState(void)
 {
-    gUnknown_0202ADD0 = 0;
-    gUnknown_0201A444 = 0;
-    gUnknown_0202BDF0 = 0;
-    gUnknown_0201C1AC = 0;
-    gUnknown_0202ADDC = 0;
+    gLinkStatusResult = 0;
+    gLinkTimeoutCounter = 0;
+    gLinkConnectionState = 0;
+    gLinkPlayerCount = 0;
+    gLinkNegotiationFlags = 0;
 }
 
-void sub_2568(void)
+void ResetSerialAndInterrupts(void)
 {
-    sub_24DC();
+    ResetSerialIO();
     REG_IME = 0;
     ResetMainCallback();
     ResetVBlankIntrFunc();

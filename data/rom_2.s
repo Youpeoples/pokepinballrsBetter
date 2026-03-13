@@ -82,7 +82,7 @@ gUnknown_086A4C18:: @ 0x086A4C18
 gUnknown_086A4C2C:: @ 0x086A4C2C
 	.4byte 2, 2, 1, -11, 3, -1
 
-gUnknown_086A4C44:: @ 0x086A4C44
+gRumblePatterns:: @ 0x086A4C44
 	.4byte gUnknown_086A4B08
 	.4byte gUnknown_086A4B14
 	.4byte gUnknown_086A4B20
@@ -100,7 +100,7 @@ gUnknown_086A4C44:: @ 0x086A4C44
 	.4byte gUnknown_086A4C2C
 
 	.align 2, 0
-gUnknown_086A4C80:: @ 0x086A4C80
+gBonusFieldSelectSpriteSets:: @ 0x086A4C80
 	.4byte gUnknown_086A699E
 	.4byte gUnknown_086A699E
 	.4byte gUnknown_086A699E
@@ -118,7 +118,7 @@ gUnknown_086A4C80:: @ 0x086A4C80
 	.4byte gUnknown_086A6A80
 	.4byte gUnknown_086A6AAA
 
-gUnknown_086A4CC0:: @ 0x086A4CC0
+gBonusFieldStageIconPositions:: @ 0x086A4CC0
 	.2byte 0x20, 0x20
 	.2byte 0x60, 0x20
 	.2byte 0xa0, 0x20
@@ -126,7 +126,7 @@ gUnknown_086A4CC0:: @ 0x086A4CC0
 	.2byte 0x60, 0x58
 	.2byte 0xa0, 0x58
 
-gUnknown_086A4CD8:: @ 0x086A4CD8
+gBonusFieldSpeedIndicatorPositions:: @ 0x086A4CD8
 	.2byte 0x18, 0x24
 	.2byte 0x58, 0x24
 	.2byte 0x98, 0x24
@@ -143,10 +143,10 @@ gBonusFieldMenuSelectionToField:: @ 0x086A4CF0
 	.byte FIELD_RAYQUAZA
 
 	.align 2, 0
-gUnknown_086A4CF8:: @ 0x086A4CF8
+gEReaderTextGlyphTable:: @ 0x086A4CF8
 	.incbin "baserom.gba", 0x6A4CF8, 0x7E0
 
-gUnknown_086A54D8:: @ 0x086A54D8
+gCatchHatchSpriteSets:: @ 0x086A54D8
 	.4byte gUnknown_086A5710
     .4byte gUnknown_086A573A
     .4byte gUnknown_086A574C
@@ -161,19 +161,19 @@ gUnknown_086A54D8:: @ 0x086A54D8
     .4byte gUnknown_086A5C4E
     .4byte gUnknown_086A5CC0
 
-gUnknown_086A550C:: @ 0x086A550C
+gEReaderTransitionStepDurations:: @ 0x086A550C
 	.2byte 0x0002, 0x0002, 0x0002, 0x0002, 0x0004;
 	.2byte 0x0004, 0x003C;
 
-gUnknown_086A551A:: @ 0x086A551A
+gEReaderTextLengths:: @ 0x086A551A
 	.byte 0x21, 0x2A, 0x41, 0x3D, 0x18, 0x47, 0x18, 0x2F, 0x2D, 0x18;
 	.byte 0x46, 0x18, 0x24, 0x43;
 
-gUnknown_086A5528:: @ 0x086A5528
+gEReaderTextHasNextPage:: @ 0x086A5528
 	.byte 0x01, 0x00, 0x01, 0x00, 0x01, 0x00, 0x01, 0x01, 0x00, 0x01;
 	.byte 0x00, 0x01, 0x00, 0x00;
 
-gUnknown_086A5536:: @ 0x086A5536
+gEReaderCardStartPages:: @ 0x086A5536
     .byte 0x02, 0x04, 0x06, 0x09, 0x0B, 0x00
 
 gUnknown_086A553C:: @ 0x086A553C
@@ -526,22 +526,22 @@ gUnknown_086A5DC6:: @ 0x086A5DC6
 gUnknown_086A5DD0:: @ 0x086A5DD0
     .incbin "baserom.gba", 0x6A5DD0, 0xA
 
-gUnknown_086A5DDA:: @ 0x086A5DDA
+gPokedexAnimBaseTileNums:: @ 0x086A5DDA
 	.incbin "baserom.gba", 0x6A5DDA, 0x18
 
-gUnknown_086A5DF2:: @ 0x086A5DF2
+gPokedexCatchAnimTileOffsets:: @ 0x086A5DF2
 	.incbin "baserom.gba", 0x6A5DF2, 0x20
 
-gUnknown_086A5E12:: @ 0x086A5E12
+gPokedexAnimTileDeltas:: @ 0x086A5E12
 	.incbin "baserom.gba", 0x6A5E12, 0xD0
 
-gUnknown_086A5EE2:: @ 0x086A5EE2
+gPokedexHatchAnimTileOffsets:: @ 0x086A5EE2
 	.incbin "baserom.gba", 0x6A5EE2, 0x132
 
-gUnknown_086A6014:: @ 0x086A6014
+gPokedexAnimFrameDurations:: @ 0x086A6014
 	.incbin "baserom.gba", 0x6A6014, 0x134
 
-gUnknown_086A6148:: @ 0x086A6148
+gPokedexSpriteSets:: @ 0x086A6148
     .4byte gUnknown_086A553C
     .4byte gUnknown_086A5706
     .4byte gUnknown_086A566E
@@ -619,7 +619,7 @@ gDexAnimationIx:: @ 0x086A61BC
 
     .2byte  79,  80,  81,  82,  83
 
-gUnknown_086A6356:: @ 0x086A6356
+gPokedexCatchAnimIndices:: @ 0x086A6356
     .2byte 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
     .2byte 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
     .2byte 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
@@ -646,7 +646,7 @@ gUnknown_086A6356:: @ 0x086A6356
 
     .2byte 0, 0, 0, 0, 0
 
-gUnknown_086A64F0:: @ 0x086A64F0
+gPokedexListNameVramOffsets:: @ 0x086A64F0
     .2byte 0x4E20, 0x5400, 0x5500, 0x5600, 0x5700
 
 gUnknown_086A64FA:: @ 0x086A64FA
@@ -867,7 +867,7 @@ gUnknown_086A6AAA:: @ 0x086A6AAA
     packed_sprite_oam x=0x10, y=0x10, affineMode=0x0, objMode=0x0, mosaic=0x0, bpp=0x0, shape=0x1, matrixNum=0x0, hFlip=0x0, vFlip=0x0, size=0x2, tileNum=0x15c, priority=0x0, paletteNum=0x1
 .2byte 0
 
-gUnknown_086A6AD4:: @ 0x086A6AD4
+gFieldSelectSpriteSets:: @ 0x086A6AD4
 	.4byte gUnknown_086A697A
     .4byte gUnknown_086A698C
     .4byte gUnknown_086A6830
@@ -885,11 +885,11 @@ gUnknown_086A6AD4:: @ 0x086A6AD4
     .4byte gUnknown_086A6A80
     .4byte gUnknown_086A6AAA
 
-gUnknown_086A6B14:: @ 0x086A6B14
+gFieldTransitionAnimData:: @ 0x086A6B14
     .2byte 2, 4, 5, 6, 7
     .2byte 3, 8, 9, 10, 11
 
-gUnknown_086A6B28:: @ 0x086A6B28
+gFieldSelectBallSpeedPositions:: @ 0x086A6B28
     .2byte 36, 72
     .2byte 140, 72
 
@@ -1741,7 +1741,7 @@ gUnknown_086A7658:: @ 0x086A7658
     packed_sprite_oam x=0x30, y=-0x28, affineMode=0x0, objMode=0x0, mosaic=0x0, bpp=0x0, shape=0x0, matrixNum=0x0, hFlip=0x0, vFlip=0x0, size=0x1, tileNum=0x396, priority=0x0, paletteNum=0x0
 .2byte 0,0
 
-gUnknown_086A769C:: @ 0x086A769C
+gIntroScene1_SpriteSets:: @ 0x086A769C
 	.4byte gUnknown_086A7570
     .4byte gUnknown_086A75C2
     .4byte gUnknown_086A7636
@@ -1795,7 +1795,7 @@ gUnknown_086A769C:: @ 0x086A769C
 gUnknown_086A7760:: @ 0x086A7760
 	.incbin "baserom.gba", 0x6A7760, 0x8
 
-gUnknown_086A7768:: @ 0x086A7768
+gIntroScene1_BGAnimTiming:: @ 0x086A7768
     .2byte 0x1, 0x14
     .2byte 0x2, 0x20
     .2byte 0x3, 0x28
@@ -1805,10 +1805,10 @@ gUnknown_086A7768:: @ 0x086A7768
     .2byte 0x7, 0x37
     .2byte 0x8, 0x39
 
-gUnknown_086A7788:: @ 0x086A7788
+gIntroScene1_TileOffsets:: @ 0x086A7788
     .2byte 0x80, 0x100, 0x180, 0x1000, 0x1080, 0x1100, 0x1180, 0x2000
 
-gUnknown_086A7798:: @ 0x086A7798
+gIntroScene1_ScaleOffsets:: @ 0x086A7798
     .2byte -64, -16
     .2byte -32, -16
     .2byte 0, -16
@@ -1929,7 +1929,7 @@ gUnknown_086A7938:: @ 0x086A7938
     packed_sprite_oam x=0x40, y=0x40, affineMode=0x0, objMode=0x0, mosaic=0x0, bpp=0x0, shape=0x2, matrixNum=0x0, hFlip=0x0, vFlip=0x0, size=0x3, tileNum=0x14, priority=0x0, paletteNum=0x6
 .2byte 0,0
 
-gUnknown_086A795C:: @ 0x086A795C
+gIntroScene3_SpriteSets:: @ 0x086A795C
     .4byte gUnknown_086A7938
     .space 0x4
 
@@ -1975,13 +1975,13 @@ gUnknown_086A79A8:: @ 0x086A79A8
 .2byte 0,0
 
 
-gUnknown_086A79EC:: @ 0x086A79EC
+gIntroScene5_SpriteSets:: @ 0x086A79EC
     .4byte gUnknown_086A7986
     .4byte gUnknown_086A7964
     .4byte gUnknown_086A79A8
     .4byte 0
 
-gUnknown_086A79FC:: @ 0x086A79FC
+gIntroScene5_BGAnimTiming:: @ 0x086A79FC
     .2byte 1, 3
     .2byte 2, 6
     .2byte 3, 9
@@ -1991,7 +1991,7 @@ gUnknown_086A79FC:: @ 0x086A79FC
     .2byte 7, 20
     .2byte 0, 0
 
-gUnknown_086A7A1C:: @ 0x086A7A1C
+gIntroScene5_TileOffsets:: @ 0x086A7A1C
     .2byte 0x1100, 0x1080, 0x1000, 0x0180, 0x100, 0x80, 0, 0
 
 gUnknown_086A7A2C:: @ 0x086A7A2C
@@ -2028,7 +2028,7 @@ gUnknown_086A7A6E:: @ 0x086A7A6E
     packed_sprite_oam x=-0x8, y=-0x8, affineMode=0x0, objMode=0x0, mosaic=0x0, bpp=0x0, shape=0x0, matrixNum=0x0, hFlip=0x0, vFlip=0x1, size=0x1, tileNum=0x14, priority=0x0, paletteNum=0x1
 .2byte 0
 
-gUnknown_086A7A78:: @ 0x086A7A78
+gIntroScene6_SpriteSets:: @ 0x086A7A78
 	.4byte gUnknown_086A7A48
     .4byte gUnknown_086A7A6E
     .4byte gUnknown_086A7A48
@@ -2048,13 +2048,13 @@ gUnknown_086A7A78:: @ 0x086A7A78
     .4byte gUnknown_086A7A2C
     .4byte gUnknown_086A7A52
 
-gUnknown_086A7AC0:: @ 0x086A7AC0
+gIntroScene6_ScrollVelocity:: @ 0x086A7AC0
 	.incbin "baserom.gba", 0x6A7AC0, 0x24
 
-gUnknown_086A7AE4:: @ 0x086A7AE4
+gIntroScene6_BounceFlags:: @ 0x086A7AE4
 	.incbin "baserom.gba", 0x6A7AE4, 0x50
 
-gUnknown_086A7B34:: @ 0x086A7B34
+gIntroScene6_EntityMovement:: @ 0x086A7B34
 	.incbin "baserom.gba", 0x6A7B34, 0x1C
 
 gUnknown_086A7B50:: @ 0x086A7B50
@@ -2068,11 +2068,11 @@ gUnknown_086A7B50:: @ 0x086A7B50
     packed_sprite_oam x=0x0, y=0x0, affineMode=0x0, objMode=0x0, mosaic=0x0, bpp=0x0, shape=0x0, matrixNum=0x0, hFlip=0x0, vFlip=0x0, size=0x3, tileNum=0x18, priority=0x0, paletteNum=0x1
 .2byte 0,0
 
-gUnknown_086A7B74:: @ 0x086A7B74
+gIntroScene7_SpriteSets:: @ 0x086A7B74
 	.4byte gUnknown_086A7B50
     .4byte 0
 
-gUnknown_086A7B7C:: @ 0x086A7B7C
+gIntroScene7_WailmerQuadOffsets:: @ 0x086A7B7C
     .2byte -64, -64
     .2byte   0, -64
     .2byte -64,   0
@@ -2102,7 +2102,7 @@ gUnknown_086A7BF8:: @ 0x086A7BF8
 gUnknown_086A7C1A:: @ 0x086A7C1A
 	.incbin "baserom.gba", 0x6A7C1A, 0xA
 
-gUnknown_086A7C24:: @ 0x086A7C24
+gIntroScene8a_SpriteSets:: @ 0x086A7C24
     .4byte gUnknown_086A7C1A
     .4byte gUnknown_086A7BF8
     .4byte gUnknown_086A7BB8
@@ -2121,7 +2121,7 @@ gUnknown_086A7C24:: @ 0x086A7C24
     .4byte gUnknown_086A7BC2
     .4byte gUnknown_086A7B8C
 
-gUnknown_086A7C68:: @ 0x086A7C68
+gIntroScene8a_DebrisMovement:: @ 0x086A7C68
 	.byte 0x05, 0x02, 0x03, 0x01, 0x06, 0x01
 	.align 2,0
 	.byte 0x05, 0xFE, 0x03, 0xFF, 0x19, 0x02
@@ -2168,7 +2168,7 @@ gUnknown_086A7CF2:: @ 0x086A7CF2
 gUnknown_086A7CFC:: @ 0x086A7CFC
 	.incbin "baserom.gba", 0x6A7CFC, 0x24
 
-gUnknown_086A7D20:: @ 0x086A7D20
+gIntroScene8b_SpriteSets:: @ 0x086A7D20
     .4byte gUnknown_086A7CFC
     .4byte gUnknown_086A7C98
     .4byte gUnknown_086A7CA2
@@ -2181,14 +2181,14 @@ gUnknown_086A7D20:: @ 0x086A7D20
     .4byte gUnknown_086A7CE8
     .4byte gUnknown_086A7CF2
 
-gUnknown_086A7D4C:: @ 0x086A7D4C
+gIntroScene8b_BallDecelTable:: @ 0x086A7D4C
 	.incbin "baserom.gba", 0x6A7D4C, 0x5C
 
-gUnknown_086A7DA8:: @ 0x086A7DA8
+gNameEntryCursorSpriteSets:: @ 0x086A7DA8
 	.4byte gUnknown_086A7DE8
     .4byte gUnknown_086A7DFA
 
-gUnknown_086A7DB0:: @ 0x086A7DB0
+gHighScoreScreenSpriteSets:: @ 0x086A7DB0
 	.4byte gUnknown_086A7E0C
     .4byte gUnknown_086A7E20
     .4byte gUnknown_086A7E34
@@ -2200,7 +2200,7 @@ gUnknown_086A7DB0:: @ 0x086A7DB0
     .4byte gUnknown_086A7EC8
 
 
-gUnknown_086A7DD4:: @ 0x086A7DD4
+gCompletionBannerSpriteSets:: @ 0x086A7DD4
 	.4byte gUnknown_086A7EFA
     .4byte gUnknown_086A7F1C
     .4byte gUnknown_086A7F3E
@@ -2356,15 +2356,15 @@ gUnknown_086A7F82:: @ 0x086A7F82
     packed_sprite_oam x=0x8, y=-0x18, affineMode=0x0, objMode=0x0, mosaic=0x0, bpp=0x0, shape=0x0, matrixNum=0x0, hFlip=0x0, vFlip=0x0, size=0x3, tileNum=0x12e, priority=0x0, paletteNum=0x7
 .2byte 0
 
-gUnknown_086A7FA4:: @ 0x086A7FA4
+gScorePaletteAnimOffsets:: @ 0x086A7FA4
 	.byte 0x0B, 0x0B, 0xEA;
 	.align 1, 0;
 
-gUnknown_086A7FA8:: @ 0x086A7FA8
+gScorePaletteResetOffsets:: @ 0x086A7FA8
 	.byte 0x00, 0xF5, 0xEA;
 	.align 1, 0;
 
-gUnknown_086A7FAC:: @ 0x086A7FAC
+gHighScoreCharToTileMap:: @ 0x086A7FAC
 	.incbin "baserom.gba", 0x6A7FAC, 0x54
 
 gUnknown_086A8000:: @ 0x086A8000
@@ -2538,7 +2538,7 @@ gUnknown_086A9630:: @ 0x086A9630
     .incbin "baserom.gba", 0x6A9630, 0x1C
 
 
-gUnknown_086A964C:: @ 0x086A964C
+gTitleMenuStateTable:: @ 0x086A964C
 	.2byte 0x0002
 	.2byte 0x000A
 	.2byte 0x0005
@@ -2551,10 +2551,10 @@ gUnknown_086A964C:: @ 0x086A964C
 	.2byte 0x0000
 	.2byte 0x000B
 
-gUnknown_086A9662:: @ 0x086A9662
+gTitlePressStartAnimDurations:: @ 0x086A9662
 	.byte 0x14, 0x05, 0x14, 0x05
 
-gUnknown_086A9666:: @ 0x086A9666
+gTitleMenuSlideInAnimData:: @ 0x086A9666
 	.byte 0x01, 0x05
 	.byte 0x03, 0x05
 	.byte 0x01, 0x05
@@ -2562,7 +2562,7 @@ gUnknown_086A9666:: @ 0x086A9666
 	.byte 0x01, 0x05
 	.byte 0x03, 0x05
 
-gUnknown_086A9672:: @ 0x086A9672
+gTitleMenuSlideOutAnimData:: @ 0x086A9672
 	.byte 0x00, 0x10
 	.byte 0x01, 0x04
 	.byte 0x02, 0x10
@@ -2573,27 +2573,27 @@ gUnknown_086A9672:: @ 0x086A9672
 	.byte 0x01, 0x04
 	.byte 0x00, 0x00
 
-gUnknown_086A9684:: @ 0x086A9684
+gTitleNoSaveArrowPositions:: @ 0x086A9684
 	@Vector16 pairs
 	.2byte 0x004B, 0x003C;
 	.2byte 0x0052, 0x004A;
 	.2byte 0x0052, 0x0058;
 	.2byte 0x0052, 0x0066;
 
-gUnknown_086A9694:: @ 0x086A9694
+gTitleNoSaveSelectorPositions:: @ 0x086A9694
 	@Vector16 pairs
 	.2byte 0x0095, 0x003C;
 	.2byte 0x008E, 0x004A;
 	.2byte 0x008E, 0x0058;
 	.2byte 0x008E, 0x0066;
 
-gUnknown_086A96A4:: @ 0x086A96A4
+gTitleNoSaveMenuActions:: @ 0x086A96A4
 	.2byte 0x0001
 	.2byte 0x0002
 	.2byte 0x0003
 	.2byte 0x0004
 
-gUnknown_086A96AC:: @ 0x086A96AC
+gTitleSavedArrowPositions:: @ 0x086A96AC
 	@Vector16 pairs
 	.2byte 0x0052, 0x0038;
 	.2byte 0x0052, 0x0045;
@@ -2601,7 +2601,7 @@ gUnknown_086A96AC:: @ 0x086A96AC
 	.2byte 0x0052, 0x005F;
 	.2byte 0x0052, 0x006B;
 
-gUnknown_086A96C0:: @ 0x086A96C0
+gTitleSavedSelectorPositions:: @ 0x086A96C0
 	@Vector16 pairs
 	.2byte 0x008E, 0x0038;
 	.2byte 0x008E, 0x0045;
@@ -2609,7 +2609,7 @@ gUnknown_086A96C0:: @ 0x086A96C0
 	.2byte 0x008E, 0x005F;
 	.2byte 0x008E, 0x006B;
 
-gUnknown_086A96D4:: @ 0x086A96D4
+gTitleSavedMenuActions:: @ 0x086A96D4
 	.2byte 0x0001
 	.2byte 0x0000
 	.2byte 0x0002
@@ -2620,14 +2620,14 @@ gUnknown_086A96D4:: @ 0x086A96D4
 @ Can't find code pointing to this... possibly part of the last array when testing?
     .2byte 0x0500, 0x0302, 0x0000
 
-gUnknown_086A96E4:: @ 0x086A96E4
+gTitlePressStartSpriteSets:: @ 0x086A96E4
 	.4byte gUnknown_086A8000
 	.4byte gUnknown_086A802A
 	.4byte gUnknown_086A8054
 	.4byte gUnknown_086A807E
 	.4byte gUnknown_086A8AFC
 
-gUnknown_086A96F8:: @ 0x086A96F8
+gTitleNoSaveDefaultSprites:: @ 0x086A96F8
 	.4byte gUnknown_086A8AC0
 	.4byte gUnknown_086A8ACA
 	.4byte gUnknown_086A8AD4
@@ -2636,7 +2636,7 @@ gUnknown_086A96F8:: @ 0x086A96F8
 	.4byte gUnknown_086A8AF2
 	.4byte gUnknown_086A80A8
 
-gUnknown_086A9714:: @ 0x086A9714
+gTitleNoSaveAnimSprites:: @ 0x086A9714
 	.4byte gUnknown_086A80A8
 	.4byte gUnknown_086A8122
 	.4byte gUnknown_086A81B4
@@ -2651,10 +2651,10 @@ gUnknown_086A9714:: @ 0x086A9714
 	.4byte gUnknown_086A89AE
 	.4byte 0x00000000
 
-gUnknown_086A9748:: @ 0x086A9748
+gTitleMenuRetractDurations:: @ 0x086A9748
 	.byte 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0
 
-gUnknown_086A975C:: @ 0x086A975C
+gTitleSavedDefaultSprites:: @ 0x086A975C
 	.4byte gUnknown_086A95FE
 	.4byte gUnknown_086A9608
 	.4byte gUnknown_086A9612
@@ -2663,7 +2663,7 @@ gUnknown_086A975C:: @ 0x086A975C
 	.4byte gUnknown_086A9630
 	.4byte gUnknown_086A8BB6
 
-gUnknown_086A9778:: @ 0x086A9778
+gTitleSavedAnimSprites:: @ 0x086A9778
 	.4byte gUnknown_086A8BB6
 	.4byte gUnknown_086A8C30
 	.4byte gUnknown_086A8CC2
@@ -3760,19 +3760,19 @@ gUnknown_086ACC98:: @ 0x086ACC98
 gUnknown_086ACCA0:: @ 0x086ACCA0
     .incbin "baserom.gba", 0x6ACCA0, 0xB0
 
-gUnknown_086ACD50:: @ 0x086ACD50
+gWallCollisionPositionCorrection:: @ 0x086ACD50
 	.incbin "baserom.gba", 0x6ACD50, 0x24
 
-gUnknown_086ACD74:: @ 0x086ACD74
+gFlipperCollisionAngleCorrection:: @ 0x086ACD74
 	.incbin "baserom.gba", 0x6ACD74, 0x10
 
-gUnknown_086ACD84:: @ 0x086ACD84
+gFlipperCollisionAngles:: @ 0x086ACD84
 	.incbin "baserom.gba", 0x6ACD84, 0x34
 
-gUnknown_086ACDB8:: @ 0x086ACDB8
+gFlipperCollisionFrameMapping:: @ 0x086ACDB8
 	.incbin "baserom.gba", 0x6ACDB8, 0x3C
 
-gUnknown_086ACDF4:: @ 0x086ACDF4
+gBounceBackForceMagnitudes:: @ 0x086ACDF4
 	.2byte 0x0000, 0x00F0, 0x008C, 0x00C8
 	.2byte 0,0,0,0,0,0,0,0
 
@@ -3784,21 +3784,21 @@ BoardCollisionFuncts_086ACE0C:: @ 0x086ACE0C
 	.4byte COLLISION_CHECK_KYOGRE_17F28, COLLISION_CHECK_GROUDON_18324;
 	.4byte COLLISION_CHECK_RAYQUAZA_187F4, COLLISION_CHECK_SPHEAL_18B50;
 
-gUnknown_086ACE2C:: @ 0x086ACE2C
+gFlipperLaunchVelocityParams:: @ 0x086ACE2C
 	.incbin "baserom.gba", 0x6ACE2C, 0x34
 
-gUnknown_086ACE60:: @ 0x086ACE60
+gWallEscapeOffsets:: @ 0x086ACE60
 	@Vector16 pairs
 	.2byte  1,  0;
 	.2byte -1,  0;
 	.2byte  0,  1;
 	.2byte  0, -1;
 
-gUnknown_086ACE70:: @ 0x086ACE70
+gSapphireTargetBumperIndexMap:: @ 0x086ACE70
     .2byte 0, 1, 2, 3, 4, 5, 6, 7, 8, 1, 2, 3, 9
     .space 0x2
 
-gUnknown_086ACE8C:: @ 0x086ACE8C
+gFlipperLineGeometry:: @ 0x086ACE8C
 	@tagged in sets of 4
 	.2byte 0x0004, 0x0010, 0x001B, 0x001E;
 	.2byte 0x0004, 0x0010, 0x001D, 0x001B;
@@ -3814,10 +3814,10 @@ gUnknown_086ACE8C:: @ 0x086ACE8C
 	.2byte 0x0004, 0x0010, 0x001B, 0x0005;
 	.2byte 0x0004, 0x0010, 0x0019, 0x0003;
 
-gUnknown_086ACEF4:: @ 0x086ACEF4
+gFlipperBaseXPositions:: @ 0x086ACEF4
 	.2byte 0x0053, 0x007D
 
-gUnknown_086ACEF8:: @ 0x086ACEF8
+gModeBannerTilemaps:: @ 0x086ACEF8
 	.4byte 0x000000
 	.4byte gUnknown_0851514C
 	.4byte gUnknown_085223AC
@@ -3827,7 +3827,7 @@ gUnknown_086ACEF8:: @ 0x086ACEF8
 	.4byte gUnknown_0851976C
 	.4byte gUnknown_0851DB8C
 
-gUnknown_086ACF18:: @ 0x086ACF18
+gModeBannerPalettes:: @ 0x086ACF18
     .4byte 0x000000
     .4byte gUnknown_0851956C
     .4byte gUnknown_085267CC
@@ -3837,7 +3837,7 @@ gUnknown_086ACF18:: @ 0x086ACF18
     .4byte gUnknown_0851958C
     .4byte gUnknown_085195AC
 
-gUnknown_086ACF38:: @ 0x086ACF38
+gCaptureSequenceTimings:: @ 0x086ACF38
     @frame timer, 34 frame states.
     .2byte 20, 5, 4, 4, 4
     .2byte 4, 4, 4, 4, 4
@@ -3849,32 +3849,32 @@ gUnknown_086ACF38:: @ 0x086ACF38
 
     .space 0x4
 
-gUnknown_086ACF80:: @ 0x086ACF80
+gCapturePalette:: @ 0x086ACF80
 	.incbin "baserom.gba", 0x6ACF80, 0x20
 
-gUnknown_086ACFA0:: @ 0x086ACFA0
+gEvoItemPositions:: @ 0x086ACFA0
 	.incbin "baserom.gba", 0x6ACFA0, 0x40
 
-gUnknown_086ACFE0:: @ 0x086ACFE0
+gCaughtTextChars:: @ 0x086ACFE0
 	.2byte 'W','A','S',' ','C','A','U','G','H','T';
 
-gUnknown_086ACFF4:: @ 0x086ACFF4
+gCaptureShakeOffsets:: @ 0x086ACFF4
     .byte 0, 1, 2, 3, 1, 2, 4, 5, 1, 1, 6, 7
 
-gUnknown_086AD000:: @ 0x086AD000
+gShopItemData:: @ 0x086AD000
 	.incbin "baserom.gba", 0x6AD000, 0x70
 
-gUnknown_086AD070:: @ 0x086AD070
+gPortraitIdleCycleData:: @ 0x086AD070
 	.incbin "baserom.gba", 0x6AD070, 0x110
 
-gUnknown_086AD180:: @ 0x086AD180
+gRouletteWheelContents:: @ 0x086AD180
 	.incbin "baserom.gba", 0x6AD180, 0x15E
 
-gUnknown_086AD2DE:: @ 0x086AD2DE
+gShopCursorToItemMap:: @ 0x086AD2DE
 	.2byte 0x0000, 0x0001, 0x0002, 0x000A, 0x0014;
 	.2byte 0x0003, 0x0016, 0x0004;
 
-gUnknown_086AD2EE:: @ 0x086AD2EE
+gEggAnimationFrameData:: @ 0x086AD2EE
 	.incbin "baserom.gba", 0x6AD2EE, 0x110
 
 gHatchSequentialTileFramesetData:: @ 0x086AD3FE
@@ -3895,7 +3895,7 @@ gHatchSequentialTileFramesetData:: @ 0x086AD3FE
     @ 8 bytes unidentified data
     .byte 0, 0, 0, 0x70, 0, 0, 0xff, 0x7f
 
-gUnknown_086AD436:: @ 0x086AD436
+gHatchSequentialFrameData:: @ 0x086AD436
 	.2byte 0x0000, 0x0005
 	.2byte 0x0001, 0x0003
 	.2byte 0x0002, 0x0004
@@ -3906,7 +3906,7 @@ gUnknown_086AD436:: @ 0x086AD436
 	.2byte 0x0006, 0x7000
 
 
-gUnknown_086AD456:: @ 0x086AD456
+gEvoShopAnimFrames:: @ 0x086AD456
 	.2byte 0x0006, 0x0007, 0x0008, 0x0003, 0x0009, 0x000A, 0x0000;
 	.2byte 0x0000, 0x0001, 0x0002, 0x0003, 0x0004, 0x0005, 0x0006;
 
@@ -3923,7 +3923,7 @@ gEvoItemAppear_GfxList:: @ 0x086AD474
 	.4byte gEvoHeartAppear_Gfx
 	.4byte gEvoBoxAppear_Gfx
 
-gUnknown_086AD49C:: @ 0x086AD49C
+gEvoItemTilesGfxPtrs:: @ 0x086AD49C
 	.4byte gPickupIcon1_Gfx
     .4byte gPickupIcon2_Gfx
     .4byte gPickupIcon3_Gfx
@@ -3936,45 +3936,45 @@ gUnknown_086AD49C:: @ 0x086AD49C
     .4byte gPickupIcon10_Gfx
 
 
-gUnknown_086AD4C4:: @ 0x086AD4C4
-    .4byte sub_25F64
-    .4byte sub_19C04
-    .4byte sub_21300
-    .4byte sub_21578
-    .4byte sub_27E08
-    .4byte sub_24350
-    .4byte sub_26F38
-    .4byte sub_269A4
-    .4byte sub_28404
+gBoardStateInitFuncs:: @ 0x086AD4C4
+    .4byte InitAreaRoulette
+    .4byte InitFieldIdle
+    .4byte InitCatchTrigger
+    .4byte InitBonusStageSelect
+    .4byte InitCatchEmMode
+    .4byte InitEggMode
+    .4byte InitEvolutionMode
+    .4byte InitTravelMode
+    .4byte InitJirachiBonus
 
-gUnknown_086AD4E8:: @ 0x086AD4E8
-    .4byte sub_260B8
-    .4byte sub_19CC8
-    .4byte sub_21320
-    .4byte sub_216FC
-    .4byte sub_27F94
-    .4byte sub_24408
-    .4byte sub_27080
-    .4byte sub_26A10
-    .4byte sub_28544
+gBoardStateUpdateFuncs:: @ 0x086AD4E8
+    .4byte UpdateAreaRoulette
+    .4byte UpdateFieldIdle
+    .4byte UpdateCatchTrigger
+    .4byte UpdateBonusStageSelect
+    .4byte UpdateCatchEmMode
+    .4byte UpdateEggMode
+    .4byte UpdateEvolutionMode
+    .4byte UpdateTravelMode
+    .4byte UpdateJirachiBonus
 
-gUnknown_086AD50C:: @ 0x086AD50C
-    .4byte gUnknown_081B8984
+gShopEvoBGAnimFrames:: @ 0x086AD50C
+    .4byte gShopModeBG_Gfx
     .4byte gUnknown_081B9984
     .4byte gUnknown_081BA984
     .4byte gUnknown_081BB984
-    .4byte gUnknown_081B4784
+    .4byte gEvoModeBG_Gfx
     .4byte gUnknown_081B5784
     .4byte gUnknown_081B6784
     .4byte gUnknown_081B7784
 
-gUnknown_086AD52C:: @ 0x086AD52C
+gEggHatchAnimData:: @ 0x086AD52C
 	.incbin "baserom.gba", 0x6AD52C, 0x54
 
-gUnknown_086AD580:: @ 0x086AD580
+gEggWalkPathWaypoints:: @ 0x086AD580
 	.incbin "baserom.gba", 0x6AD580, 0x1D0
 
-gUnknown_086AD750:: @ 0x086AD750
+gSapphireEggWaypoints:: @ 0x086AD750
 	@Vector32 pairs
     .4byte 0x00000974, 0x00000384
 	.4byte 0x00000974, 0x000006cc
@@ -3985,16 +3985,16 @@ gUnknown_086AD750:: @ 0x086AD750
 	.4byte 0x00000708, 0x00000960
 
 
-gUnknown_086AD788:: @ 0x086AD788
+gAngleToDirectionTable:: @ 0x086AD788
 	.2byte 0x0005, 0x0008, 0x0008, 0x000B, 0x000B, 0x0002, 0x0002, 0x0005
 
-gUnknown_086AD798:: @ 0x086AD798
+gPortraitPaletteSlots:: @ 0x086AD798
 	.2byte 0x000D, 0x000C;
 
-gUnknown_086AD79C:: @ 0x086AD79C
+gRouletteOutcomeFrameOffsets:: @ 0x086AD79C
 	.2byte 0, 1, 0, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1
 
-gUnknown_086AD7C0:: @ 0x086AD7C0
+gNuzleafAnimFrameData:: @ 0x086AD7C0
 	.2byte 0x000E, 0x0003, 0x0008;
     .2byte 0x000F, 0x0003, 0x0009;
     .2byte 0x0010, 0x0003, 0x0009;
@@ -4021,7 +4021,7 @@ gUnknown_086AD7C0:: @ 0x086AD7C0
     .2byte 0x001B, 0x0004, 0x0011;
     .2byte 0x001C, 0x0014, 0x0012;
 
-gUnknown_086AD856:: @ 0x086AD856
+gNuzleafPositions:: @ 0x086AD856
     .2byte 28, 51
     .2byte 64, 33
     .2byte 28, 51
@@ -4077,18 +4077,18 @@ gWhiscashFramesetData:: @ 0x086AD862
     .2byte 0x000A, 0x0031, 0x0000, 0x0000
     .align 2, 0
 
-gUnknown_086AD9DC:: @ 0x086AD9DC
+gChinchouWaypointPositions:: @ 0x086AD9DC
     @ 4 Vector16
     .2byte 120, 135
     .2byte 159, 144
     .2byte 151, 167
     .2byte 131, 179
 
-gUnknown_086AD9EC:: @ 0x086AD9EC
+gWhiscashShakeOffsets:: @ 0x086AD9EC
     @ 8 s16 vals
     .2byte 1,3,1,0,-1,-3,-1,0
 
-gUnknown_086AD9FC:: @ 0x086AD9FC
+gSharpedoAnimFrameData:: @ 0x086AD9FC
 	.2byte 0x0, 0x0
     .2byte 0x1, 0x0
     .2byte 0x2, 0x1
@@ -4113,67 +4113,67 @@ gUnknown_086AD9FC:: @ 0x086AD9FC
     .2byte 0x13, 0x2
     .2byte 0x14, 0x2
 
-gUnknown_086ADA58:: @ 0x086ADA58
+gGauntletBossFlashFrameIndices:: @ 0x086ADA58
 	.incbin "baserom.gba", 0x6ADA58, 0x16
 
-gUnknown_086ADA6E:: @ 0x086ADA6E
+gGulpinAnimData:: @ 0x086ADA6E
 	.incbin "baserom.gba", 0x6ADA6E, 0x442
 
-gUnknown_086ADEB0:: @ 0x086ADEB0
+gHatchTileGfxFrameIndices:: @ 0x086ADEB0
 	.2byte 0x00
 
-gUnknown_086ADEB2:: @ 0x086ADEB2
+gHatchTileAnimDurations:: @ 0x086ADEB2
 	.incbin "baserom.gba", 0x6ADEB2, 0x2E
 
-gUnknown_086ADEE0:: @ 0x086ADEE0
+gCatchOverlayAnimData:: @ 0x086ADEE0
 	.incbin "baserom.gba", 0x6ADEE0, 0x68
 
-gUnknown_086ADF48:: @ 0x086ADF48
+gPikaSaverAnimFrameTable:: @ 0x086ADF48
 	.incbin "baserom.gba", 0x6ADF48, 0x42
 
-gUnknown_086ADF8A:: @ 0x086ADF8A
+gCatchHoleXPositions:: @ 0x086ADF8A
 	.incbin "baserom.gba", 0x6ADF8A, 0x6
 
-gUnknown_086ADF90:: @ 0x086ADF90
+gPikaSaverWaypoints:: @ 0x086ADF90
 	.incbin "baserom.gba", 0x6ADF90, 0x38
 
-gUnknown_086ADFC8:: @ 0x086ADFC8
+gArrowBounceOffsets:: @ 0x086ADFC8
 	.incbin "baserom.gba", 0x6ADFC8, 0xC
 
-gUnknown_086ADFD4:: @ 0x086ADFD4
+gTimerIndicatorFrames:: @ 0x086ADFD4
 	.incbin "baserom.gba", 0x6ADFD4, 0xE
 
-gUnknown_086ADFE2:: @ 0x086ADFE2
+gPikaSaverFrameData:: @ 0x086ADFE2
 	.incbin "baserom.gba", 0x6ADFE2, 0xA6
 
-gUnknown_086AE088:: @ 0x086AE088
+gFlyingCreatureCameraOffsets:: @ 0x086AE088
 	.incbin "baserom.gba", 0x6AE088, 0x1C
 
-gUnknown_086AE0A4:: @ 0x086AE0A4
+gCyndaquilCavePositions:: @ 0x086AE0A4
 	.incbin "baserom.gba", 0x6AE0A4, 0x10
 
-gUnknown_086AE0B4:: @ 0x086AE0B4
+gCyndaquilFrameIndices:: @ 0x086AE0B4
 	.incbin "baserom.gba", 0x6AE0B4, 0xC
 
-gUnknown_086AE0C0:: @ 0x086AE0C0
+gHatchRevealSparkleTimings:: @ 0x086AE0C0
 	.incbin "baserom.gba", 0x6AE0C0, 0x10
 
-gUnknown_086AE0D0:: @ 0x086AE0D0
+gHatchRevealFinalTimings:: @ 0x086AE0D0
 	.incbin "baserom.gba", 0x6AE0D0, 0x16
 
-gUnknown_086AE0E6:: @ 0x086AE0E6
+gEvoItemAppearFrameThresholds:: @ 0x086AE0E6
 	.incbin "baserom.gba", 0x6AE0E6, 0x3E
 
-gUnknown_086AE124:: @ 0x086AE124
+gJirachiWaypoints:: @ 0x086AE124
 	.incbin "baserom.gba", 0x6AE124, 0x30
 
-gUnknown_086AE154:: @ 0x086AE154
+gJirachiStarFrameIndices:: @ 0x086AE154
 	.incbin "baserom.gba", 0x6AE154, 0x50
 
-gUnknown_086AE1A4:: @ 0x086AE1A4
+gHatchPieceAnimIndices:: @ 0x086AE1A4
 	.incbin "baserom.gba", 0x6AE1A4, 0x90
 
-gUnknown_086AE234:: @ 0x086AE234
+gHatchRevealPieceIndices:: @ 0x086AE234
     .2byte 0, 1, 2, 3, 4, 0, 1, 2, 3, 4, 0, 1, 2, 3, 4, 0
     .2byte 1, 2, 3, 4, 0, 1, 2, 3, 4, 0, 1, 2, 3, 4, 0, 1
     .2byte 0, 1, 2, 3, 4, 0, 1, 2, 3, 4, 0, 1, 2, 3, 4, 0
@@ -4181,7 +4181,7 @@ gUnknown_086AE234:: @ 0x086AE234
     .2byte 1, 2, 3, 4, 0, 1, 2, 3, 4, 0, 1, 2, 3, 4, 0, 1
     .2byte 4, 0, 1, 2, 3, 4, 0, 1, 2, 3, 4, 0, 1, 2, 3, 4
 
-gUnknown_086AE2F4:: @ 0x086AE2F4
+gHatchPieceVelocities:: @ 0x086AE2F4
     .2byte -240, -130
     .2byte 100, -300
     .2byte 240, -100
@@ -4189,28 +4189,28 @@ gUnknown_086AE2F4:: @ 0x086AE2F4
     .2byte -280, 90
     .2byte 340, 150
 
-gUnknown_086AE30C:: @ 0x086AE30C
+gHatchPieceAffineModes:: @ 0x086AE30C
 	.incbin "baserom.gba", 0x6AE30C, 0xC
 
-gUnknown_086AE318:: @ 0x086AE318
+gHatchPieceMatrixNums:: @ 0x086AE318
 	.2byte 0x0002, 0x0003, 0x0002, 0x0004, 0x0005, 0x0003
 
-gUnknown_086AE324:: @ 0x086AE324
+gOneUpSpritePalette:: @ 0x086AE324
 	.incbin "baserom.gba", 0x6AE324, 0x20
 
-gUnknown_086AE344:: @ 0x086AE344
+gSapphirePondAnimFramesets:: @ 0x086AE344
 	.incbin "baserom.gba", 0x6AE344, 0x50
 
-gUnknown_086AE394:: @ 0x086AE394
+gTravelEventAnimData:: @ 0x086AE394
 	.incbin "baserom.gba", 0x6AE394, 0x48
 
-gUnknown_086AE3DC:: @ 0x086AE3DC
+gPelliperSwallowAnimData:: @ 0x086AE3DC
 	.incbin "baserom.gba", 0x6AE3DC, 0x7E
 
-gUnknown_086AE45A:: @ 0x086AE45A
+gPelliperIdleFrameIndices:: @ 0x086AE45A
 	.incbin "baserom.gba", 0x6AE45A, 0x8
 
-gUnknown_086AE462:: @ 0x086AE462
+gWailmerAnimFrameMap:: @ 0x086AE462
     .2byte 0x0, 0x0
     .2byte 0x1, 0x1
     .2byte 0x2, 0x2
@@ -4225,28 +4225,28 @@ gUnknown_086AE462:: @ 0x086AE462
     .2byte 0xB, 0x4
     .2byte 0xC, 0x0
 
-gUnknown_086AE496:: @ 0x086AE496
+gZigzagoonAnimKeyframes:: @ 0x086AE496
 	.incbin "baserom.gba", 0x6AE496, 0x66
 
-gUnknown_086AE4FC:: @ 0x086AE4FC
+gSapphireBumperAnimFrames:: @ 0x086AE4FC
 	.incbin "baserom.gba", 0x6AE4FC, 0x48
 
-gUnknown_086AE544:: @ 0x086AE544
+gSeedotBaseXPositions:: @ 0x086AE544
 	.incbin "baserom.gba", 0x6AE544, 0x6
 
-gUnknown_086AE54A:: @ 0x086AE54A
+gSeedotBasketBounceFrames:: @ 0x086AE54A
 	.incbin "baserom.gba", 0x6AE54A, 0xA
 
-gUnknown_086AE554:: @ 0x086AE554
+gSplashEffectPositions:: @ 0x086AE554
 	.incbin "baserom.gba", 0x6AE554, 0x34
 
-gUnknown_086AE588:: @ 0x086AE588
+gSplashEffectTileIndices:: @ 0x086AE588
 	.incbin "baserom.gba", 0x6AE588, 0x2
 
-gUnknown_086AE58A:: @ 0x086AE58A
+gSplashEffectFrameDurations:: @ 0x086AE58A
 	.incbin "baserom.gba", 0x6AE58A, 0x16
 
-gUnknown_086AE5A0:: @ 0x086AE5A0
+gHoleAnimKeyframeData:: @ 0x086AE5A0
 	.2byte 0x0006, 0x0001;
 	.2byte 0x0007, 0x0003;
 	.2byte 0x0008, 0x000E;
@@ -4336,136 +4336,136 @@ DuclopsFramesetData:: @ 0x086AE68E
     .2byte 0x041A, 0x049C
     .2byte 0x02EE, 0x049C, 0x01C2
 
-gUnknown_086AE718:: @ 0x086AE718
+gKecleonAnimFramesetTable:: @ 0x086AE718
 	.incbin "baserom.gba", 0x6AE718, 0x2AC
 
-gUnknown_086AE9C4:: @ 0x086AE9C4
+gKecleonVisibleWalkDirectionMap:: @ 0x086AE9C4
 	.incbin "baserom.gba", 0x6AE9C4, 0x10
 
-gUnknown_086AE9D4:: @ 0x086AE9D4
+gKecleonInvisibleDashDirectionMap:: @ 0x086AE9D4
 	.incbin "baserom.gba", 0x6AE9D4, 0x10
 
-gUnknown_086AE9E4:: @ 0x086AE9E4
+gKecleonMovementTargetGraph:: @ 0x086AE9E4
 	.incbin "baserom.gba", 0x6AE9E4, 0x58
 
-gUnknown_086AEA3C:: @ 0x086AEA3C
+gKecleonScopeFallTargets:: @ 0x086AEA3C
 	.incbin "baserom.gba", 0x6AEA3C, 0x14
 
-gUnknown_086AEA50:: @ 0x086AEA50
+gKecleonOverlayTilemapPointers:: @ 0x086AEA50
 	.incbin "baserom.gba", 0x6AEA50, 0x10
 
-gUnknown_086AEA60:: @ 0x086AEA60
+gKecleonOverlayTileAnimIndices:: @ 0x086AEA60
 	.incbin "baserom.gba", 0x6AEA60, 0x8
 
-gUnknown_086AEA68:: @ 0x086AEA68
+gKecleonBerryFlashAnimIndices:: @ 0x086AEA68
 	.incbin "baserom.gba", 0x6AEA68, 0x8
 
-gUnknown_086AEA70:: @ 0x086AEA70
+gKecleonSpriteYSortData:: @ 0x086AEA70
 	.incbin "baserom.gba", 0x6AEA70, 0x70
 
-gUnknown_086AEAE0:: @ 0x086AEAE0
+gKyogreOceanPaletteProgression:: @ 0x086AEAE0
 	.incbin "baserom.gba", 0x6AEAE0, 0x18
 
-gUnknown_086AEAF8:: @ 0x086AEAF8
+gKyogreAnimFramesetTable:: @ 0x086AEAF8
 	.incbin "baserom.gba", 0x6AEAF8, 0x2AC
 
-gUnknown_086AEDA4:: @ 0x086AEDA4
+gKyogreRisingPaletteCycleIndices:: @ 0x086AEDA4
 	.incbin "baserom.gba", 0x6AEDA4, 0x28
 
-gUnknown_086AEDCC:: @ 0x086AEDCC
+gKyogreSplashAnimIndices:: @ 0x086AEDCC
 	.incbin "baserom.gba", 0x6AEDCC, 0x1C
 
-gUnknown_086AEDE8:: @ 0x086AEDE8
+gKyogreWhirlpoolTargetPositions:: @ 0x086AEDE8
 	.incbin "baserom.gba", 0x6AEDE8, 0x38
 
-gUnknown_086AEE20:: @ 0x086AEE20
+gShockwaveSplashDistanceThresholds:: @ 0x086AEE20
 	.incbin "baserom.gba", 0x6AEE20, 0x3E
 
-gUnknown_086AEE5E:: @ 0x086AEE5E
+gKyogreWhirlpoolTrapAnimFrameset:: @ 0x086AEE5E
 	.incbin "baserom.gba", 0x6AEE5E, 0x78
 
-gUnknown_086AEED6:: @ 0x086AEED6
+gWaterTilePaletteCycle:: @ 0x086AEED6
 	.incbin "baserom.gba", 0x6AEED6, 0x8
 
-gUnknown_086AEEDE:: @ 0x086AEEDE
+gKyogreWaterPaletteSegmentCycle:: @ 0x086AEEDE
 	.incbin "baserom.gba", 0x6AEEDE, 0x8
 
-gUnknown_086AEEE6:: @ 0x086AEEE6
+gKyogreBgTileVariantCycle:: @ 0x086AEEE6
 	.incbin "baserom.gba", 0x6AEEE6, 0x18
 
-gUnknown_086AEEFE:: @ 0x086AEEFE
+gKyogreBgSpriteBaseTileNums:: @ 0x086AEEFE
 	.incbin "baserom.gba", 0x6AEEFE, 0x6
 
-gUnknown_086AEF04:: @ 0x086AEF04
+gKyogreIntroPaletteCycleIndices:: @ 0x086AEF04
 	.incbin "baserom.gba", 0x6AEF04, 0x24
 
-gUnknown_086AEF28:: @ 0x086AEF28
+gScreenShakeOscillationValues:: @ 0x086AEF28
 	.incbin "baserom.gba", 0x6AEF28, 0x18
 
-gUnknown_086AEF40:: @ 0x086AEF40
+gGroudonFootstepShakePatterns:: @ 0x086AEF40
 	.incbin "baserom.gba", 0x6AEF40, 0x174
 
-gUnknown_086AF0B4:: @ 0x086AF0B4
+gGroudonCryShakePattern:: @ 0x086AF0B4
 	.incbin "baserom.gba", 0x6AF0B4, 0x8C
 
-gUnknown_086AF140:: @ 0x086AF140
+gGroudonAnimFramesetTable:: @ 0x086AF140
 	.incbin "baserom.gba", 0x6AF140, 0x18C
 
-gUnknown_086AF2CC:: @ 0x086AF2CC
+gGroudonFirePillarBasePositions:: @ 0x086AF2CC
 	.incbin "baserom.gba", 0x6AF2CC, 0x10
 
-gUnknown_086AF2DC:: @ 0x086AF2DC
+gGroudonFirePillarAnimFrameset:: @ 0x086AF2DC
 	.incbin "baserom.gba", 0x6AF2DC, 0x70
 
-gUnknown_086AF34C:: @ 0x086AF34C
+gGroudonBoulderPositionTable:: @ 0x086AF34C
 	.incbin "baserom.gba", 0x6AF34C, 0x60
 
-gUnknown_086AF3AC:: @ 0x086AF3AC
+gGroudonBoulderBaseSpriteIndices:: @ 0x086AF3AC
 	.incbin "baserom.gba", 0x6AF3AC, 0x6
 
-gUnknown_086AF3B2:: @ 0x086AF3B2
+gGroudonLavaPaletteAnimIndices:: @ 0x086AF3B2
 	.incbin "baserom.gba", 0x6AF3B2, 0xC
 
-gUnknown_086AF3BE:: @ 0x086AF3BE
+gGroudonBgTileAnimIndices:: @ 0x086AF3BE
 	.incbin "baserom.gba", 0x6AF3BE, 0x8
 
-gUnknown_086AF3C6:: @ 0x086AF3C6
+gGroudonBgSpriteBaseTileNums:: @ 0x086AF3C6
 	.incbin "baserom.gba", 0x6AF3C6, 0x6
 
-gUnknown_086AF3CC:: @ 0x086AF3CC
+gRayquazaAnimFramesetTable:: @ 0x086AF3CC
 	.incbin "baserom.gba", 0x6AF3CC, 0x378
 
-gUnknown_086AF744:: @ 0x086AF744
+gRayquazaMinionOrbitWaypoints:: @ 0x086AF744
 	.incbin "baserom.gba", 0x6AF744, 0x40
 
-gUnknown_086AF784:: @ 0x086AF784
+gRayquazaCloudScrollPositions:: @ 0x086AF784
 	.incbin "baserom.gba", 0x6AF784, 0x33C
 
-gUnknown_086AFAC0:: @ 0x086AFAC0
+gSphealFlyingEnemyPathData:: @ 0x086AFAC0
 	.incbin "baserom.gba", 0x6AFAC0, 0x20
 
-gUnknown_086AFAE0:: @ 0x086AFAE0
+gSphealFramesetToSpriteMap:: @ 0x086AFAE0
 	.incbin "baserom.gba", 0x6AFAE0, 0x2
 
-gUnknown_086AFAE2:: @ 0x086AFAE2
+gSphealAnimTimingTable:: @ 0x086AFAE2
 	.incbin "baserom.gba", 0x6AFAE2, 0x4A
 
-gUnknown_086AFB2C:: @ 0x086AFB2C
+gSphealFlyingEnemyFramesetTable:: @ 0x086AFB2C
 	.incbin "baserom.gba", 0x6AFB2C, 0xEA
 
-gUnknown_086AFC16:: @ 0x086AFC16
+gSphealWhiscashAnimFrameset:: @ 0x086AFC16
 	.incbin "baserom.gba", 0x6AFC16, 0x9A
 
-gUnknown_086AFCB0:: @ 0x086AFCB0
+gBoardCollisionDataSets:: @ 0x086AFCB0
 	.incbin "baserom.gba", 0x6AFCB0, 0xC0
 
-gUnknown_086AFD70:: @ 0x086AFD70
+gFieldBoardConfigs:: @ 0x086AFD70
 	.incbin "baserom.gba", 0x6AFD70, 0x2A0
 
-gUnknown_086B0010:: @ 0x086B0010
+gScrollTileUpdateTable:: @ 0x086B0010
 	.incbin "baserom.gba", 0x6B0010, 0x118
 
-gUnknown_086B0128:: @ 0x086B0128
+gBonusSummaryTextTemplates:: @ 0x086B0128
 	.ascii "POK^MON_CAUGHT______BONUS_______________"
 
 gUnknown_086B0150:: @ 0x086B0150
@@ -4507,141 +4507,141 @@ BoardProcPairs_086B077C:: @ 0x086B077C
 	.4byte SphealBoardProcess_0A_51150, SphealBoardProcess_0B_511F8
 	.4byte nullsub_19, nullsub_19
 
-gUnknown_086B085C:: @ 0x086B085C
-	.4byte sub_4ABEC
-	.4byte sub_4AE8C
+gFieldInitFuncs:: @ 0x086B085C
+	.4byte MainGameFrameUpdate
+	.4byte BonusFieldFrameUpdate
 
 gUnknown_086B0864:: @ 0x086B0664
 	.incbin "baserom.gba", 0x6B0864, 0x20
 
-gUnknown_086B0884:: @ 0x086B0884
+gTimerWarningPalette_Fast:: @ 0x086B0884
 	.incbin "baserom.gba", 0x6B0884, 0x20
 
-gUnknown_086B08A4:: @ 0x086B08A4
+gTimerWarningPalette_Slow:: @ 0x086B08A4
 	.incbin "baserom.gba", 0x6B08A4, 0x20
 
-gUnknown_086B08C4:: @ 0x086B08C4
+gCoinRewardLevelTimerThresholds:: @ 0x086B08C4
 	.incbin "baserom.gba", 0x6B08C4, 0x6
 
-gUnknown_086B08CA:: @ 0x086B08CA
+gRubySlingshotAnimIndices:: @ 0x086B08CA
 	.incbin "baserom.gba", 0x6B08CA, 0xA
 
-gUnknown_086B08D4:: @ 0x086B08D4
+gRubySlingshotTilePointers:: @ 0x086B08D4
 	.incbin "baserom.gba", 0x6B08D4, 0x78
 
-gUnknown_086B094C:: @ 0x086B094C
+gShopItemTilePointers:: @ 0x086B094C
 	.incbin "baserom.gba", 0x6B094C, 0x24
 
-gUnknown_086B0970:: @ 0x086B0970
+gRubyProgressDigitTilePointers:: @ 0x086B0970
 	.incbin "baserom.gba", 0x6B0970, 0x58
 
-gUnknown_086B09C8:: @ 0x086B09C8
+gRubyTrapIndicatorTilePointers:: @ 0x086B09C8
 	.incbin "baserom.gba", 0x6B09C8, 0x20
 
-gUnknown_086B09E8:: @ 0x086B09E8
+gRubyCatchLightTilePointers:: @ 0x086B09E8
 	.incbin "baserom.gba", 0x6B09E8, 0xA8
 
-gUnknown_086B0A90:: @ 0x086B0A90
+gRubyModeTimerTilePointers:: @ 0x086B0A90
 	.incbin "baserom.gba", 0x6B0A90, 0x30
 
-gUnknown_086B0AC0:: @ 0x086B0AC0
+gRubyCatchArrowTilePointers:: @ 0x086B0AC0
 	.incbin "baserom.gba", 0x6B0AC0, 0x30
 
-gUnknown_086B0AF0:: @ 0x086B0AF0
+gRubyEvoArrowTilePointers:: @ 0x086B0AF0
 	.incbin "baserom.gba", 0x6B0AF0, 0x30
 
-gUnknown_086B0B20:: @ 0x086B0B20
+gRubyRouletteSlotTilePointers:: @ 0x086B0B20
 	.incbin "baserom.gba", 0x6B0B20, 0x50
 
-gUnknown_086B0B70:: @ 0x086B0B70
+gRubyBallPowerUpLightTilePointers:: @ 0x086B0B70
 	.incbin "baserom.gba", 0x6B0B70, 0x24
 
-gUnknown_086B0B94:: @ 0x086B0B94
+gRubyCatchProgressArrowTilePointers:: @ 0x086B0B94
 	.incbin "baserom.gba", 0x6B0B94, 0x30
 
-gUnknown_086B0BC4:: @ 0x086B0BC4
+gRubyHoleIndicatorTilePointers:: @ 0x086B0BC4
 	.incbin "baserom.gba", 0x6B0BC4, 0x40
 
-gUnknown_086B0C04:: @ 0x086B0C04
+gSapphireEvoArrowTilePtrs:: @ 0x086B0C04
 	.incbin "baserom.gba", 0x6B0C04, 0xB4
 
-gUnknown_086B0CB8:: @ 0x086B0CB8
+gSapphireCoinRewardTilePtrs:: @ 0x086B0CB8
 	.incbin "baserom.gba", 0x6B0CB8, 0xB4
 
-gUnknown_086B0D6C:: @ 0x086B0D6C
+gSapphireCatchArrowTilePtrs:: @ 0x086B0D6C
 	.incbin "baserom.gba", 0x6B0D6C, 0xB4
 
-gUnknown_086B0E20:: @ 0x086B0E20
+gBallShadowTileIndices:: @ 0x086B0E20
 	.incbin "baserom.gba", 0x6B0E20, 0x40
 
-gUnknown_086B0E60:: @ 0x086B0E60
+gSlingshotHitFrameIndices:: @ 0x086B0E60
 	.incbin "baserom.gba", 0x6B0E60, 0xC
 
-gUnknown_086B0E6C:: @ 0x086B0E6C
+gBumperHitCounterTilePtrs:: @ 0x086B0E6C
 	.incbin "baserom.gba", 0x6B0E6C, 0x30
 
-gUnknown_086B0E9C:: @ 0x086B0E9C
+gSapphireProgressDigitTilePtrs:: @ 0x086B0E9C
 	.incbin "baserom.gba", 0x6B0E9C, 0xB0
 
-gUnknown_086B0F4C:: @ 0x086B0F4C
+gRotatingBackgroundTilePtrs:: @ 0x086B0F4C
 	.incbin "baserom.gba", 0x6B0F4C, 0x50
 
-gUnknown_086B0F9C:: @ 0x086B0F9C
+gBonusModeIndicatorTilePtrs:: @ 0x086B0F9C
 	.incbin "baserom.gba", 0x6B0F9C, 0x10
 
 gUnknown_086B0FAC:: @ 0x086B0FAC
 	.incbin "baserom.gba", 0x6B0FAC, 0xE0
 
-gUnknown_086B108C:: @ 0x086B108C
+gSapphireSlingshotTilePtrs:: @ 0x086B108C
 	.incbin "baserom.gba", 0x6B108C, 0x78
 
-gUnknown_086B1104:: @ 0x086B1104
+gSapphireTrapIndicatorTilePtrs:: @ 0x086B1104
 	.incbin "baserom.gba", 0x6B1104, 0x20
 
-gUnknown_086B1124:: @ 0x086B1124
+gSapphireCatchLightTilePtrs:: @ 0x086B1124
 	.incbin "baserom.gba", 0x6B1124, 0xA8
 
-gUnknown_086B11CC:: @ 0x086B11CC
+gSapphireModeTimerDisplayTilePtrs:: @ 0x086B11CC
 	.incbin "baserom.gba", 0x6B11CC, 0x30
 
-gUnknown_086B11FC:: @ 0x086B11FC
+gSapphireCatchArrowPaletteTilePtrs:: @ 0x086B11FC
 	.incbin "baserom.gba", 0x6B11FC, 0x30
 
-gUnknown_086B122C:: @ 0x086B122C
+gSapphireEvoArrowPaletteTilePtrs:: @ 0x086B122C
 	.incbin "baserom.gba", 0x6B122C, 0x30
 
-gUnknown_086B125C:: @ 0x086B125C
+gSapphireRouletteSlotTilePtrs:: @ 0x086B125C
 	.incbin "baserom.gba", 0x6B125C, 0x50
 
-gUnknown_086B12AC:: @ 0x086B12AC
+gSapphireBallPowerUpLightTilePtrs:: @ 0x086B12AC
 	.incbin "baserom.gba", 0x6B12AC, 0x24
 
-gUnknown_086B12D0:: @ 0x086B12D0
+gSapphireCatchFlashTilePtrs:: @ 0x086B12D0
 	.incbin "baserom.gba", 0x6B12D0, 0x30
 
-gUnknown_086B1300:: @ 0x086B1300
+gSapphireHoleIndicatorTilePtrs:: @ 0x086B1300
 	.incbin "baserom.gba", 0x6B1300, 0x40
 
-gUnknown_086B1340:: @ 0x086B1340
+gSapphireEvoArrowBonusTilePtrs:: @ 0x086B1340
 	.incbin "baserom.gba", 0x6B1340, 0xB4
 
-gUnknown_086B13F4:: @ 0x086B13F4
+gSapphireCoinRewardAltTilePtrs:: @ 0x086B13F4
 	.incbin "baserom.gba", 0x6B13F4, 0x78
 
 gUnknown_086B146C:: @ 0x086B146C
 	.incbin "baserom.gba", 0x6B146C, 0x3C
 
-gUnknown_086B14A8:: @ 0x086B14A8
+gSapphireCatchArrowBonusTilePtrs:: @ 0x086B14A8
 	.incbin "baserom.gba", 0x6B14A8, 0xB4
 
-gUnknown_086B155C:: @ 0x086B155C
+gFieldSpriteSets:: @ 0x086B155C
     .4byte gUnknown_086B2390
     .2byte 0x54, 0
     .4byte gUnknown_086B24E0
     .2byte 0x57, 0
     .4byte gUnknown_086BB3E4
     .2byte 0xF, 0
-    .4byte gUnknown_086BB420
+    .4byte gKecleonDefaultSpriteSets
     .2byte 0x21, 0
     .4byte gUnknown_086BB4A4
     .2byte 0x1B, 0
@@ -4660,7 +4660,7 @@ gMonHatchSpriteGroupPals:: @ 0x086B159C
 	.4byte gMonHatchSpriteGroup4_Pals
 	.4byte gMonHatchSpriteGroup5_Pals
 
-gUnknown_086B15B4:: @ 0x086B15B4
+gMonIconPalettes:: @ 0x086B15B4
 	.incbin "baserom.gba", 0x6B15B4, 0x44
 
 gUnknown_086B15F8:: @ 0x086B15F8
@@ -5969,7 +5969,7 @@ gUnknown_086B24E0:: @ 0x086B24E0
 .4byte gUnknown_086B1A98
 
 
-gUnknown_086B263C:: @ 0x086B263C
+gSapphireFloatOamFramesets:: @ 0x086B263C
     packed_sprite_oam x=0x0, y=0x0, spriteSize=SPRITE_SIZE_8x8, tileNum=0x291, priority=0x1, paletteNum=0xd
     packed_sprite_oam x=0x0, y=0x0, spriteSize=SPRITE_SIZE_8x8, tileNum=0x291, priority=0x1, paletteNum=0xd
     packed_sprite_oam x=0x0, y=0x0, spriteSize=SPRITE_SIZE_8x8, tileNum=0x291, priority=0x1, paletteNum=0xd
@@ -6074,7 +6074,7 @@ gUnknown_086B263C:: @ 0x086B263C
     packed_sprite_oam x=0xD, y=0x1B, spriteSize=SPRITE_SIZE_8x8, tileNum=0x291, priority=0x1, paletteNum=0xd
 
 
-gUnknown_086B28A0:: @ 0x086B28A0
+gPokemonFloatOamFramesets:: @ 0x086B28A0
     packed_sprite_oam x=-0xC, y=-0x2A, spriteSize=SPRITE_SIZE_32x16, tileNum=0x2c0, paletteNum=0xe
     packed_sprite_oam x=-0xC, y=-0x1A, spriteSize=SPRITE_SIZE_32x8, tileNum=0x2c8, paletteNum=0xe
     packed_sprite_oam x=-0xC, y=-0x2A, spriteSize=SPRITE_SIZE_32x16, tileNum=0x2c0, paletteNum=0xe
@@ -6323,7 +6323,7 @@ gUnknown_086B28A0:: @ 0x086B28A0
     packed_sprite_oam x=0x0, y=0x10, spriteSize=SPRITE_SIZE_16x8, tileNum=0x322, paletteNum=0xb
 
 
-gUnknown_086B2E64:: @ 0x086B2E64
+gNuzleafOamData:: @ 0x086B2E64
     packed_sprite_oam x=0x0, y=0x0, spriteSize=SPRITE_SIZE_32x32, tileNum=0x21c, priority=0x2, paletteNum=0x4
     packed_sprite_oam x=0x0, y=0x20, spriteSize=SPRITE_SIZE_32x8, tileNum=0x22c, priority=0x2, paletteNum=0x4
     packed_sprite_oam x=0x0, y=0x0, spriteSize=SPRITE_SIZE_32x32, tileNum=0x21c, priority=0x2, paletteNum=0x4
@@ -6384,7 +6384,7 @@ gUnknown_086B2E64:: @ 0x086B2E64
     packed_sprite_oam x=0x38, y=0x10, spriteSize=SPRITE_SIZE_8x32, tileNum=0x22c, priority=0x2, paletteNum=0x4
 
 
-gUnknown_086B2FC0:: @ 0x086B2FC0
+gGulpinOamData:: @ 0x086B2FC0
     packed_sprite_oam x=-0x20, y=-0x9, spriteSize=SPRITE_SIZE_32x16, tileNum=0x1c4, priority=0x1, paletteNum=0x7
     packed_sprite_oam x=-0x20, y=0x7, spriteSize=SPRITE_SIZE_32x8, tileNum=0x1cc, priority=0x1, paletteNum=0x7
     packed_sprite_oam x=-0x21, y=-0xB, spriteSize=SPRITE_SIZE_32x16, tileNum=0x1d0, priority=0x1, paletteNum=0x7
@@ -6891,7 +6891,7 @@ gSharpedoSpritesheetOam:: @ 0x086B3A04
     packed_sprite_oam x=0x1E, y=0x18, spriteSize=SPRITE_SIZE_8x8, tileNum=0x173, priority=0x1, paletteNum=0x6
 
 
-gUnknown_086B3B7E:: @ 0x086B3B7E
+gZigzagoonFxSpritesheetOam:: @ 0x086B3B7E
     packed_sprite_oam x=0x0, y=0x0, spriteSize=SPRITE_SIZE_8x8, tileNum=0x31a, priority=0x1, paletteNum=0x6
     packed_sprite_oam x=0x0, y=0x0, spriteSize=SPRITE_SIZE_8x8, tileNum=0x31a, priority=0x1, paletteNum=0x6
     packed_sprite_oam x=0x0, y=0x0, spriteSize=SPRITE_SIZE_8x8, tileNum=0x31a, priority=0x1, paletteNum=0x6
@@ -7048,7 +7048,7 @@ gSapphireBoardSeedotSpritesheetOam:: @ 0x086B3E1E
     packed_sprite_oam x=-0x20, y=-0x18, spriteSize=SPRITE_SIZE_8x32, tileNum=0x201, priority=0x1, paletteNum=0x7
 
 
-gUnknown_086B3EF6:: @ 0x086B3EF6
+gPelliperPondSpritesheetOam:: @ 0x086B3EF6
     packed_sprite_oam x=0x0, y=0x0, mosaic=0x1, spriteSize=SPRITE_SIZE_32x32, tileNum=0x115, priority=0x1, paletteNum=0x4
     packed_sprite_oam x=0x20, y=0x0, mosaic=0x1, spriteSize=SPRITE_SIZE_16x32, tileNum=0x125, priority=0x1, paletteNum=0x4
     packed_sprite_oam x=0x0, y=0x20, mosaic=0x1, spriteSize=SPRITE_SIZE_32x16, tileNum=0x12d, priority=0x1, paletteNum=0x4
@@ -7091,7 +7091,7 @@ gUnknown_086B3EF6:: @ 0x086B3EF6
     packed_sprite_oam x=0x0, y=0x20, mosaic=0x1, spriteSize=SPRITE_SIZE_16x16, hFlip=0x1, tileNum=0x135, priority=0x1, paletteNum=0x4
 
 
-gUnknown_086B3FE6:: @ 0x086B3FE6
+gTravelEventSpritesheetOam:: @ 0x086B3FE6
     packed_sprite_oam x=0x0, y=-0x8, spriteSize=SPRITE_SIZE_32x32, tileNum=0x2c0, paletteNum=0xe
     packed_sprite_oam x=0x20, y=-0x8, spriteSize=SPRITE_SIZE_16x32, tileNum=0x2d0, paletteNum=0xe
     packed_sprite_oam x=0x0, y=0x18, spriteSize=SPRITE_SIZE_32x16, tileNum=0x2d8, paletteNum=0xe
@@ -7145,7 +7145,7 @@ gUnknown_086B3FE6:: @ 0x086B3FE6
 
 
 
-gUnknown_086B4112:: @ 0x086B4112
+gEvolutionSparkleSpritesheetOam:: @ 0x086B4112
     packed_sprite_oam x=-0x38, y=0x0, spriteSize=SPRITE_SIZE_16x32, tileNum=0x386, paletteNum=0xe
     packed_sprite_oam x=-0x38, y=0x0, spriteSize=SPRITE_SIZE_16x32, tileNum=0x386, paletteNum=0xe
     packed_sprite_oam x=-0x38, y=0x0, spriteSize=SPRITE_SIZE_16x32, tileNum=0x386, paletteNum=0xe
@@ -7188,7 +7188,7 @@ gUnknown_086B4112:: @ 0x086B4112
     packed_sprite_oam x=0x20, y=0x18, spriteSize=SPRITE_SIZE_16x16, tileNum=0x3b2, paletteNum=0xe
 
 
-gUnknown_086B4202:: @ 0x086B4202
+gEvoItemAnimOamFramesets:: @ 0x086B4202
     packed_sprite_oam x=-0x10, y=-0x10, spriteSize=SPRITE_SIZE_32x16, tileNum=0x2c0, paletteNum=0xf
     packed_sprite_oam x=-0x10, y=0x0, spriteSize=SPRITE_SIZE_32x16, hFlip=0x1, vFlip=0x1, tileNum=0x2c0, paletteNum=0xf
     packed_sprite_oam x=-0x10, y=-0x10, spriteSize=SPRITE_SIZE_32x16, tileNum=0x2c0, paletteNum=0xf
@@ -7336,7 +7336,7 @@ gUnknown_086B4202:: @ 0x086B4202
     packed_sprite_oam x=-0x8, y=-0x10, spriteSize=SPRITE_SIZE_16x16, tileNum=0x364, paletteNum=0xf
 
 
-gUnknown_086B4568:: @ 0x086B4568
+gModeBannerOamAttributes:: @ 0x086B4568
     packed_sprite_oam x=-0x7F, y=0x0, spriteSize=SPRITE_SIZE_64x64, tileNum=0x2c0, paletteNum=0xe
     packed_sprite_oam x=-0x3F, y=0x0, spriteSize=SPRITE_SIZE_64x64, tileNum=0x300, paletteNum=0xe
     packed_sprite_oam x=0x1, y=0x0, spriteSize=SPRITE_SIZE_64x64, tileNum=0x340, paletteNum=0xe
@@ -7444,7 +7444,7 @@ gUnknown_086B4568:: @ 0x086B4568
     packed_sprite_oam x=0x61, y=0x40, spriteSize=SPRITE_SIZE_16x8, tileNum=0x3cc, paletteNum=0xe
 
 
-gUnknown_086B47DE:: @ 0x086B47DE
+gShopNumberOamFramesets:: @ 0x086B47DE
     packed_sprite_oam x=0x0, y=0x0, spriteSize=SPRITE_SIZE_8x32, tileNum=0x2f5, paletteNum=0xe
     packed_sprite_oam x=0x8, y=0x0, spriteSize=SPRITE_SIZE_32x32, tileNum=0x2f9, paletteNum=0xe
     packed_sprite_oam x=0x48, y=0x0, spriteSize=SPRITE_SIZE_8x32, hFlip=0x1, tileNum=0x2f5, paletteNum=0xe
@@ -7457,7 +7457,7 @@ gUnknown_086B47DE:: @ 0x086B47DE
     packed_sprite_oam x=0x68, y=0x0, spriteSize=SPRITE_SIZE_16x32, tileNum=0x309, paletteNum=0xe
 
 
-gUnknown_086B481A:: @ 0x086B481A
+gShopOamAttributes:: @ 0x086B481A
     packed_sprite_oam x=-0x10, y=0x0, spriteSize=SPRITE_SIZE_16x16, tileNum=0xdb, paletteNum=0x3
     packed_sprite_oam x=-0x10, y=0x4, spriteSize=SPRITE_SIZE_16x16, tileNum=0xdf, paletteNum=0x3
     packed_sprite_oam x=-0x10, y=-0x8, spriteSize=SPRITE_SIZE_16x16, tileNum=0xe3, paletteNum=0x3
@@ -7469,7 +7469,7 @@ gUnknown_086B481A:: @ 0x086B481A
     packed_sprite_oam x=-0x10, y=-0x19, spriteSize=SPRITE_SIZE_16x16, tileNum=0xdb, paletteNum=0x3
 
 
-gUnknown_086B4850:: @ 0x086B4850
+gEggFloatOamFramesets:: @ 0x086B4850
     packed_sprite_oam x=0x3, y=0xA, spriteSize=SPRITE_SIZE_32x32, tileNum=0x2c0, paletteNum=0xe
     packed_sprite_oam x=0x3, y=0x2A, spriteSize=SPRITE_SIZE_16x8, tileNum=0x2d0, paletteNum=0xe
     packed_sprite_oam x=0x23, y=0x2, spriteSize=SPRITE_SIZE_16x32, tileNum=0x2d2, paletteNum=0xe
@@ -7507,7 +7507,7 @@ gUnknown_086B4850:: @ 0x086B4850
     packed_sprite_oam x=0x4, y=0x27, spriteSize=SPRITE_SIZE_16x8, tileNum=0x2f8, paletteNum=0xe
 
 
-gUnknown_086B4922:: @ 0x086B4922
+gCatchOverlayOamData:: @ 0x086B4922
     packed_sprite_oam x=0x0, y=0x0, spriteSize=SPRITE_SIZE_32x16, tileNum=0x2c0, priority=0x2, paletteNum=0x3
     packed_sprite_oam x=0x8, y=0x10, spriteSize=SPRITE_SIZE_16x8, tileNum=0x2c8, priority=0x2, paletteNum=0x3
     packed_sprite_oam x=0x0, y=0x0, spriteSize=SPRITE_SIZE_32x16, tileNum=0x2c0, priority=0x2, paletteNum=0x3
@@ -7595,7 +7595,7 @@ gWailmerSpritesheetOam:: @ 0x086B4A72
     packed_sprite_oam x=0x20, y=0x0, mosaic=0x1, spriteSize=SPRITE_SIZE_16x32, tileNum=0x149, priority=0x3, paletteNum=0x2
 
 
-gUnknown_086B4B0E:: @ 0x086B4B0E
+gCatchCreatureOamFramesets:: @ 0x086B4B0E
     packed_sprite_oam x=0x0, y=0x0, spriteSize=SPRITE_SIZE_16x16, tileNum=0x95, priority=0x1, paletteNum=0xd
     packed_sprite_oam x=0x10, y=0x0, spriteSize=SPRITE_SIZE_8x16, tileNum=0x99, priority=0x1, paletteNum=0xd
     packed_sprite_oam x=0x0, y=0x10, spriteSize=SPRITE_SIZE_16x8, tileNum=0x9b, priority=0x1, paletteNum=0xd
@@ -7694,7 +7694,7 @@ gUnknown_086B4B0E:: @ 0x086B4B0E
     packed_sprite_oam x=0x10, y=0xC, spriteSize=SPRITE_SIZE_8x8, tileNum=0x9d, priority=0x1, paletteNum=0xd
 
 
-gUnknown_086B4D4E:: @ 0x086B4D4E
+gHatchCaveOamFramesets:: @ 0x086B4D4E
     packed_sprite_oam x=-0x10, y=-0x28, spriteSize=SPRITE_SIZE_32x32, tileNum=0xe7, priority=0x1, paletteNum=0xb
     packed_sprite_oam x=-0x10, y=-0x28, spriteSize=SPRITE_SIZE_32x32, tileNum=0xe7, priority=0x1, paletteNum=0xb
     packed_sprite_oam x=-0x10, y=-0x28, spriteSize=SPRITE_SIZE_32x32, tileNum=0xe7, priority=0x1, paletteNum=0xb
@@ -7737,13 +7737,13 @@ gUnknown_086B4D4E:: @ 0x086B4D4E
     packed_sprite_oam x=0x2, y=-0x20, spriteSize=SPRITE_SIZE_32x16, tileNum=0xef, priority=0x1, paletteNum=0xb
 
 
-gUnknown_086B4E3E:: @ 0x086B4E3E
+gHatchParticleOamAttributes:: @ 0x086B4E3E
 	.incbin "baserom.gba", 0x6B4E3E, 0x4
 
 gUnknown_086B4E42:: @ 0x086B4E42
 	.incbin "baserom.gba", 0x6B4E42, 0x20
 
-gUnknown_086B4E62:: @ 0x086B4E62
+gHatchSequentialOamFramesets:: @ 0x086B4E62
     packed_sprite_oam x=0x18, y=0x18, spriteSize=SPRITE_SIZE_16x16, tileNum=0x2c8, paletteNum=0xe
     packed_sprite_oam x=0x28, y=0x8, spriteSize=SPRITE_SIZE_16x32, tileNum=0x2c0, paletteNum=0xe
     packed_sprite_oam x=0x18, y=0x18, spriteSize=SPRITE_SIZE_16x16, tileNum=0x2c8, paletteNum=0xe
@@ -7790,7 +7790,7 @@ gUnknown_086B4E62:: @ 0x086B4E62
     packed_sprite_oam x=-0xE, y=-0x8, spriteSize=SPRITE_SIZE_16x32, tileNum=0x356, paletteNum=0xe
 
 
-gUnknown_086B4F6A:: @ 0x086B4F6A
+gHatchFullRevealOamFramesets:: @ 0x086B4F6A
     packed_sprite_oam x=0x0, y=0x0, spriteSize=SPRITE_SIZE_16x16, tileNum=0x2c4, paletteNum=0xe
     packed_sprite_oam x=0x10, y=0x0, spriteSize=SPRITE_SIZE_16x16, tileNum=0x2c0, paletteNum=0xe
     packed_sprite_oam x=0x20, y=0x0, spriteSize=SPRITE_SIZE_16x16, tileNum=0x2c0, paletteNum=0xe
@@ -7847,7 +7847,7 @@ gUnknown_086B4F6A:: @ 0x086B4F6A
     packed_sprite_oam x=0x0, y=0x10, spriteSize=SPRITE_SIZE_16x16, tileNum=0x2c0, paletteNum=0xe
 
 
-gUnknown_086B50AE:: @ 0x086B50AE
+gHatchRevealOamFramesets:: @ 0x086B50AE
     packed_sprite_oam x=0x0, y=-0x10, spriteSize=SPRITE_SIZE_16x32, tileNum=0x2c0, paletteNum=0xe
     packed_sprite_oam x=0x0, y=-0x10, spriteSize=SPRITE_SIZE_16x32, tileNum=0x2c0, paletteNum=0xe
     packed_sprite_oam x=0x0, y=-0x10, spriteSize=SPRITE_SIZE_16x32, tileNum=0x2c0, paletteNum=0xe
@@ -7898,7 +7898,7 @@ gUnknown_086B50AE:: @ 0x086B50AE
     packed_sprite_oam x=0x8, y=0x38, spriteSize=SPRITE_SIZE_8x16, tileNum=0x3ae, paletteNum=0xe
 
 
-gUnknown_086B51CE:: @ 0x086B51CE
+gAreaRouletteOamFramesets:: @ 0x086B51CE
     packed_sprite_oam x=0x0, y=0x0, spriteSize=SPRITE_SIZE_16x16, tileNum=0x2c0, paletteNum=0xe
     packed_sprite_oam x=0x10, y=0x0, spriteSize=SPRITE_SIZE_16x16, tileNum=0x2c0, paletteNum=0xe
     packed_sprite_oam x=0x0, y=0x10, spriteSize=SPRITE_SIZE_16x16, tileNum=0x2c0, paletteNum=0xe
@@ -7982,7 +7982,7 @@ gUnknown_086B51CE:: @ 0x086B51CE
     packed_sprite_oam x=-0x13, y=0xC, spriteSize=SPRITE_SIZE_16x16, vFlip=0x1, tileNum=0x2c8, paletteNum=0xe
 
 
-gUnknown_086B53B4:: @ 0x086B53B4
+gHatchAnimOamAttributes:: @ 0x086B53B4
 	.incbin "baserom.gba", 0x6B53B4, 0x4
 
 gUnknown_086B53B8:: @ 0x086B53B8
@@ -8075,7 +8075,7 @@ gHatchSequentialTileBreakSpritesheetOam:: @ 0x086B53E4
     packed_sprite_oam x=0x8, y=0x5, spriteSize=SPRITE_SIZE_32x32, hFlip=0x1, vFlip=0x1, tileNum=0x3a1, paletteNum=0xe
 
 
-gUnknown_086B55DC:: @ 0x086B55DC
+gSapphireHatchOamFramesets:: @ 0x086B55DC
     packed_sprite_oam x=0x10, y=0x8, spriteSize=SPRITE_SIZE_16x16, tileNum=0x2c0, paletteNum=0xe
     packed_sprite_oam x=0x10, y=0x8, spriteSize=SPRITE_SIZE_16x16, tileNum=0x2c0, paletteNum=0xe
     packed_sprite_oam x=0x10, y=0x8, spriteSize=SPRITE_SIZE_16x16, tileNum=0x2c0, paletteNum=0xe
@@ -8120,7 +8120,7 @@ gUnknown_086B55DC:: @ 0x086B55DC
     packed_sprite_oam x=0x24, y=0x1C, spriteSize=SPRITE_SIZE_8x8, tileNum=0x358, paletteNum=0xe
 
 
-gUnknown_086B56D8:: @ 0x086B56D8
+gSphealFlyingEnemyOamData:: @ 0x086B56D8
     packed_sprite_oam x=0x0, y=0x0, spriteSize=SPRITE_SIZE_16x16, tileNum=0xe5, priority=0x1, paletteNum=0x4
     packed_sprite_oam x=0x10, y=0x0, spriteSize=SPRITE_SIZE_8x16, tileNum=0xe9, priority=0x1, paletteNum=0x4
     packed_sprite_oam x=0x0, y=0x10, spriteSize=SPRITE_SIZE_16x8, tileNum=0xeb, priority=0x1, paletteNum=0x4
@@ -8375,7 +8375,7 @@ gUnknown_086B56D8:: @ 0x086B56D8
     packed_sprite_oam x=0x10, y=0x10, spriteSize=SPRITE_SIZE_8x8, tileNum=0xed, priority=0x1, paletteNum=0x4
 
 
-gUnknown_086B5CC0:: @ 0x086B5CC0
+gRayquazaHitBurstOamData:: @ 0x086B5CC0
     packed_sprite_oam x=0x0, y=-0x8, spriteSize=SPRITE_SIZE_32x32, tileNum=0x121, priority=0x1, paletteNum=0xc
     packed_sprite_oam x=0x0, y=0x18, spriteSize=SPRITE_SIZE_32x16, tileNum=0x131, priority=0x1, paletteNum=0xc
     packed_sprite_oam x=0x0, y=-0x8, spriteSize=SPRITE_SIZE_32x32, tileNum=0x121, priority=0x1, paletteNum=0xc
@@ -8403,7 +8403,7 @@ gUnknown_086B5CC0:: @ 0x086B5CC0
     packed_sprite_oam x=0x0, y=-0x10, spriteSize=SPRITE_SIZE_32x16, tileNum=0x15d, priority=0x1, paletteNum=0xc
 
 
-gUnknown_086B5D56:: @ 0x086B5D56
+gRayquazaWhirlwindGrabOamData:: @ 0x086B5D56
     packed_sprite_oam x=-0x2, y=0x8, spriteSize=SPRITE_SIZE_16x8, tileNum=0x254, priority=0x1, paletteNum=0xc
     packed_sprite_oam x=0xE, y=0x0, spriteSize=SPRITE_SIZE_8x16, tileNum=0x256, priority=0x1, paletteNum=0xc
     packed_sprite_oam x=-0x4, y=0x5, spriteSize=SPRITE_SIZE_16x8, tileNum=0x258, priority=0x1, paletteNum=0xc
@@ -8426,7 +8426,7 @@ gUnknown_086B5D56:: @ 0x086B5D56
     packed_sprite_oam x=0x0, y=0x0, spriteSize=SPRITE_SIZE_8x8, tileNum=0x18c, priority=0x1, paletteNum=0xc
 
 
-gUnknown_086B5DCE:: @ 0x086B5DCE
+gRayquazaSwoopAttackOamData:: @ 0x086B5DCE
     packed_sprite_oam x=-0x18, y=-0x60, spriteSize=SPRITE_SIZE_16x32, tileNum=0x208, priority=0x1, paletteNum=0xc
     packed_sprite_oam x=-0x8, y=-0x50, spriteSize=SPRITE_SIZE_8x16, tileNum=0x210, priority=0x1, paletteNum=0xc
     packed_sprite_oam x=-0x10, y=-0x40, spriteSize=SPRITE_SIZE_16x32, tileNum=0x212, priority=0x1, paletteNum=0xc
@@ -8471,7 +8471,7 @@ gUnknown_086B5DCE:: @ 0x086B5DCE
     packed_sprite_oam x=0x0, y=0x0, spriteSize=SPRITE_SIZE_8x8, tileNum=0x18c, priority=0x1, paletteNum=0xc
 
 
-gUnknown_086B5ECA:: @ 0x086B5ECA
+gRayquazaNeckSegmentOamData:: @ 0x086B5ECA
     packed_sprite_oam x=-0x3, y=-0x3D, spriteSize=SPRITE_SIZE_8x32, tileNum=0x1da, priority=0x1, paletteNum=0xc
     packed_sprite_oam x=-0x2, y=-0x1D, spriteSize=SPRITE_SIZE_8x16, tileNum=0x1de, priority=0x1, paletteNum=0xc
     packed_sprite_oam x=0x5, y=-0xD, spriteSize=SPRITE_SIZE_8x32, tileNum=0x1e0, priority=0x1, paletteNum=0xc
@@ -8552,7 +8552,7 @@ gUnknown_086B5ECA:: @ 0x086B5ECA
     packed_sprite_oam x=0x0, y=0x0, spriteSize=SPRITE_SIZE_8x8, tileNum=0x18c, priority=0x1, paletteNum=0xc
 
 
-gUnknown_086B609E:: @ 0x086B609E
+gRayquazaHeadOamData:: @ 0x086B609E
     packed_sprite_oam x=0x0, y=0x2B, spriteSize=SPRITE_SIZE_32x16, tileNum=0x18a, priority=0x1, paletteNum=0xc
     packed_sprite_oam x=0x20, y=0x28, spriteSize=SPRITE_SIZE_32x16, tileNum=0x192, priority=0x1, paletteNum=0xc
     packed_sprite_oam x=0x20, y=0x28, spriteSize=SPRITE_SIZE_32x16, tileNum=0x192, priority=0x1, paletteNum=0xc
@@ -8579,7 +8579,7 @@ gUnknown_086B609E:: @ 0x086B609E
     packed_sprite_oam x=0x0, y=0x0, spriteSize=SPRITE_SIZE_8x8, tileNum=0x18c, priority=0x1, paletteNum=0xc
 
 
-gUnknown_086B612E:: @ 0x086B612E
+gRayquazaMainBodyOamData:: @ 0x086B612E
     packed_sprite_oam x=0x0, y=-0x2, spriteSize=SPRITE_SIZE_64x64, tileNum=0xb1, priority=0x1, paletteNum=0xf
     packed_sprite_oam x=0x0, y=-0x1, spriteSize=SPRITE_SIZE_64x64, tileNum=0xb1, priority=0x1, paletteNum=0xf
     packed_sprite_oam x=0x0, y=0x0, spriteSize=SPRITE_SIZE_64x64, tileNum=0xb1, priority=0x1, paletteNum=0xf
@@ -8688,7 +8688,7 @@ gUnknown_086B612E:: @ 0x086B612E
     packed_sprite_oam x=0x0, y=0x9, spriteSize=SPRITE_SIZE_64x64, tileNum=0xb1, priority=0x1, paletteNum=0x7
 
 
-gUnknown_086B63AA:: @ 0x086B63AA
+gGroudonBallGrabOamData:: @ 0x086B63AA
 	packed_sprite_oam x=-0x7, y=-0x2, spriteSize=SPRITE_SIZE_32x16, tileNum=0x364, paletteNum=0xc
     packed_sprite_oam x=-0x7, y=0xE, spriteSize=SPRITE_SIZE_32x8, tileNum=0x36c, paletteNum=0xc
     packed_sprite_oam x=-0x8, y=-0x8, spriteSize=SPRITE_SIZE_32x32, tileNum=0x370, paletteNum=0xc
@@ -8703,7 +8703,7 @@ gUnknown_086B63AA:: @ 0x086B63AA
     packed_sprite_oam x=0x0, y=0x0, spriteSize=SPRITE_SIZE_8x8, tileNum=0x3bf, paletteNum=0xc
 
 
-gUnknown_086B63F2:: @ 0x086B63F2
+gGroudonProjectileOamData:: @ 0x086B63F2
 	packed_sprite_oam x=0x0, y=0x0, spriteSize=SPRITE_SIZE_16x32, tileNum=0x2f4, paletteNum=0xc
     packed_sprite_oam x=0x10, y=0x0, spriteSize=SPRITE_SIZE_8x32, tileNum=0x2fc, paletteNum=0xc
     packed_sprite_oam x=0x0, y=0x0, spriteSize=SPRITE_SIZE_16x32, tileNum=0x2f4, paletteNum=0xc
@@ -8754,7 +8754,7 @@ gUnknown_086B63F2:: @ 0x086B63F2
     packed_sprite_oam x=-0xE, y=-0x1, spriteSize=SPRITE_SIZE_16x32, hFlip=0x1, tileNum=0x35c, paletteNum=0xc
 
 
-gUnknown_086B6512:: @ 0x086B6512
+gGroudonProjectileAttackOamData:: @ 0x086B6512
 	packed_sprite_oam x=-0x4, y=0x1D, spriteSize=SPRITE_SIZE_16x16, tileNum=0x2c0, paletteNum=0xc
     packed_sprite_oam x=0xC, y=0x1D, spriteSize=SPRITE_SIZE_8x16, tileNum=0x2c4, paletteNum=0xc
     packed_sprite_oam x=0x1C, y=0x1D, spriteSize=SPRITE_SIZE_16x16, hFlip=0x1, tileNum=0x2c0, paletteNum=0xc
@@ -8793,7 +8793,7 @@ gUnknown_086B6512:: @ 0x086B6512
     packed_sprite_oam x=0x1, y=0x23, spriteSize=SPRITE_SIZE_16x16, hFlip=0x1, tileNum=0x2ee, paletteNum=0xc
 
 
-gUnknown_086B65EA:: @ 0x086B65EA
+gGroudonMainBodyOamData:: @ 0x086B65EA
 	packed_sprite_oam x=0x1, y=0x11, spriteSize=SPRITE_SIZE_16x8, tileNum=0x1d1, priority=0x1, paletteNum=0xf
     packed_sprite_oam x=0x1, y=0x19, spriteSize=SPRITE_SIZE_16x16, tileNum=0x1d3, priority=0x1, paletteNum=0xf
     packed_sprite_oam x=0x17, y=0x11, spriteSize=SPRITE_SIZE_16x8, hFlip=0x1, tileNum=0x1d1, priority=0x1, paletteNum=0xf
@@ -10373,7 +10373,7 @@ gUnknown_086B65EA:: @ 0x086B65EA
     packed_sprite_oam x=0x0, y=0x0, spriteSize=SPRITE_SIZE_8x8, tileNum=0x19c, priority=0x1, paletteNum=0x4
 
 
-gUnknown_086B8AE0:: @ 0x086B8AE0
+gGroudonFirePillarOamData:: @ 0x086B8AE0
     packed_sprite_oam x=0x0, y=0x32, spriteSize=SPRITE_SIZE_32x16, tileNum=0x16d, priority=0x1, paletteNum=0x5
     packed_sprite_oam x=0x0, y=0x0, spriteSize=SPRITE_SIZE_8x8, tileNum=0x19c, priority=0x1, paletteNum=0x4
     packed_sprite_oam x=0x0, y=0x0, spriteSize=SPRITE_SIZE_8x8, tileNum=0x19c, priority=0x1, paletteNum=0x4
@@ -10665,7 +10665,7 @@ gUnknown_086B8AE0:: @ 0x086B8AE0
     packed_sprite_oam x=0x0, y=0x0, spriteSize=SPRITE_SIZE_8x8, tileNum=0x19c, priority=0x1, paletteNum=0x4
     packed_sprite_oam x=0x0, y=0x0, spriteSize=SPRITE_SIZE_8x8, tileNum=0x19c, priority=0x1, paletteNum=0x4
 
-gUnknown_086B91AC:: @ 0x086B91AC
+gKyogreWhirlpoolTrapOamData:: @ 0x086B91AC
     packed_sprite_oam x=-0x10, y=-0x9, spriteSize=SPRITE_SIZE_32x32, tileNum=0x127, priority=0x1, paletteNum=0xc
     packed_sprite_oam x=0x10, y=-0x9, spriteSize=SPRITE_SIZE_16x32, tileNum=0x137, priority=0x1, paletteNum=0xc
     packed_sprite_oam x=-0x10, y=0x17, spriteSize=SPRITE_SIZE_32x8, tileNum=0x13f, priority=0x1, paletteNum=0xc
@@ -10724,7 +10724,7 @@ gUnknown_086B91AC:: @ 0x086B91AC
     packed_sprite_oam x=0x10, y=0x17, spriteSize=SPRITE_SIZE_16x8, tileNum=0x143, priority=0x1, paletteNum=0xc
 
 
-gUnknown_086B92FC:: @ 0x086B92FC
+gKyogreMainBodyOamData:: @ 0x086B92FC
     packed_sprite_oam x=0x10, y=0x0, spriteSize=SPRITE_SIZE_32x16, tileNum=0x7d, priority=0x1, paletteNum=0xf
     packed_sprite_oam x=0x0, y=0x10, spriteSize=SPRITE_SIZE_32x32, tileNum=0x85, priority=0x1, paletteNum=0xf
     packed_sprite_oam x=0x20, y=0x10, spriteSize=SPRITE_SIZE_16x32, tileNum=0x95, priority=0x1, paletteNum=0xf
@@ -11057,7 +11057,7 @@ gUnknown_086B92FC:: @ 0x086B92FC
     packed_sprite_oam x=0x30, y=0x3C, spriteSize=SPRITE_SIZE_16x8, hFlip=0x1, tileNum=0xa1, priority=0x1, paletteNum=0xf
 
 
-gUnknown_086B9AB8:: @ 0x086B9AB8
+gKecleonLowerBodyOamData:: @ 0x086B9AB8
     packed_sprite_oam x=0x0, y=0x8, objMode=ST_OAM_OBJ_BLEND, spriteSize=SPRITE_SIZE_32x32, vFlip=0x1, tileNum=0x49, priority=0x3, paletteNum=0x4
     packed_sprite_oam x=0x0, y=0x0, objMode=ST_OAM_OBJ_BLEND, spriteSize=SPRITE_SIZE_32x8, vFlip=0x1, tileNum=0x59, priority=0x3, paletteNum=0x4
     packed_sprite_oam x=0x0, y=0x8, objMode=ST_OAM_OBJ_BLEND, spriteSize=SPRITE_SIZE_32x32, vFlip=0x1, tileNum=0x49, priority=0x3, paletteNum=0x4
@@ -11186,7 +11186,7 @@ gUnknown_086B9AB8:: @ 0x086B9AB8
     packed_sprite_oam x=0x18, y=0x0, objMode=ST_OAM_OBJ_BLEND, spriteSize=SPRITE_SIZE_32x8, hFlip=0x1, vFlip=0x1, tileNum=0x59, priority=0x3, paletteNum=0x4
 
 
-gUnknown_086B9DAC:: @ 0x086B9DAC
+gKecleonUpperBodyOamData:: @ 0x086B9DAC
     packed_sprite_oam x=0x0, y=0x0, objMode=ST_OAM_OBJ_BLEND, spriteSize=SPRITE_SIZE_32x32, tileNum=0x49, priority=0x2, paletteNum=0x2
     packed_sprite_oam x=0x0, y=0x20, objMode=ST_OAM_OBJ_BLEND, spriteSize=SPRITE_SIZE_32x8, tileNum=0x59, priority=0x2, paletteNum=0x2
     packed_sprite_oam x=0x0, y=0x0, objMode=ST_OAM_OBJ_BLEND, spriteSize=SPRITE_SIZE_32x32, tileNum=0x49, priority=0x2, paletteNum=0x2
@@ -12778,7 +12778,7 @@ gUnknown_086BB3E4:: @ 0x086BB3E4
     .4byte gUnknown_086BA25A
     .4byte gUnknown_086BA250
 
-gUnknown_086BB420:: @ 0x086BB420
+gKecleonDefaultSpriteSets:: @ 0x086BB420
 .4byte gUnknown_086BA18A
 .4byte gUnknown_086BA1E4
 .4byte gUnknown_086BA1F6
@@ -12974,7 +12974,7 @@ gMonHatchSpriteGroupGfx:: @ 0x086BB6DC
 	.4byte gMonHatchSpriteGroup4_Gfx
 	.4byte gMonHatchSpriteGroup5_Gfx
 
-gUnknown_086BB6F4:: @ 0x086BB6F4
+gCatchSpriteGfxPtrs:: @ 0x086BB6F4
 	.incbin "baserom.gba", 0x6BB6F4, 0x44
 
 gMonPortraitGroupGfx:: @ 0x086BB738
@@ -12995,7 +12995,7 @@ gMonPortraitGroupGfx:: @ 0x086BB738
 
 .incbin "baserom.gba", 0x6BB770, 0x1A0 @ 0x6BB910 - 0x6BB770
 
-gUnknown_086BB910:: @ 0x086BB910
+gButtonInfoTable:: @ 0x086BB910
 	.2byte A_BUTTON, 0x4, 0x0, 0x8
 	.2byte B_BUTTON, 0x5, 0x0, 0x8
 	.2byte SELECT_BUTTON, 0xE, 0x101, 0x20
@@ -13008,16 +13008,16 @@ gUnknown_086BB910:: @ 0x086BB910
 	.2byte L_BUTTON, 0x6, 0x1, 0x10
 	.2byte 0x0, 0x2A, 0x0, 0x08
 
-gUnknown_086BB968:: @ 0x086BB968
+gOptionsCursorPositionTable:: @ 0x086BB968
 	.incbin "baserom.gba", 0x6BB968, 0x40
 
-gUnknown_086BB9A8:: @ 0x086BB9A8
+gOptionsBGMSelectorYPositions:: @ 0x086BB9A8
 	.2byte 0x0054, 0x0060, 0x006c, 0x0078, 0x0084, 0x00
 
-gUnknown_086BB9B4:: @ 0x086BB9B4
+gButtonAnimData:: @ 0x086BB9B4
 	.incbin "baserom.gba", 0x6BB9B4, 0x38
 
-gUnknown_086BB9EC:: @ 0x086BB9EC
+gOptionsSpriteSets:: @ 0x086BB9EC
 	.incbin "baserom.gba", 0x6BB9EC, 0x80
 
 gSaveFileSignature:: @ 0x086BBA6C

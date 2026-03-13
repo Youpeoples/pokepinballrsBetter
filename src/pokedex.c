@@ -29,52 +29,52 @@ enum PokedexStates
     POKEDEX_STATE_RETURN_TO_TITLE,
 };
 
-void sub_5174(void);
+void RefreshPokedexListDisplay(void);
 static void PokedexListScrollUp(void);
 static void PokedexListScrollDown(void);
 static void PokedexListScrollUpFast(void);
 static void PokedexListScrollDownFast(void);
 void Pokedex_CheckDeleteKeyComboPressed(void);
-void sub_5064(void);
-void sub_51CC(void);
-static s16 sub_5EA4(void);
-s16 sub_5EC8(void);
-void sub_70E0(s16, u32);
-void sub_88E4(void);
-void sub_51FC(void);
+void UpdateMonSpriteVisibility(void);
+void RefreshMonPreviewSprite(void);
+static s16 Pokedex_ProcessLinkExchange(void);
+s16 SendLinkPokedexData(void);
+void PrintDexDescription(s16, u32);
+void LoadPokedexFlagsFromSave(void);
+void RenderPokedexSprites(void);
 static void RenderLinkGraphics(void);
-static void sub_5E60(void);
-int sub_639C(void);
-static int sub_5EEC(void);
-static int sub_6144(void);
-static int sub_65DC(void);
+static void InitLinkTransferState(void);
+int MasterReceivePokedexFlags(void);
+static int MasterSendPokedexFlags(void);
+static int ClientSendPokedexFlags(void);
+static int ClientReceivePokedexFlags(void);
 static void PrintSelectedMonDexNum(s16);
 static void PrintSeenOwnedTotals(s16, s16);
-void sub_71DC(int, int, int);
+void BlitGlyphToTileBuffer(int, int, int);
 void PrintDexNumbersFromListPosition(s16);
 static void PrintCaughtBallFromListPosition(s16);
-void sub_6F78(s16);
+void LoadMonPortrait(s16);
 
-extern u8 *gUnknown_086B15B4[];
-extern u8 *gUnknown_086BB6F4[];
+extern u8 *gMonIconPalettes[];
+extern u8 *gCatchSpriteGfxPtrs[];
 
-extern u16 gUnknown_0201C180;
-extern u16 gUnknown_0202C5B4;
-extern s8 gUnknown_0201C1BC;
-extern s8 gUnknown_0202C544;
-extern s8 gUnknown_0202BECC;
-extern u16 gUnknown_0202BE30[];
-extern u16 gUnknown_0201B130[];
+extern u16 gPokedexLinkSendCounter;
+extern u16 gPokedexLinkChunkIndex;
+extern s8 gPokedexMasterHandshakeState;
+extern s8 gPokedexClientHandshakeState;
+extern s8 gPokedexHandshakeRetryCount;
+extern u16 gGlyphUpperRowBuffer[];
+extern u16 gGlyphLowerRowBuffer[];
 
-extern const struct SpriteSet *const gUnknown_086A6148[];
-extern u16 gUnknown_0202BF08;
-extern const u16 gUnknown_086A5DDA[][4];
-extern const u16 gUnknown_086A5DF2[][20];
-extern const s16 gUnknown_086A6356[];
-extern const u16 gUnknown_086A5EE2[][51];
-extern const s16 gUnknown_086A6014[][51];
-extern const u16 gUnknown_086A5E12[][4];
-extern s16 gUnknown_086A64F0[];
+extern const struct SpriteSet *const gPokedexSpriteSets[];
+extern u16 gPokedexScrollbarY;
+extern const u16 gPokedexAnimBaseTileNums[][4];
+extern const u16 gPokedexCatchAnimTileOffsets[][20];
+extern const s16 gPokedexCatchAnimIndices[];
+extern const u16 gPokedexHatchAnimTileOffsets[][51];
+extern const s16 gPokedexAnimFrameDurations[][51];
+extern const u16 gPokedexAnimTileDeltas[][4];
+extern s16 gPokedexListNameVramOffsets[];
 
 enum PokedexPopupType {
     POKEDEX_POPUP_TRANSMISSION_CONNECT_PROMPT = 0,
@@ -124,82 +124,82 @@ void LoadPokedexGraphics(void)
     DmaCopy16(3, gPokedexBgText_Gfx, (void *)BG_CHAR_ADDR(1), 0x4400);
     DmaCopy16(3, gPokedexBg_Gfx, (void *)BG_CHAR_ADDR(3), 0x1400);
     DmaCopy16(3, gPokedexBackground_Pals, (void *)BG_PLTT, BG_PLTT_SIZE);
-    DmaCopy16(3, gPokedexBg1_Tilemap, gUnknown_03005C00, BG_SCREEN_SIZE);
-    DmaCopy16(3, gPokedexBg2_Tilemap, gUnknown_02019C40, BG_SCREEN_SIZE);
+    DmaCopy16(3, gPokedexBg1_Tilemap, gBG0TilemapBuffer, BG_SCREEN_SIZE);
+    DmaCopy16(3, gPokedexBg2_Tilemap, gPokedexVramBuffer, BG_SCREEN_SIZE);
     DmaCopy16(3, gPokedexBg3_Tilemap, (void *)BG_SCREEN_ADDR(2), BG_SCREEN_SIZE);
     DmaCopy16(3, gPokedexSprites_Pals, (void *)OBJ_PLTT, OBJ_PLTT_SIZE);
     DmaCopy16(3, gPokedexSprites_Gfx, (void *)OBJ_VRAM0, 0x6C20);
 
-    sub_3FAC();
+    InitPokedexState();
     PrintSeenOwnedTotals(gPokedexNumSeen, gPokedexNumOwned);
     PrintSelectedMonDexNum(gPokedexSelectedMon);
     PrintDexNumbersFromListPosition(gPokedexListPosition);
     PrintCaughtBallFromListPosition(gPokedexListPosition);
-    sub_6F78(gPokedexSelectedMon);
-    sub_8974(gPokedexSelectedMon);
-    sub_8A78(gPokedexSelectedMon);
+    LoadMonPortrait(gPokedexSelectedMon);
+    LoadMonAnimationSprite(gPokedexSelectedMon);
+    CheckMonHasAnimation(gPokedexSelectedMon);
 
-    gUnknown_02019C40[0x134] = 0x59;
+    gPokedexVramBuffer[0x134] = 0x59;
 
-    DmaCopy16(3, gUnknown_03005C00, (void *)BG_SCREEN_ADDR(0), BG_SCREEN_SIZE);
-    DmaCopy16(3, gUnknown_02019C40, (void *)BG_SCREEN_ADDR(1), BG_SCREEN_SIZE);
+    DmaCopy16(3, gBG0TilemapBuffer, (void *)BG_SCREEN_ADDR(0), BG_SCREEN_SIZE);
+    DmaCopy16(3, gPokedexVramBuffer, (void *)BG_SCREEN_ADDR(1), BG_SCREEN_SIZE);
 
-    sub_51FC();
-    sub_0CBC();
-    sub_024C();
+    RenderPokedexSprites();
+    EnableVBlankInterrupts();
+    FadeInScreen();
 
     gMain.subState = POKEDEX_STATE_HANDLE_LIST_INPUT;
 
     m4aSongNumStart(MUS_POKEDEX);
 }
 
-void sub_3FAC(void)
+void InitPokedexState(void)
 {
     s32 i;
 
     gPokedexSelectedMon = 0;
     gPokedexListPosition = 0;
-    gUnknown_0201A448 = 0;
-    gUnknown_0202BF00 = 0;
-    gUnknown_0202A57C = 0;
-    gUnknown_0201A4F0 = 0;
-    gUnknown_0202BE20 = 0;
+    gPokedexAnimatedIconFrame = 0;
+    gPokedexAnimatedIconTimer = 0;
+    gPokedexCursorOffset = 0;
+    gPokedexCursorBlinkOffset = 0;
+    gPokedexBlinkTimer = 0;
     gPokedexScrollWaitFrames = 0;
-    gUnknown_02019C24 = 0;
-    gUnknown_0202BF0C = 0;
-    gUnknown_0201A440 = 0;
-    gUnknown_0202C5E8 = 0;
-    gUnknown_0202BEF4 = 0;
-    gUnknown_0202A588 = 1;
-    gUnknown_0202A55C = 1;
+    gPokedexScrollActive = 0;
+    gPokedexSpriteAnimFrame = 0;
+    gPokedexSpriteAnimTimer = 0;
+    gPokedexDetailFrameCount = 0;
+    gPokedexPageIndicatorTimer = 0;
+    gPokedexShowAnimSprite = 1;
+    gPokedexShowPortrait = 1;
 
-    gUnknown_0202A568[0] = 0;
-    gUnknown_0202A568[1] = 0;
+    gPokedexShowCatchHatch[0] = 0;
+    gPokedexShowCatchHatch[1] = 0;
 
-    gUnknown_0202BF14 = 0;
-    gUnknown_0202A558 = 0;
-    gUnknown_0202BEE0 = 0;
-    gUnknown_0202BF04 = 1;
+    gPokedexSpriteCategory = 0;
+    gPokedexInfoWindowSlideStep = 0;
+    gPokedexButtonPromptFrame = 0;
+    gPokedexShowButtonPrompt = 1;
 
-    sub_88E4();
-    if (sub_FD20() == 1)
+    LoadPokedexFlagsFromSave();
+    if (CheckAllPokemonCaught() == 1)
     {
-        gUnknown_0202C590 = 1;
+        gPokedexShowLinkCableIcon = 1;
     }
     else
     {
-        gUnknown_0202C590 = 0;
+        gPokedexShowLinkCableIcon = 0;
     }
 
-    gUnknown_0202BEC4 = 0;
+    gPokedexShowPopupWindow = 0;
     Pokedex_PopupTypeIx = POKEDEX_POPUP_TRANSMISSION_CONNECT_PROMPT;
-    gUnknown_0201B120 = 0;
+    gPokedexLinkStateTimer = 0;
     gPokedex_EraseSaveDataAccessCounter = 0;
     gPokedex_EraseSaveDataAccessStep = 0;
-    gUnknown_0202C794 = 0;
-    gUnknown_0201C1B4 = 0;
-    gUnknown_0202C5AC = 0;
-    gUnknown_02019C28 = 0;
+    gPokedexDescriptionPage = 0;
+    gPokedexShowPageIndicator = 0;
+    gPokedexPageIndicatorBlink = 0;
+    gPokedexSpriteIndexBase = 0;
 
     for (i = 0; i < 0xE1; i++)
     {
@@ -224,50 +224,50 @@ void Pokedex_HandleListInput(void)
 {
     if (JOY_HELD(SELECT_BUTTON))
     {
-        gUnknown_0202BF04 = 0;
+        gPokedexShowButtonPrompt = 0;
 
         if (JOY_HELD(DPAD_UP))
         {
             PokedexListScrollUp();
-            sub_5064();
-            sub_51CC();
+            UpdateMonSpriteVisibility();
+            RefreshMonPreviewSprite();
             gMain.subState = POKEDEX_STATE_2;
         }
         else if (JOY_HELD(DPAD_DOWN))
         {
             PokedexListScrollDown();
-            sub_5064();
-            sub_51CC();
+            UpdateMonSpriteVisibility();
+            RefreshMonPreviewSprite();
             gMain.subState = POKEDEX_STATE_2;
         }
         else if (JOY_HELD(DPAD_LEFT))
         {
             PokedexListScrollUpFast();
-            sub_5064();
-            sub_51CC();
+            UpdateMonSpriteVisibility();
+            RefreshMonPreviewSprite();
             gMain.subState = POKEDEX_STATE_2;
         }
         else if (JOY_HELD(DPAD_RIGHT))
         {
             PokedexListScrollDownFast();
-            sub_5064();
-            sub_51CC();
+            UpdateMonSpriteVisibility();
+            RefreshMonPreviewSprite();
             gMain.subState = POKEDEX_STATE_2;
         }
         else
         {
-            gUnknown_02019C24 = 0;
-            sub_5064();
+            gPokedexScrollActive = 0;
+            UpdateMonSpriteVisibility();
         }
 
         if (JOY_NEW(A_BUTTON))
         {
-            gUnknown_0202C5E8 = 0;
+            gPokedexDetailFrameCount = 0;
 
             if (gPokedexFlags[gPokedexSelectedMon] >= 2)
             {
-                gUnknown_0202BF04 = 0;
-                DmaCopy16(3, 0x6000280, (void *)gUnknown_0202A590, 0x200);
+                gPokedexShowButtonPrompt = 0;
+                DmaCopy16(3, 0x6000280, (void *)gPokedexInfoWindowBackupTiles, 0x200);
                 gMain.subState = POKEDEX_STATE_3;
             }
             else
@@ -278,52 +278,52 @@ void Pokedex_HandleListInput(void)
     }
     else
     {
-        gUnknown_0202BF04 = 1;
+        gPokedexShowButtonPrompt = 1;
 
         if (JOY_HELD(DPAD_UP))
         {
             PokedexListScrollUp();
-            sub_5174();
+            RefreshPokedexListDisplay();
         }
         else if (JOY_HELD(DPAD_DOWN))
         {
             PokedexListScrollDown();
-            sub_5174();
+            RefreshPokedexListDisplay();
         }
         else if (JOY_HELD(DPAD_LEFT))
         {
             PokedexListScrollUpFast();
-            sub_5174();
+            RefreshPokedexListDisplay();
         }
         else if (JOY_HELD(DPAD_RIGHT))
         {
             PokedexListScrollDownFast();
-            sub_5174();
+            RefreshPokedexListDisplay();
         }
         else
         {
-            gUnknown_02019C24 = 0;
+            gPokedexScrollActive = 0;
         }
 
-        if (sub_8A78(gPokedexSelectedMon) == 1)
-            gUnknown_0202A588 = 1;
+        if (CheckMonHasAnimation(gPokedexSelectedMon) == 1)
+            gPokedexShowAnimSprite = 1;
         else
-            gUnknown_0202A588 = 0;
+            gPokedexShowAnimSprite = 0;
 
-        gUnknown_0202A55C = 1;
-        gUnknown_0202A568[0] = 0;
-        gUnknown_0202A568[1] = 0;
-        gUnknown_0201A440 = 0;
-        gUnknown_0202BF0C = 0;
+        gPokedexShowPortrait = 1;
+        gPokedexShowCatchHatch[0] = 0;
+        gPokedexShowCatchHatch[1] = 0;
+        gPokedexSpriteAnimTimer = 0;
+        gPokedexSpriteAnimFrame = 0;
 
         if (JOY_NEW(A_BUTTON))
         {
-            gUnknown_0202C5E8 = 0;
+            gPokedexDetailFrameCount = 0;
 
             if (gPokedexFlags[gPokedexSelectedMon] >= SPECIES_SHARED)
             {
-                gUnknown_0202BF04 = 0;
-                DmaCopy16(3, 0x6000280, (void *)gUnknown_0202A590, 0x200);
+                gPokedexShowButtonPrompt = 0;
+                DmaCopy16(3, 0x6000280, (void *)gPokedexInfoWindowBackupTiles, 0x200);
                 gMain.subState = POKEDEX_STATE_3;
             }
             else
@@ -339,10 +339,10 @@ void Pokedex_HandleListInput(void)
         else if (JOY_NEW(START_BUTTON))
         {
             m4aSongNumStart(SE_MENU_POPUP_OPEN);
-            gUnknown_0202BEC4 = 1;
+            gPokedexShowPopupWindow = 1;
             Pokedex_PopupTypeIx = POKEDEX_POPUP_TRANSMISSION_CONNECT_PROMPT;
-            gUnknown_0202BF04 = 0;
-            gUnknown_0202A588 = 0;
+            gPokedexShowButtonPrompt = 0;
+            gPokedexShowAnimSprite = 0;
             gMain.subState = POKEDEX_STATE_LINK_SETUP;
         }
 
@@ -352,52 +352,52 @@ void Pokedex_HandleListInput(void)
     if (gPokedexScrollWaitFrames > 0)
         gPokedexScrollWaitFrames--;
 
-    sub_51FC();
-    DmaCopy16(3, gUnknown_03005C00, (void *)BG_SCREEN_ADDR(0), BG_SCREEN_SIZE);
+    RenderPokedexSprites();
+    DmaCopy16(3, gBG0TilemapBuffer, (void *)BG_SCREEN_ADDR(0), BG_SCREEN_SIZE);
 }
 
-void Pokedex_State2_43D4(void)
+void Pokedex_PostScrollRefresh(void)
 {
-    sub_5174();
-    gUnknown_0202A588 = 0;
+    RefreshPokedexListDisplay();
+    gPokedexShowAnimSprite = 0;
 
     if (gPokedexScrollWaitFrames > 0)
         gPokedexScrollWaitFrames--;
 
-    sub_51FC();
-    DmaCopy16(3, gUnknown_03005C00, (void *)BG_SCREEN_ADDR(0), BG_SCREEN_SIZE);
+    RenderPokedexSprites();
+    DmaCopy16(3, gBG0TilemapBuffer, (void *)BG_SCREEN_ADDR(0), BG_SCREEN_SIZE);
     gMain.subState = POKEDEX_STATE_HANDLE_LIST_INPUT;
 }
 
-void Pokedex_State3_4428(void)
+void Pokedex_InfoWindowSlideIn(void)
 {
     int i;
 
     for (i = 0; i < 0x20; i++)
     {
-        gUnknown_03005C00[0x20*(gUnknown_0202A558 + 10) + i] = gDexInfoWindowEmptyTextRowTiles[i];
-        gUnknown_02019C40[0x20*(gUnknown_0202A558 + 9) + i] = gDexInfoWindowMiddleRowTiles[i];
-        gUnknown_02019C40[0x20*(gUnknown_0202A558 + 10) + i] = gDexInfoWindowBottomRowTiles[i];
+        gBG0TilemapBuffer[0x20*(gPokedexInfoWindowSlideStep + 10) + i] = gDexInfoWindowEmptyTextRowTiles[i];
+        gPokedexVramBuffer[0x20*(gPokedexInfoWindowSlideStep + 9) + i] = gDexInfoWindowMiddleRowTiles[i];
+        gPokedexVramBuffer[0x20*(gPokedexInfoWindowSlideStep + 10) + i] = gDexInfoWindowBottomRowTiles[i];
     }
 
-    gUnknown_0202A558++;
-    gUnknown_02019C40[0x134] = 0x59;
-    DmaCopy16(3, gUnknown_03005C00, (void *)BG_SCREEN_ADDR(0), BG_SCREEN_SIZE);
-    DmaCopy16(3, gUnknown_02019C40, (void *)BG_SCREEN_ADDR(1), BG_SCREEN_SIZE);
+    gPokedexInfoWindowSlideStep++;
+    gPokedexVramBuffer[0x134] = 0x59;
+    DmaCopy16(3, gBG0TilemapBuffer, (void *)BG_SCREEN_ADDR(0), BG_SCREEN_SIZE);
+    DmaCopy16(3, gPokedexVramBuffer, (void *)BG_SCREEN_ADDR(1), BG_SCREEN_SIZE);
 
-    if (gUnknown_0202A558 > 7)
+    if (gPokedexInfoWindowSlideStep > 7)
     {
-        gUnknown_0202A558 = 0;
-        gUnknown_0202C5E8 = 0;
-        gUnknown_0202BEF4 = 0;
-        gUnknown_02019C28 = 0;
-        gUnknown_0202C5AC = 0;
+        gPokedexInfoWindowSlideStep = 0;
+        gPokedexDetailFrameCount = 0;
+        gPokedexPageIndicatorTimer = 0;
+        gPokedexSpriteIndexBase = 0;
+        gPokedexPageIndicatorBlink = 0;
 
         if (gPokedexSelectedMon < BONUS_SPECIES_START)
-            gUnknown_0201C1B4 = 1;
+            gPokedexShowPageIndicator = 1;
 
-        DmaCopy16(3, gUnknown_08086B40, (void *)0x6000280, 2*0xE0);
-        sub_70E0(gPokedexSelectedMon, gUnknown_0202C794);
+        DmaCopy16(3, gPokedexInfoWindowTiles, (void *)0x6000280, 2*0xE0);
+        PrintDexDescription(gPokedexSelectedMon, gPokedexDescriptionPage);
         m4aMPlayVolumeControl(&gMPlayInfo_BGM, TRACKS_ALL, 0x40);
         PlayCry_NormalNoDucking(gSpeciesInfo[gPokedexSelectedMon].mainSeriesIndexNumber, 0, 127, 10);
         gMain.subState = POKEDEX_STATE_5;
@@ -405,44 +405,44 @@ void Pokedex_State3_4428(void)
 
 }
 
-void Pokedex_State5_45A4(void)
+void Pokedex_DetailViewInput(void)
 {
     u16 var0;
 
-    if (gUnknown_0202C5E8 < 0x51)
+    if (gPokedexDetailFrameCount < 0x51)
     {
-        gUnknown_0202C5E8++;
-        if (gUnknown_0202C5E8 == 0x50)
+        gPokedexDetailFrameCount++;
+        if (gPokedexDetailFrameCount == 0x50)
         {
             m4aMPlayVolumeControl(&gMPlayInfo_BGM, TRACKS_ALL, 0x100);
         }
     }
-    gUnknown_0202BEF4++;
-    if (0x1e < gUnknown_0202BEF4)
+    gPokedexPageIndicatorTimer++;
+    if (0x1e < gPokedexPageIndicatorTimer)
     {
-        gUnknown_0202BEF4 = 0;
-        gUnknown_0202C5AC = 1 - gUnknown_0202C5AC;
+        gPokedexPageIndicatorTimer = 0;
+        gPokedexPageIndicatorBlink = 1 - gPokedexPageIndicatorBlink;
     }
-    gUnknown_0202BE20 = 0;
+    gPokedexBlinkTimer = 0;
 
     if (JOY_NEW(DPAD_UP))
     {
-        if ((gPokedexSelectedMon < BONUS_SPECIES_START) && (gUnknown_0202C794 == 1))
+        if ((gPokedexSelectedMon < BONUS_SPECIES_START) && (gPokedexDescriptionPage == 1))
         {
             m4aSongNumStart(SE_UNKNOWN_0x6D);
-            gUnknown_0202C794 = 0;
-            sub_70E0(gPokedexSelectedMon, 0);
-            gUnknown_02019C28 = gUnknown_0202C794;
+            gPokedexDescriptionPage = 0;
+            PrintDexDescription(gPokedexSelectedMon, 0);
+            gPokedexSpriteIndexBase = gPokedexDescriptionPage;
         }
     }
     else if (JOY_NEW(DPAD_DOWN))
     {
-        if ((gPokedexSelectedMon < BONUS_SPECIES_START) && (gUnknown_0202C794 == 0))
+        if ((gPokedexSelectedMon < BONUS_SPECIES_START) && (gPokedexDescriptionPage == 0))
         {
             m4aSongNumStart(SE_UNKNOWN_0x6D);
-            gUnknown_0202C794 = 1;
-            sub_70E0(gPokedexSelectedMon, 1);
-            gUnknown_02019C28 = gUnknown_0202C794;
+            gPokedexDescriptionPage = 1;
+            PrintDexDescription(gPokedexSelectedMon, 1);
+            gPokedexSpriteIndexBase = gPokedexDescriptionPage;
         }
     }
 
@@ -450,21 +450,21 @@ void Pokedex_State5_45A4(void)
     {
         if (gPokedexSelectedMon < BONUS_SPECIES_START)
         {
-            if (!gUnknown_0202C794)
+            if (!gPokedexDescriptionPage)
             {
                 m4aSongNumStart(SE_UNKNOWN_0x6D);
-                gUnknown_0202C794 = 1 - gUnknown_0202C794;
-                sub_70E0(gPokedexSelectedMon, gUnknown_0202C794);
-                gUnknown_02019C28 = gUnknown_0202C794;
+                gPokedexDescriptionPage = 1 - gPokedexDescriptionPage;
+                PrintDexDescription(gPokedexSelectedMon, gPokedexDescriptionPage);
+                gPokedexSpriteIndexBase = gPokedexDescriptionPage;
             }
             else
             {
                 m4aSongNumStart(SE_MENU_POPUP_CLOSE);
                 m4aMPlayVolumeControl(&gMPlayInfo_BGM, TRACKS_ALL, 0x100);
-                gUnknown_0202C794 = 0;
-                gUnknown_0202C5E8 = 0;
-                gUnknown_0202BEF4 = gUnknown_0202C5E8;
-                gUnknown_0201C1B4 = 0;
+                gPokedexDescriptionPage = 0;
+                gPokedexDetailFrameCount = 0;
+                gPokedexPageIndicatorTimer = gPokedexDetailFrameCount;
+                gPokedexShowPageIndicator = 0;
                 gMain.subState = POKEDEX_STATE_4;
             }
         }
@@ -473,10 +473,10 @@ void Pokedex_State5_45A4(void)
     {
         m4aSongNumStart(SE_MENU_POPUP_CLOSE);
         m4aMPlayVolumeControl(&gMPlayInfo_BGM, TRACKS_ALL, 0x100);
-        gUnknown_0202C794 = 0;
-        gUnknown_0202C5E8 = 0;
-        gUnknown_0202BEF4 = gUnknown_0202C5E8;
-        gUnknown_0201C1B4 = 0;
+        gPokedexDescriptionPage = 0;
+        gPokedexDetailFrameCount = 0;
+        gPokedexPageIndicatorTimer = gPokedexDetailFrameCount;
+        gPokedexShowPageIndicator = 0;
         gMain.subState = POKEDEX_STATE_4;
     }
 
@@ -486,86 +486,86 @@ void Pokedex_State5_45A4(void)
         {
             if (gDexAnimationIx[gPokedexSelectedMon] == -1)
             {
-                gUnknown_0202A588 = 0;
-                gUnknown_0202A55C = 1;
-                gUnknown_0202A568[0] = 0;
-                gUnknown_0202A568[1] = 0;
-                gUnknown_0201A440 = 0;
-                gUnknown_0202BF0C = 0;
+                gPokedexShowAnimSprite = 0;
+                gPokedexShowPortrait = 1;
+                gPokedexShowCatchHatch[0] = 0;
+                gPokedexShowCatchHatch[1] = 0;
+                gPokedexSpriteAnimTimer = 0;
+                gPokedexSpriteAnimFrame = 0;
             }
             else
             {
                 if (gDexAnimationIx[gPokedexSelectedMon] < 100)
                 {
-                    gUnknown_0202A588 = 0;
-                    gUnknown_0202A55C = 0;
-                    gUnknown_0202A568[0] = 1;
-                    gUnknown_0202A568[1] = 0;
+                    gPokedexShowAnimSprite = 0;
+                    gPokedexShowPortrait = 0;
+                    gPokedexShowCatchHatch[0] = 1;
+                    gPokedexShowCatchHatch[1] = 0;
                 }
                 else
                 {
-                    gUnknown_0202A588 = 0;
-                    gUnknown_0202A55C = 0;
-                    gUnknown_0202A568[0] = 0;
-                    gUnknown_0202A568[1] = 1;
+                    gPokedexShowAnimSprite = 0;
+                    gPokedexShowPortrait = 0;
+                    gPokedexShowCatchHatch[0] = 0;
+                    gPokedexShowCatchHatch[1] = 1;
                 }
             }
         }
         else
         {
-            gUnknown_0202A588 = 0;
-            gUnknown_0202A55C = 1;
-            gUnknown_0202A568[0] = 0;
-            gUnknown_0202A568[1] = 0;
+            gPokedexShowAnimSprite = 0;
+            gPokedexShowPortrait = 1;
+            gPokedexShowCatchHatch[0] = 0;
+            gPokedexShowCatchHatch[1] = 0;
         }
     }
     else
     {
-        if (sub_8A78(gPokedexSelectedMon) == 1)
-            gUnknown_0202A588 = 1;
+        if (CheckMonHasAnimation(gPokedexSelectedMon) == 1)
+            gPokedexShowAnimSprite = 1;
         else
-            gUnknown_0202A588 = 0;
+            gPokedexShowAnimSprite = 0;
 
-        gUnknown_0202A55C = 1;
-        gUnknown_0202A568[0] = 0;
-        gUnknown_0202A568[1] = 0;
-        gUnknown_0201A440 = 0;
-        gUnknown_0202BF0C = 0;
+        gPokedexShowPortrait = 1;
+        gPokedexShowCatchHatch[0] = 0;
+        gPokedexShowCatchHatch[1] = 0;
+        gPokedexSpriteAnimTimer = 0;
+        gPokedexSpriteAnimFrame = 0;
     }
 
-    sub_51FC();
+    RenderPokedexSprites();
 }
 
-void Pokedex_State4_4860(void)
+void Pokedex_InfoWindowSlideOut(void)
 {
     s32 i;
 
     for (i = 0; i < 0x20; i++)
     {
-        gUnknown_02019C40[0x20 * (0x11 - gUnknown_0202A558) + i] = gDexInfoWindowBottomRowTiles[i];
-        gUnknown_02019C40[0x20 * (0x12 - gUnknown_0202A558) + i] = gDexInfoWindowEmptyRowTiles[i];
+        gPokedexVramBuffer[0x20 * (0x11 - gPokedexInfoWindowSlideStep) + i] = gDexInfoWindowBottomRowTiles[i];
+        gPokedexVramBuffer[0x20 * (0x12 - gPokedexInfoWindowSlideStep) + i] = gDexInfoWindowEmptyRowTiles[i];
     }
 
-    if (gUnknown_0202A558 < 8)
+    if (gPokedexInfoWindowSlideStep < 8)
     {
         for (i = 0; i < 0x20; i++)
         {
-            gUnknown_03005C00[0x20 * (0x11 - gUnknown_0202A558) + i] = gUnknown_0202A590[0x20 * (0x7 - gUnknown_0202A558) + i];
+            gBG0TilemapBuffer[0x20 * (0x11 - gPokedexInfoWindowSlideStep) + i] = gPokedexInfoWindowBackupTiles[0x20 * (0x7 - gPokedexInfoWindowSlideStep) + i];
         }
     }
-    gUnknown_0202A558++;
+    gPokedexInfoWindowSlideStep++;
 
-    gUnknown_02019C40[0x134] = 0x59;
-    DmaCopy16(3, gUnknown_02019C40, (void *)BG_SCREEN_ADDR(1), BG_SCREEN_SIZE);
-    DmaCopy16(3, gUnknown_03005C00, (void *)BG_SCREEN_ADDR(0), BG_SCREEN_SIZE);
+    gPokedexVramBuffer[0x134] = 0x59;
+    DmaCopy16(3, gPokedexVramBuffer, (void *)BG_SCREEN_ADDR(1), BG_SCREEN_SIZE);
+    DmaCopy16(3, gBG0TilemapBuffer, (void *)BG_SCREEN_ADDR(0), BG_SCREEN_SIZE);
 
-    if (gUnknown_0202A558 > 8)
+    if (gPokedexInfoWindowSlideStep > 8)
     {
-        gUnknown_0202A558 = 0;
-        gUnknown_0202A588 = 0;
-        gUnknown_0202BF04 = 1;
+        gPokedexInfoWindowSlideStep = 0;
+        gPokedexShowAnimSprite = 0;
+        gPokedexShowButtonPrompt = 1;
 
-        DmaFill16(3, 0, (void *)gUnknown_03000000, 0x1800);
+        DmaFill16(3, 0, (void *)gTempGfxBuffer, 0x1800);
         DmaFill16(3, 0, (void *)0x6005C00, 0x1800);
         gMain.subState = POKEDEX_STATE_HANDLE_LIST_INPUT;
     }
@@ -573,14 +573,14 @@ void Pokedex_State4_4860(void)
 
 void Pokedex_LinkSetup(void)
 {
-    sub_19B4();
-    sub_5E60();
-    gUnknown_0201B124 = 0;
+    InitLinkHardware();
+    InitLinkTransferState();
+    gLinkExchangeStep = 0;
     RenderLinkGraphics();
     gMain.subState = POKEDEX_STATE_7;
 }
 
-void Pokedex_State7_49D0(void)
+void Pokedex_LinkTransferLoop(void)
 {
     s16 var0;
 
@@ -589,27 +589,27 @@ void Pokedex_State7_49D0(void)
     if (JOY_NEW(B_BUTTON))
     {
         m4aSongNumStart(SE_MENU_CANCEL);
-        gUnknown_0202BEC4 = 0;
+        gPokedexShowPopupWindow = 0;
         Pokedex_PopupTypeIx = POKEDEX_POPUP_TRANSMISSION_CONNECT_PROMPT;
-        gUnknown_0202BF04 = 1;
-        gUnknown_0202A588 = 1;
-        sub_2568();
+        gPokedexShowButtonPrompt = 1;
+        gPokedexShowAnimSprite = 1;
+        ResetSerialAndInterrupts();
         gMain.subState = POKEDEX_STATE_HANDLE_LIST_INPUT;
     }
     else
     {
-        gUnknown_0202ADD0 = LinkMain1(&gUnknown_0202BEC8, gUnknown_0202C5F0, gUnknown_0201A4D0);
-        gUnknown_0202BDF0 = gUnknown_0202ADD0 & 3;
-        gUnknown_0201C1AC = (gUnknown_0202ADD0 & 0x1C) >> 2;
-        gUnknown_0202ADDC = (gUnknown_0202ADD0 & 0xe00) >> 9;
+        gLinkStatusResult = LinkMain1(&gLinkAdvanceState, gLinkSendBuffer, gLinkRecvBuffer);
+        gLinkConnectionState = gLinkStatusResult & 3;
+        gLinkPlayerCount = (gLinkStatusResult & 0x1C) >> 2;
+        gLinkNegotiationFlags = (gLinkStatusResult & 0xe00) >> 9;
 
-        if ((gUnknown_0202ADD0 & 0x40) && (gUnknown_0202BDF0 < 2))
+        if ((gLinkStatusResult & 0x40) && (gLinkConnectionState < 2))
         {
-            sub_5EC8();
+            SendLinkPokedexData();
 
-            if (!(gUnknown_0202ADD0 & 0x100))
+            if (!(gLinkStatusResult & 0x100))
             {
-                var0 = sub_5EA4();
+                var0 = Pokedex_ProcessLinkExchange();
                 if (var0 == -1)
                 {
                     gMain.subState = POKEDEX_STATE_9;
@@ -622,12 +622,12 @@ void Pokedex_State7_49D0(void)
                 }
             }
 
-            gUnknown_0201A510++;
+            gLinkExchangeFrameCounter++;
 
-            if ((gUnknown_0202ADD0 & 0x7f0000) && gUnknown_0201B128 == -1)
+            if ((gLinkStatusResult & 0x7f0000) && gPokedexLinkTransferPhase == -1)
             {
-                gUnknown_0201A444++;
-                if (0xB4 < gUnknown_0201A444)
+                gLinkTimeoutCounter++;
+                if (0xB4 < gLinkTimeoutCounter)
                 {
                     Pokedex_PopupTypeIx = POKEDEX_POPUP_TRANSMISSION_ERROR;
                     gMain.subState = POKEDEX_STATE_8;
@@ -638,32 +638,32 @@ void Pokedex_State7_49D0(void)
     }
 }
 
-void Pokedex_State10_4B10(void)
+void Pokedex_LinkRetryDelay(void)
 {
-    gUnknown_0201A444++;
+    gLinkTimeoutCounter++;
 
-    if (2 < gUnknown_0201A444) {
-        gUnknown_0201A444 = 0;
+    if (2 < gLinkTimeoutCounter) {
+        gLinkTimeoutCounter = 0;
         gMain.subState = POKEDEX_STATE_LINK_SETUP;
     }
 }
 
-void Pokedex_State8_4B34(void)
+void Pokedex_LinkErrorTimeout(void)
 {
     s32 iVar1;
 
     RenderLinkGraphics();
-    gUnknown_0201B120++;
+    gPokedexLinkStateTimer++;
 
-    if (0x5A < gUnknown_0201B120)
+    if (0x5A < gPokedexLinkStateTimer)
     {
-        gUnknown_0201B120 = 0;
-        gUnknown_0202BEC4 = 0;
+        gPokedexLinkStateTimer = 0;
+        gPokedexShowPopupWindow = 0;
         Pokedex_PopupTypeIx = POKEDEX_POPUP_TRANSMISSION_CONNECT_PROMPT;
-        gUnknown_0202BF04 = 1;
-        gUnknown_0202A588 = 1;
+        gPokedexShowButtonPrompt = 1;
+        gPokedexShowAnimSprite = 1;
 
-        sub_2568();
+        ResetSerialAndInterrupts();
         DisableSerial();
 
         for(iVar1 = 0; iVar1 < 0xE1; iVar1++)
@@ -671,22 +671,22 @@ void Pokedex_State8_4B34(void)
             gPokedexFlagExchangeBuffer[iVar1] = gPokedexFlags[iVar1];
         }
 
-        sub_02B4();
+        FadeOutScreen();
         m4aMPlayAllStop();
-        sub_0D10();
+        DisableVBlankInterrupts();
         gMain.subState = POKEDEX_STATE_LOAD_GRAPHICS;
     }
 }
 
-void Pokedex_State9_4BB4(void)
+void Pokedex_LinkSuccessSequence(void)
 {
     s32 index;
 
     RenderLinkGraphics();
-    switch(gUnknown_0201B120)
+    switch(gPokedexLinkStateTimer)
     {
         case 0x4:
-            sub_2568();
+            ResetSerialAndInterrupts();
             DisableSerial();
             break;
         case 0x82:
@@ -694,11 +694,11 @@ void Pokedex_State9_4BB4(void)
             m4aSongNumStart(SE_MENU_SELECT);
             break;
         case 0xFA:
-            gUnknown_0201B120 = 0;
-            gUnknown_0202BEC4 = 0;
+            gPokedexLinkStateTimer = 0;
+            gPokedexShowPopupWindow = 0;
             Pokedex_PopupTypeIx = POKEDEX_POPUP_TRANSMISSION_CONNECT_PROMPT;
-            gUnknown_0202BF04 = 1;
-            gUnknown_0202A588 = 1;
+            gPokedexShowButtonPrompt = 1;
+            gPokedexShowAnimSprite = 1;
             for(index = 0; index < 0xE1; index++)
             {
                 gPokedexFlags[index] = gPokedexFlagExchangeBuffer[index];
@@ -708,20 +708,20 @@ void Pokedex_State9_4BB4(void)
                 gMain_saveData.pokedexFlags[index] = gPokedexFlags[index];
             }
             SaveFile_WriteToSram();
-            sub_02B4();
+            FadeOutScreen();
             m4aMPlayAllStop();
-            sub_0D10();
+            DisableVBlankInterrupts();
             gMain.subState = POKEDEX_STATE_LOAD_GRAPHICS;
             break;
     }
-    gUnknown_0201B120++;
+    gPokedexLinkStateTimer++;
 }
 
 void Pokedex_DeleteConfirmation(void)
 {
     s32 i;
 
-    sub_51FC();
+    RenderPokedexSprites();
 
     if (JOY_NEW(A_BUTTON))
     {
@@ -736,24 +736,24 @@ void Pokedex_DeleteConfirmation(void)
             gMain_saveData.pokedexFlags[i] = gPokedexFlags[i];
         }
 
-        gUnknown_0202BEC4 = 0;
+        gPokedexShowPopupWindow = 0;
         Pokedex_PopupTypeIx = POKEDEX_POPUP_TRANSMISSION_CONNECT_PROMPT;
-        gUnknown_0202BF04 = 1;
-        gUnknown_0202A588 = 1;
+        gPokedexShowButtonPrompt = 1;
+        gPokedexShowAnimSprite = 1;
 
         SaveFile_WriteToSram();
-        sub_02B4();
+        FadeOutScreen();
         m4aMPlayAllStop();
-        sub_0D10();
+        DisableVBlankInterrupts();
         gMain.subState = POKEDEX_STATE_LOAD_GRAPHICS;
     }
     else if (JOY_NEW(B_BUTTON))
     {
         m4aSongNumStart(SE_MENU_CANCEL);
-        gUnknown_0202BEC4 = 0;
+        gPokedexShowPopupWindow = 0;
         Pokedex_PopupTypeIx = POKEDEX_POPUP_TRANSMISSION_CONNECT_PROMPT;
-        gUnknown_0202BF04 = 1;
-        gUnknown_0202A588 = 1;
+        gPokedexShowButtonPrompt = 1;
+        gPokedexShowAnimSprite = 1;
         gMain.subState = POKEDEX_STATE_HANDLE_LIST_INPUT;
 
 
@@ -762,9 +762,9 @@ void Pokedex_DeleteConfirmation(void)
 
 void Pokedex_ReturnToTitle(void)
 {
-    sub_02B4();
+    FadeOutScreen();
     m4aMPlayAllStop();
-    sub_0D10();
+    DisableVBlankInterrupts();
 
     gAutoDisplayTitlescreenMenu = TRUE;
     SetMainGameState(STATE_TITLE);
@@ -775,18 +775,18 @@ static void PokedexListScrollUp(void)
     if (gPokedexScrollWaitFrames != 0)
         return;
 
-    gUnknown_0201A440 = 0;
-    gUnknown_0202BF0C = 0;
+    gPokedexSpriteAnimTimer = 0;
+    gPokedexSpriteAnimFrame = 0;
 
-    if (gUnknown_0202A57C == 0)
+    if (gPokedexCursorOffset == 0)
     {
         if (gPokedexListPosition == 0)
         {
-            if (gUnknown_02019C24 == 0)
+            if (gPokedexScrollActive == 0)
             {
                 gPokedexListPosition = gPokedexListEntryCount - NUM_BONUS_SPECIES - 1;
                 gPokedexSelectedMon = gPokedexListEntryCount - 1;
-                gUnknown_0202A57C = 4;
+                gPokedexCursorOffset = 4;
                 m4aSongNumStart(SE_MENU_MOVE);
             }
         }
@@ -802,13 +802,13 @@ static void PokedexListScrollUp(void)
     else
     {
         m4aSongNumStart(SE_MENU_MOVE);
-        gUnknown_0202A57C--;
+        gPokedexCursorOffset--;
         gPokedexSelectedMon--;
 
         gPokedexScrollWaitFrames = SCROLL_WAIT_FRAMES;
     }
 
-    gUnknown_02019C24 = 1;
+    gPokedexScrollActive = 1;
 }
 
 static void PokedexListScrollDown(void)
@@ -816,17 +816,17 @@ static void PokedexListScrollDown(void)
     if (gPokedexScrollWaitFrames != 0)
         return;
 
-    gUnknown_0201A440 = 0;
-    gUnknown_0202BF0C = 0;
-    if (gUnknown_0202A57C == 4)
+    gPokedexSpriteAnimTimer = 0;
+    gPokedexSpriteAnimFrame = 0;
+    if (gPokedexCursorOffset == 4)
     {
         if (gPokedexListPosition == gPokedexListEntryCount - NUM_BONUS_SPECIES - 1)
         {
-            if (gUnknown_02019C24 == 0)
+            if (gPokedexScrollActive == 0)
             {
                 gPokedexListPosition = 0;
                 gPokedexSelectedMon = 0;
-                gUnknown_0202A57C = 0;
+                gPokedexCursorOffset = 0;
                 m4aSongNumStart(SE_MENU_MOVE);
             }
         }
@@ -842,12 +842,12 @@ static void PokedexListScrollDown(void)
     else
     {
         m4aSongNumStart(SE_MENU_MOVE);
-        gUnknown_0202A57C++;
+        gPokedexCursorOffset++;
         gPokedexSelectedMon++;
         gPokedexScrollWaitFrames = SCROLL_WAIT_FRAMES;
     }
 
-    gUnknown_02019C24 = 1;
+    gPokedexScrollActive = 1;
 }
 
 static void PokedexListScrollUpFast(void)
@@ -855,8 +855,8 @@ static void PokedexListScrollUpFast(void)
     if (gPokedexScrollWaitFrames != 0)
         return;
 
-    gUnknown_0201A440 = 0;
-    gUnknown_0202BF0C = 0;
+    gPokedexSpriteAnimTimer = 0;
+    gPokedexSpriteAnimFrame = 0;
     if (gPokedexListPosition == 0)
         return;
 
@@ -865,7 +865,7 @@ static void PokedexListScrollUpFast(void)
     if (gPokedexListPosition < 0)
         gPokedexListPosition = 0;
 
-    gPokedexSelectedMon = gPokedexListPosition + gUnknown_0202A57C;
+    gPokedexSelectedMon = gPokedexListPosition + gPokedexCursorOffset;
     gPokedexScrollWaitFrames = SCROLL_WAIT_FRAMES;
 }
 
@@ -874,8 +874,8 @@ static void PokedexListScrollDownFast(void)
     if (gPokedexScrollWaitFrames != 0)
         return;
 
-    gUnknown_0201A440 = 0;
-    gUnknown_0202BF0C = 0;
+    gPokedexSpriteAnimTimer = 0;
+    gPokedexSpriteAnimFrame = 0;
     if (gPokedexListPosition == gPokedexListEntryCount - NUM_BONUS_SPECIES - 1)
         return;
 
@@ -884,7 +884,7 @@ static void PokedexListScrollDownFast(void)
     if (gPokedexListPosition > gPokedexListEntryCount - NUM_BONUS_SPECIES - 1)
         gPokedexListPosition = gPokedexListEntryCount - NUM_BONUS_SPECIES - 1;
 
-    gPokedexSelectedMon = gPokedexListPosition + gUnknown_0202A57C;
+    gPokedexSelectedMon = gPokedexListPosition + gPokedexCursorOffset;
     gPokedexScrollWaitFrames = SCROLL_WAIT_FRAMES;
 }
 
@@ -899,10 +899,10 @@ void Pokedex_CheckDeleteKeyComboPressed(void)
             gPokedex_EraseSaveDataAccessStep = 0;
             gPokedex_EraseSaveDataAccessCounter = 0;
             m4aSongNumStart(SE_MENU_POPUP_OPEN);
-            gUnknown_0202BEC4 = 1;
+            gPokedexShowPopupWindow = 1;
             Pokedex_PopupTypeIx = POKEDEX_POPUP_DELETE_CONFIRMATION_PROMPT;
-            gUnknown_0202BF04 = 0;
-            gUnknown_0202A588 = 0;
+            gPokedexShowButtonPrompt = 0;
+            gPokedexShowAnimSprite = 0;
             gMain.subState = POKEDEX_STATE_DELETE_CONFIRMATION;
         }
     }
@@ -917,44 +917,44 @@ void Pokedex_CheckDeleteKeyComboPressed(void)
     }
 }
 
-void sub_5064(void)
+void UpdateMonSpriteVisibility(void)
 {
     if (gPokedexFlags[gPokedexSelectedMon] == SPECIES_CAUGHT)
     {
         if (gDexAnimationIx[gPokedexSelectedMon] == -1)
         {
-            gUnknown_0202A588 = 0;
-            gUnknown_0202A55C = 1;
-            gUnknown_0202A568[0] = 0;
-            gUnknown_0202A568[1] = 0;
-            gUnknown_0201A440 = 0;
-            gUnknown_0202BF0C = 0;
+            gPokedexShowAnimSprite = 0;
+            gPokedexShowPortrait = 1;
+            gPokedexShowCatchHatch[0] = 0;
+            gPokedexShowCatchHatch[1] = 0;
+            gPokedexSpriteAnimTimer = 0;
+            gPokedexSpriteAnimFrame = 0;
         }
         else if (gDexAnimationIx[gPokedexSelectedMon] < 100)
         {
-            gUnknown_0202A588 = 0;
-            gUnknown_0202A55C = 0;
-            gUnknown_0202A568[0] = 1;
-            gUnknown_0202A568[1] = 0;
+            gPokedexShowAnimSprite = 0;
+            gPokedexShowPortrait = 0;
+            gPokedexShowCatchHatch[0] = 1;
+            gPokedexShowCatchHatch[1] = 0;
         }
         else
         {
-            gUnknown_0202A588 = 0;
-            gUnknown_0202A55C = 0;
-            gUnknown_0202A568[0] = 0;
-            gUnknown_0202A568[1] = 1;
+            gPokedexShowAnimSprite = 0;
+            gPokedexShowPortrait = 0;
+            gPokedexShowCatchHatch[0] = 0;
+            gPokedexShowCatchHatch[1] = 1;
         }
     }
     else
     {
-        gUnknown_0202A588 = 0;
-        gUnknown_0202A55C = 1;
-        gUnknown_0202A568[0] = 0;
-        gUnknown_0202A568[1] = 0;
+        gPokedexShowAnimSprite = 0;
+        gPokedexShowPortrait = 1;
+        gPokedexShowCatchHatch[0] = 0;
+        gPokedexShowCatchHatch[1] = 0;
     }
 }
 
-u8 sub_5134(void)
+u8 GetSelectedMonSpriteType(void)
 {
     if (gPokedexFlags[gPokedexSelectedMon] == SPECIES_CAUGHT && gDexAnimationIx[gPokedexSelectedMon] != -1)
     {
@@ -967,27 +967,27 @@ u8 sub_5134(void)
     return 0;
 }
 
-void sub_5174(void)
+void RefreshPokedexListDisplay(void)
 {
     PrintDexNumbersFromListPosition(gPokedexListPosition);
     PrintCaughtBallFromListPosition(gPokedexListPosition);
     PrintSelectedMonDexNum(gPokedexSelectedMon);
-    sub_6F78(gPokedexSelectedMon);
-    sub_8974(gPokedexSelectedMon);
-    sub_8A78(gPokedexSelectedMon);
-    gUnknown_0202BF00 = 0;
-    gUnknown_0201A448 = 0;
+    LoadMonPortrait(gPokedexSelectedMon);
+    LoadMonAnimationSprite(gPokedexSelectedMon);
+    CheckMonHasAnimation(gPokedexSelectedMon);
+    gPokedexAnimatedIconTimer = 0;
+    gPokedexAnimatedIconFrame = 0;
 }
 
-void sub_51CC(void)
+void RefreshMonPreviewSprite(void)
 {
-    if (sub_5134() == 0)
-        sub_6F78(gPokedexSelectedMon);
+    if (GetSelectedMonSpriteType() == 0)
+        LoadMonPortrait(gPokedexSelectedMon);
     else
-        sub_8974(gPokedexSelectedMon);
+        LoadMonAnimationSprite(gPokedexSelectedMon);
 }
 
-void sub_51FC(void)
+void RenderPokedexSprites(void)
 {
     int i;
     struct SpriteGroup *group0;
@@ -1009,38 +1009,38 @@ void sub_51FC(void)
     group2 = &gMain_spriteGroups[2];
     group3 = &gMain_spriteGroups[3];
     group4 = &gMain_spriteGroups[4];
-    group5 = &gMain_spriteGroups[5 + gUnknown_0201A448];
+    group5 = &gMain_spriteGroups[5 + gPokedexAnimatedIconFrame];
     group6 = &gMain_spriteGroups[17 + Pokedex_PopupTypeIx];
-    group7 = &gMain_spriteGroups[22 + gUnknown_0202BEE0];
+    group7 = &gMain_spriteGroups[22 + gPokedexButtonPromptFrame];
     group8 = &gMain_spriteGroups[24];
-    group9 = &gMain_spriteGroups[25 + gUnknown_02019C28 * 2 + gUnknown_0202C5AC];
+    group9 = &gMain_spriteGroups[25 + gPokedexSpriteIndexBase * 2 + gPokedexPageIndicatorBlink];
 
     group0->available = TRUE;
     group1->available = TRUE;
-    group2->available = gUnknown_0202A55C;
-    group3->available = gUnknown_0202A568[0];
-    group4->available = gUnknown_0202A568[1];
-    group5->available = gUnknown_0202A588;
-    group6->available = gUnknown_0202BEC4;
-    group7->available = gUnknown_0202BF04;
-    group8->available = gUnknown_0202C590;
-    group9->available = gUnknown_0201C1B4;
-    LoadSpriteSets(gUnknown_086A6148, 29, group0);
+    group2->available = gPokedexShowPortrait;
+    group3->available = gPokedexShowCatchHatch[0];
+    group4->available = gPokedexShowCatchHatch[1];
+    group5->available = gPokedexShowAnimSprite;
+    group6->available = gPokedexShowPopupWindow;
+    group7->available = gPokedexShowButtonPrompt;
+    group8->available = gPokedexShowLinkCableIcon;
+    group9->available = gPokedexShowPageIndicator;
+    LoadSpriteSets(gPokedexSpriteSets, 29, group0);
 
-    group0->baseX = 20 + gUnknown_0201A4F0;
-    group0->baseY = 84 + gUnknown_0202A57C * 16;
+    group0->baseX = 20 + gPokedexCursorBlinkOffset;
+    group0->baseY = 84 + gPokedexCursorOffset * 16;
     groupOam = &group0->oam[0];
     gOamBuffer[groupOam->oamId].priority = 3;
     gOamBuffer[groupOam->oamId].x = groupOam->xOffset + group0->baseX;
     gOamBuffer[groupOam->oamId].y = groupOam->yOffset + group0->baseY;
 
     if (gPokedexSelectedMon < 200)
-        gUnknown_0202BF08 = 86 + gPokedexSelectedMon / 3;
+        gPokedexScrollbarY = 86 + gPokedexSelectedMon / 3;
     else
-        gUnknown_0202BF08 = 152;
+        gPokedexScrollbarY = 152;
 
     group1->baseX = 13;
-    group1->baseY = gUnknown_0202BF08;
+    group1->baseY = gPokedexScrollbarY;
     groupOam = &group1->oam[0];
     gOamBuffer[groupOam->oamId].priority = 3;
     gOamBuffer[groupOam->oamId].x = groupOam->xOffset + group1->baseX;
@@ -1067,23 +1067,23 @@ void sub_51FC(void)
         {
             groupOam = &group3->oam[i];
             gOamBuffer[groupOam->oamId].priority = 1;
-            gOamBuffer[groupOam->oamId].tileNum = gUnknown_086A5DDA[gUnknown_0202BF14][i] +
-                                                  gUnknown_086A5DF2[gUnknown_0202BF14][gUnknown_0202BF0C];
+            gOamBuffer[groupOam->oamId].tileNum = gPokedexAnimBaseTileNums[gPokedexSpriteCategory][i] +
+                                                  gPokedexCatchAnimTileOffsets[gPokedexSpriteCategory][gPokedexSpriteAnimFrame];
             gOamBuffer[groupOam->oamId].x = groupOam->xOffset + group3->baseX;
             gOamBuffer[groupOam->oamId].y = groupOam->yOffset + group3->baseY;
         }
 
-        if (++gUnknown_0201A440 > 14)
+        if (++gPokedexSpriteAnimTimer > 14)
         {
-            gUnknown_0201A440 = 0;
-            if (++gUnknown_0202BF0C > 8)
-                gUnknown_0202BF0C = 0;
+            gPokedexSpriteAnimTimer = 0;
+            if (++gPokedexSpriteAnimFrame > 8)
+                gPokedexSpriteAnimFrame = 0;
         }
     }
 
     if (group4->available == 1)
     {
-        if (gUnknown_086A6356[gPokedexSelectedMon] == -1)
+        if (gPokedexCatchAnimIndices[gPokedexSelectedMon] == -1)
         {
             var0 = 1;
             var1 = 36;
@@ -1100,16 +1100,16 @@ void sub_51FC(void)
         {
             groupOam = &group4->oam[i];
             gOamBuffer[groupOam->oamId].priority = 1;
-            gOamBuffer[groupOam->oamId].tileNum = gUnknown_086A5DDA[var0][i] + gUnknown_086A5EE2[var0][gUnknown_0202BF0C];
+            gOamBuffer[groupOam->oamId].tileNum = gPokedexAnimBaseTileNums[var0][i] + gPokedexHatchAnimTileOffsets[var0][gPokedexSpriteAnimFrame];
             gOamBuffer[groupOam->oamId].x = groupOam->xOffset + group4->baseX;
             gOamBuffer[groupOam->oamId].y = groupOam->yOffset + group4->baseY;
         }
 
-        if (++gUnknown_0201A440 > gUnknown_086A6014[var0][gUnknown_0202BF0C])
+        if (++gPokedexSpriteAnimTimer > gPokedexAnimFrameDurations[var0][gPokedexSpriteAnimFrame])
         {
-            gUnknown_0201A440 = 0;
-            if (++gUnknown_0202BF0C > var1)
-                gUnknown_0202BF0C = 0;
+            gPokedexSpriteAnimTimer = 0;
+            if (++gPokedexSpriteAnimFrame > var1)
+                gPokedexSpriteAnimFrame = 0;
         }
     }
 
@@ -1117,7 +1117,7 @@ void sub_51FC(void)
     {
         group5->baseX = 36;
         group5->baseY = 64;
-        spriteSet = gUnknown_086A6148[5 + gUnknown_0201A448];
+        spriteSet = gPokedexSpriteSets[5 + gPokedexAnimatedIconFrame];
         for (i = 0; i < spriteSet->count; i++)
         {
             groupOam = &group5->oam[i];
@@ -1126,11 +1126,11 @@ void sub_51FC(void)
             gOamBuffer[groupOam->oamId].y = groupOam->yOffset + group5->baseY;
         }
 
-        if (++gUnknown_0202BF00 > 8)
+        if (++gPokedexAnimatedIconTimer > 8)
         {
-            gUnknown_0202BF00 = 0;
-            if (++gUnknown_0201A448 > 11)
-                gUnknown_0201A448 = 0;
+            gPokedexAnimatedIconTimer = 0;
+            if (++gPokedexAnimatedIconFrame > 11)
+                gPokedexAnimatedIconFrame = 0;
         }
     }
 
@@ -1148,7 +1148,7 @@ void sub_51FC(void)
             group6->baseY = 80;
         }
 
-        spriteSet = gUnknown_086A6148[17 + Pokedex_PopupTypeIx];
+        spriteSet = gPokedexSpriteSets[17 + Pokedex_PopupTypeIx];
         for (i = 0; i < spriteSet->count; i++)
         {
             groupOam = &group6->oam[i];
@@ -1162,7 +1162,7 @@ void sub_51FC(void)
     {
         group7->baseX = 158;
         group7->baseY = 148;
-        spriteSet = gUnknown_086A6148[22 + gUnknown_0202BEE0];
+        spriteSet = gPokedexSpriteSets[22 + gPokedexButtonPromptFrame];
         for (i = 0; i < spriteSet->count; i++)
         {
             groupOam = &group7->oam[i];
@@ -1193,11 +1193,11 @@ void sub_51FC(void)
         gOamBuffer[groupOam->oamId].y = groupOam->yOffset + group9->baseY;
     }
 
-    if (++gUnknown_0202BE20 > 12)
+    if (++gPokedexBlinkTimer > 12)
     {
-        gUnknown_0202BE20 = 0;
-        gUnknown_0201A4F0 = 1 - gUnknown_0201A4F0;
-        gUnknown_0202BEE0 = 1 - gUnknown_0202BEE0;
+        gPokedexBlinkTimer = 0;
+        gPokedexCursorBlinkOffset = 1 - gPokedexCursorBlinkOffset;
+        gPokedexButtonPromptFrame = 1 - gPokedexButtonPromptFrame;
     }
 
     group5->available = FALSE;
@@ -1225,30 +1225,30 @@ static void RenderLinkGraphics(void)
     group2 = &gMain_spriteGroups[2];
     group3 = &gMain_spriteGroups[3];
     group4 = &gMain_spriteGroups[4];
-    group6 = &gMain_spriteGroups[5 + gUnknown_0201A448];
+    group6 = &gMain_spriteGroups[5 + gPokedexAnimatedIconFrame];
     group7 = &gMain_spriteGroups[17 + Pokedex_PopupTypeIx];
     group5 = &gMain_spriteGroups[24];
 
     group0->available = TRUE;
     group1->available = TRUE;
-    group2->available = gUnknown_0202A55C;
-    group3->available = gUnknown_0202A568[0];
-    group4->available = gUnknown_0202A568[1];
+    group2->available = gPokedexShowPortrait;
+    group3->available = gPokedexShowCatchHatch[0];
+    group4->available = gPokedexShowCatchHatch[1];
     group6->available = FALSE;
-    group7->available = gUnknown_0202BEC4;
-    group5->available = gUnknown_0202C590;
-    sub_2414(gUnknown_086A6148, 29, group0);
+    group7->available = gPokedexShowPopupWindow;
+    group5->available = gPokedexShowLinkCableIcon;
+    LoadSpriteSetsWithCpuCopy(gPokedexSpriteSets, 29, group0);
 
-    group0->baseX = 20 + gUnknown_0201A4F0;
-    group0->baseY = 84 + gUnknown_0202A57C * 16;
+    group0->baseX = 20 + gPokedexCursorBlinkOffset;
+    group0->baseY = 84 + gPokedexCursorOffset * 16;
     groupOam = &group0->oam[0];
     gOamBuffer[groupOam->oamId].priority = 2;
     gOamBuffer[groupOam->oamId].x = groupOam->xOffset + group0->baseX;
     gOamBuffer[groupOam->oamId].y = groupOam->yOffset + group0->baseY;
 
-    gUnknown_0202BF08 = 86 + gPokedexSelectedMon / 3;
+    gPokedexScrollbarY = 86 + gPokedexSelectedMon / 3;
     group1->baseX = 13;
-    group1->baseY = gUnknown_0202BF08;
+    group1->baseY = gPokedexScrollbarY;
     groupOam = &group1->oam[0];
     gOamBuffer[groupOam->oamId].priority = 2;
     gOamBuffer[groupOam->oamId].x = groupOam->xOffset + group1->baseX;
@@ -1273,8 +1273,8 @@ static void RenderLinkGraphics(void)
         for (i = 0; i < 4; i++)
         {
             groupOam = &group3->oam[i];
-            gOamBuffer[groupOam->oamId].tileNum = gUnknown_086A5DDA[gUnknown_0202BF14][i] +
-                                                  gUnknown_086A5DF2[gUnknown_0202BF14][gUnknown_0202BF0C];
+            gOamBuffer[groupOam->oamId].tileNum = gPokedexAnimBaseTileNums[gPokedexSpriteCategory][i] +
+                                                  gPokedexCatchAnimTileOffsets[gPokedexSpriteCategory][gPokedexSpriteAnimFrame];
             gOamBuffer[groupOam->oamId].x = groupOam->xOffset + group3->baseX;
             gOamBuffer[groupOam->oamId].y = groupOam->yOffset + group3->baseY;
         }
@@ -1287,8 +1287,8 @@ static void RenderLinkGraphics(void)
         for (i = 0; i < 4; i++)
         {
             groupOam = &group4->oam[i];
-            gOamBuffer[groupOam->oamId].tileNum = gUnknown_086A5DDA[1][i] +
-                                                  gUnknown_086A5E12[1][gUnknown_0202BF0C];
+            gOamBuffer[groupOam->oamId].tileNum = gPokedexAnimBaseTileNums[1][i] +
+                                                  gPokedexAnimTileDeltas[1][gPokedexSpriteAnimFrame];
             gOamBuffer[groupOam->oamId].x = groupOam->xOffset + group4->baseX;
             gOamBuffer[groupOam->oamId].y = groupOam->yOffset + group4->baseY;
         }
@@ -1298,7 +1298,7 @@ static void RenderLinkGraphics(void)
     {
         group6->baseX = 36;
         group6->baseY = 64;
-        spriteSet = gUnknown_086A6148[5 + gUnknown_0201A448];
+        spriteSet = gPokedexSpriteSets[5 + gPokedexAnimatedIconFrame];
         for (i = 0; i < spriteSet->count; i++)
         {
             groupOam = &group6->oam[i];
@@ -1321,7 +1321,7 @@ static void RenderLinkGraphics(void)
             group7->baseY = 80;
         }
 
-        spriteSet = gUnknown_086A6148[17 + Pokedex_PopupTypeIx];
+        spriteSet = gPokedexSpriteSets[17 + Pokedex_PopupTypeIx];
         for (i = 0; i < spriteSet->count; i++)
         {
             groupOam = &group7->oam[i];
@@ -1346,101 +1346,101 @@ static void RenderLinkGraphics(void)
     group7->available = FALSE;
 }
 
-static void sub_5E60(void)
+static void InitLinkTransferState(void)
 {
-    gUnknown_0202C5F0[0] = 0xDDDD;
-    gUnknown_0202C5B4 = 1;
-    gUnknown_0201C180 = 1;
-    gUnknown_0201B128 = 0;
-    gUnknown_0201C1BC = 0;
-    gUnknown_0202C544 = 0;
-    gUnknown_0202BECC = 0;
+    gLinkSendBuffer[0] = 0xDDDD;
+    gPokedexLinkChunkIndex = 1;
+    gPokedexLinkSendCounter = 1;
+    gPokedexLinkTransferPhase = 0;
+    gPokedexMasterHandshakeState = 0;
+    gPokedexClientHandshakeState = 0;
+    gPokedexHandshakeRetryCount = 0;
 }
 
-static s16 sub_5EA4(void)
-{
-    s16 result;
-
-    if (gLink.isMaster)
-        result = sub_639C();
-    else
-        result = sub_65DC();
-
-    return result;
-}
-
-s16 sub_5EC8(void)
+static s16 Pokedex_ProcessLinkExchange(void)
 {
     s16 result;
 
     if (gLink.isMaster)
-        result = sub_5EEC();
+        result = MasterReceivePokedexFlags();
     else
-        result = sub_6144();
+        result = ClientReceivePokedexFlags();
 
     return result;
 }
 
-static int sub_5EEC(void)
+s16 SendLinkPokedexData(void)
+{
+    s16 result;
+
+    if (gLink.isMaster)
+        result = MasterSendPokedexFlags();
+    else
+        result = ClientSendPokedexFlags();
+
+    return result;
+}
+
+static int MasterSendPokedexFlags(void)
 {
     int i;
     u16 var0;
 
-    if (gUnknown_0201B128 == 0)
+    if (gPokedexLinkTransferPhase == 0)
     {
-        switch (gUnknown_0201C1BC)
+        switch (gPokedexMasterHandshakeState)
         {
             case 0:
                 if (JOY_NEW(A_BUTTON))
                 {
-                    gUnknown_0202C5F0[0] = 0xFEFE;
+                    gLinkSendBuffer[0] = 0xFEFE;
                 }
                 else
                 {
                     for (i = 0; i < 8; i++)
-                        gUnknown_0202C5F0[i] = 0;
+                        gLinkSendBuffer[i] = 0;
                 }
                 return 0;
             case 1:
-                gUnknown_0202C5F0[0] = 0xECEC;
+                gLinkSendBuffer[0] = 0xECEC;
                 return 0;
         }
         return 0;
     }
-    else if (gUnknown_0201C180 < 8)
+    else if (gPokedexLinkSendCounter < 8)
     {
         for (i = 0; i < 8; i++)
-            gUnknown_0202C5F0[i] = 0xDDDD;
+            gLinkSendBuffer[i] = 0xDDDD;
     }
-    else if (gUnknown_0201C180 < 16)
+    else if (gPokedexLinkSendCounter < 16)
     {
-        var0 = (gUnknown_0201C180 - 8) * 28;
-        gUnknown_0202C5F0[0] = gUnknown_0201C180;
-        gUnknown_0202C5F0[1] = gPokedexFlags[var0] |
+        var0 = (gPokedexLinkSendCounter - 8) * 28;
+        gLinkSendBuffer[0] = gPokedexLinkSendCounter;
+        gLinkSendBuffer[1] = gPokedexFlags[var0] |
                                (gPokedexFlags[var0 + 1] << 4) |
                                (gPokedexFlags[var0 + 2] << 8) |
                                (gPokedexFlags[var0 + 3] << 12);
-        gUnknown_0202C5F0[2] =  gPokedexFlags[var0 + 4] |
+        gLinkSendBuffer[2] =  gPokedexFlags[var0 + 4] |
                                (gPokedexFlags[var0 + 5] << 4) |
                                (gPokedexFlags[var0 + 6] << 8) |
                                (gPokedexFlags[var0 + 7] << 12);
-        gUnknown_0202C5F0[3] =  gPokedexFlags[var0 + 8] |
+        gLinkSendBuffer[3] =  gPokedexFlags[var0 + 8] |
                                (gPokedexFlags[var0 + 9] << 4) |
                                (gPokedexFlags[var0 + 10] << 8) |
                                (gPokedexFlags[var0 + 11] << 12);
-        gUnknown_0202C5F0[4] =  gPokedexFlags[var0 + 12] |
+        gLinkSendBuffer[4] =  gPokedexFlags[var0 + 12] |
                                (gPokedexFlags[var0 + 13] << 4) |
                                (gPokedexFlags[var0 + 14] << 8) |
                                (gPokedexFlags[var0 + 15] << 12);
-        gUnknown_0202C5F0[5] =  gPokedexFlags[var0 + 16] |
+        gLinkSendBuffer[5] =  gPokedexFlags[var0 + 16] |
                                (gPokedexFlags[var0 + 17] << 4) |
                                (gPokedexFlags[var0 + 18] << 8) |
                                (gPokedexFlags[var0 + 19] << 12);
-        gUnknown_0202C5F0[6] =  gPokedexFlags[var0 + 20] |
+        gLinkSendBuffer[6] =  gPokedexFlags[var0 + 20] |
                                (gPokedexFlags[var0 + 21] << 4) |
                                (gPokedexFlags[var0 + 22] << 8) |
                                (gPokedexFlags[var0 + 23] << 12);
-        gUnknown_0202C5F0[7] =  gPokedexFlags[var0 + 24] |
+        gLinkSendBuffer[7] =  gPokedexFlags[var0 + 24] |
                                (gPokedexFlags[var0 + 25] << 4) |
                                (gPokedexFlags[var0 + 26] << 8) |
                                (gPokedexFlags[var0 + 27] << 12);
@@ -1448,73 +1448,73 @@ static int sub_5EEC(void)
     else
     {
         for (i = 0; i < 8; i++)
-            gUnknown_0202C5F0[i] = 0;
+            gLinkSendBuffer[i] = 0;
     }
 
-    gUnknown_0201C180++;
+    gPokedexLinkSendCounter++;
     return 0;
 }
 
-static int sub_6144(void)
+static int ClientSendPokedexFlags(void)
 {
     int i;
     u16 var0;
 
-    if (gUnknown_0201B128 == 0)
+    if (gPokedexLinkTransferPhase == 0)
     {
-        switch (gUnknown_0202C544)
+        switch (gPokedexClientHandshakeState)
         {
             case 0:
                 if (JOY_NEW(A_BUTTON))
                 {
-                    gUnknown_0202C5F0[0] = 0xFEFE;
+                    gLinkSendBuffer[0] = 0xFEFE;
                 }
                 else
                 {
                     for (i = 0; i < 8; i++)
-                        gUnknown_0202C5F0[i] = 0;
+                        gLinkSendBuffer[i] = 0;
                 }
                 return 0;
             case 1:
-                gUnknown_0202C5F0[0] = 0xECEC;
+                gLinkSendBuffer[0] = 0xECEC;
                 return 0;
         }
         return 0;
     }
-    else if (gUnknown_0201C180 < 8)
+    else if (gPokedexLinkSendCounter < 8)
     {
         for (i = 0; i < 8; i++)
-            gUnknown_0202C5F0[i] = 0xDDDD;
+            gLinkSendBuffer[i] = 0xDDDD;
     }
-    else if (gUnknown_0201C180 < 16)
+    else if (gPokedexLinkSendCounter < 16)
     {
-        var0 = (gUnknown_0201C180 - 8) * 28;
-        gUnknown_0202C5F0[0] = gUnknown_0201C180;
-        gUnknown_0202C5F0[1] = gPokedexFlags[var0] |
+        var0 = (gPokedexLinkSendCounter - 8) * 28;
+        gLinkSendBuffer[0] = gPokedexLinkSendCounter;
+        gLinkSendBuffer[1] = gPokedexFlags[var0] |
                                (gPokedexFlags[var0 + 1] << 4) |
                                (gPokedexFlags[var0 + 2] << 8) |
                                (gPokedexFlags[var0 + 3] << 12);
-        gUnknown_0202C5F0[2] =  gPokedexFlags[var0 + 4] |
+        gLinkSendBuffer[2] =  gPokedexFlags[var0 + 4] |
                                (gPokedexFlags[var0 + 5] << 4) |
                                (gPokedexFlags[var0 + 6] << 8) |
                                (gPokedexFlags[var0 + 7] << 12);
-        gUnknown_0202C5F0[3] =  gPokedexFlags[var0 + 8] |
+        gLinkSendBuffer[3] =  gPokedexFlags[var0 + 8] |
                                (gPokedexFlags[var0 + 9] << 4) |
                                (gPokedexFlags[var0 + 10] << 8) |
                                (gPokedexFlags[var0 + 11] << 12);
-        gUnknown_0202C5F0[4] =  gPokedexFlags[var0 + 12] |
+        gLinkSendBuffer[4] =  gPokedexFlags[var0 + 12] |
                                (gPokedexFlags[var0 + 13] << 4) |
                                (gPokedexFlags[var0 + 14] << 8) |
                                (gPokedexFlags[var0 + 15] << 12);
-        gUnknown_0202C5F0[5] =  gPokedexFlags[var0 + 16] |
+        gLinkSendBuffer[5] =  gPokedexFlags[var0 + 16] |
                                (gPokedexFlags[var0 + 17] << 4) |
                                (gPokedexFlags[var0 + 18] << 8) |
                                (gPokedexFlags[var0 + 19] << 12);
-        gUnknown_0202C5F0[6] =  gPokedexFlags[var0 + 20] |
+        gLinkSendBuffer[6] =  gPokedexFlags[var0 + 20] |
                                (gPokedexFlags[var0 + 21] << 4) |
                                (gPokedexFlags[var0 + 22] << 8) |
                                (gPokedexFlags[var0 + 23] << 12);
-        gUnknown_0202C5F0[7] =  gPokedexFlags[var0 + 24] |
+        gLinkSendBuffer[7] =  gPokedexFlags[var0 + 24] |
                                (gPokedexFlags[var0 + 25] << 4) |
                                (gPokedexFlags[var0 + 26] << 8) |
                                (gPokedexFlags[var0 + 27] << 12);
@@ -1522,38 +1522,38 @@ static int sub_6144(void)
     else
     {
         for (i = 0; i < 8; i++)
-            gUnknown_0202C5F0[i] = 0;
+            gLinkSendBuffer[i] = 0;
     }
 
-    gUnknown_0201C180++;
+    gPokedexLinkSendCounter++;
     return 0;
 }
 
-//Link transfer as host (See sub_65DC for client)
-int sub_639C(void)
+//Link transfer as host (See ClientReceivePokedexFlags for client)
+int MasterReceivePokedexFlags(void)
 {
     int i, j;
     u16 var0;
     u16 arr0[28];
 
-    if (gUnknown_0201B128 == 0)
+    if (gPokedexLinkTransferPhase == 0)
     {
-        switch (gUnknown_0201C1BC)
+        switch (gPokedexMasterHandshakeState)
         {
             case 0:
-                if (gUnknown_0201A4D0[0][0] == 0xFEFE || gUnknown_0201A4D0[0][1] == 0xFEFE)
+                if (gLinkRecvBuffer[0][0] == 0xFEFE || gLinkRecvBuffer[0][1] == 0xFEFE)
                 {
-                    gUnknown_0201C1BC = 1;
+                    gPokedexMasterHandshakeState = 1;
                 }
                 break;
             case 1:
-                if (gUnknown_0201A4D0[0][0] == 0xECEC && gUnknown_0201A4D0[0][1] == 0xECEC)
+                if (gLinkRecvBuffer[0][0] == 0xECEC && gLinkRecvBuffer[0][1] == 0xECEC)
                 {
-                    gUnknown_0201B128 = -1;
+                    gPokedexLinkTransferPhase = -1;
                     Pokedex_PopupTypeIx = POKEDEX_POPUP_TRANSMITTING_ACTIVE;
-                    gUnknown_0201C180 = 1;
+                    gPokedexLinkSendCounter = 1;
                 }
-                else if (++gUnknown_0202BECC > 10)
+                else if (++gPokedexHandshakeRetryCount > 10)
                 {
                     return 1;
                 }
@@ -1562,87 +1562,87 @@ int sub_639C(void)
     }
     else
     {
-        u16 var1 = gUnknown_0201A4D0[0][1] - 8;
+        u16 var1 = gLinkRecvBuffer[0][1] - 8;
          if (var1 > 7)
             return 0;
 
-        gUnknown_0202C5B4 = gUnknown_0201A4D0[0][1];
-        arr0[0]  =  gUnknown_0201A4D0[0][3]  & 0xF;
-        arr0[1]  = (gUnknown_0201A4D0[0][3]  & 0xF0)   >> 4;
-        arr0[2]  = (gUnknown_0201A4D0[0][3]  & 0xF00)  >> 8;
-        arr0[3]  = (gUnknown_0201A4D0[0][3]  & 0xF000) >> 12;
-        arr0[4]  =  gUnknown_0201A4D0[0][5]  & 0xF;
-        arr0[5]  = (gUnknown_0201A4D0[0][5]  & 0xF0)   >> 4;
-        arr0[6]  = (gUnknown_0201A4D0[0][5]  & 0xF00)  >> 8;
-        arr0[7]  = (gUnknown_0201A4D0[0][5]  & 0xF000) >> 12;
-        arr0[8]  =  gUnknown_0201A4D0[0][7]  & 0xF;
-        arr0[9]  = (gUnknown_0201A4D0[0][7]  & 0xF0)   >> 4;
-        arr0[10] = (gUnknown_0201A4D0[0][7]  & 0xF00)  >> 8;
-        arr0[11] = (gUnknown_0201A4D0[0][7]  & 0xF000) >> 12;
-        arr0[12] =  gUnknown_0201A4D0[0][9]  & 0xF;
-        arr0[13] = (gUnknown_0201A4D0[0][9]  & 0xF0)   >> 4;
-        arr0[14] = (gUnknown_0201A4D0[0][9]  & 0xF00)  >> 8;
-        arr0[15] = (gUnknown_0201A4D0[0][9]  & 0xF000) >> 12;
-        arr0[16] =  gUnknown_0201A4D0[0][11] & 0xF;
-        arr0[17] = (gUnknown_0201A4D0[0][11] & 0xF0)   >> 4;
-        arr0[18] = (gUnknown_0201A4D0[0][11] & 0xF00)  >> 8;
-        arr0[19] = (gUnknown_0201A4D0[0][11] & 0xF000) >> 12;
-        arr0[20] =  gUnknown_0201A4D0[0][13] & 0xF;
-        arr0[21] = (gUnknown_0201A4D0[0][13] & 0xF0)   >> 4;
-        arr0[22] = (gUnknown_0201A4D0[0][13] & 0xF00)  >> 8;
-        arr0[23] = (gUnknown_0201A4D0[0][13] & 0xF000) >> 12;
-        arr0[24] =  gUnknown_0201A4D0[0][15] & 0xF;
-        arr0[25] = (gUnknown_0201A4D0[0][15] & 0xF0)   >> 4;
-        arr0[26] = (gUnknown_0201A4D0[0][15] & 0xF00)  >> 8;
-        arr0[27] = (gUnknown_0201A4D0[0][15] & 0xF000) >> 12;
+        gPokedexLinkChunkIndex = gLinkRecvBuffer[0][1];
+        arr0[0]  =  gLinkRecvBuffer[0][3]  & 0xF;
+        arr0[1]  = (gLinkRecvBuffer[0][3]  & 0xF0)   >> 4;
+        arr0[2]  = (gLinkRecvBuffer[0][3]  & 0xF00)  >> 8;
+        arr0[3]  = (gLinkRecvBuffer[0][3]  & 0xF000) >> 12;
+        arr0[4]  =  gLinkRecvBuffer[0][5]  & 0xF;
+        arr0[5]  = (gLinkRecvBuffer[0][5]  & 0xF0)   >> 4;
+        arr0[6]  = (gLinkRecvBuffer[0][5]  & 0xF00)  >> 8;
+        arr0[7]  = (gLinkRecvBuffer[0][5]  & 0xF000) >> 12;
+        arr0[8]  =  gLinkRecvBuffer[0][7]  & 0xF;
+        arr0[9]  = (gLinkRecvBuffer[0][7]  & 0xF0)   >> 4;
+        arr0[10] = (gLinkRecvBuffer[0][7]  & 0xF00)  >> 8;
+        arr0[11] = (gLinkRecvBuffer[0][7]  & 0xF000) >> 12;
+        arr0[12] =  gLinkRecvBuffer[0][9]  & 0xF;
+        arr0[13] = (gLinkRecvBuffer[0][9]  & 0xF0)   >> 4;
+        arr0[14] = (gLinkRecvBuffer[0][9]  & 0xF00)  >> 8;
+        arr0[15] = (gLinkRecvBuffer[0][9]  & 0xF000) >> 12;
+        arr0[16] =  gLinkRecvBuffer[0][11] & 0xF;
+        arr0[17] = (gLinkRecvBuffer[0][11] & 0xF0)   >> 4;
+        arr0[18] = (gLinkRecvBuffer[0][11] & 0xF00)  >> 8;
+        arr0[19] = (gLinkRecvBuffer[0][11] & 0xF000) >> 12;
+        arr0[20] =  gLinkRecvBuffer[0][13] & 0xF;
+        arr0[21] = (gLinkRecvBuffer[0][13] & 0xF0)   >> 4;
+        arr0[22] = (gLinkRecvBuffer[0][13] & 0xF00)  >> 8;
+        arr0[23] = (gLinkRecvBuffer[0][13] & 0xF000) >> 12;
+        arr0[24] =  gLinkRecvBuffer[0][15] & 0xF;
+        arr0[25] = (gLinkRecvBuffer[0][15] & 0xF0)   >> 4;
+        arr0[26] = (gLinkRecvBuffer[0][15] & 0xF00)  >> 8;
+        arr0[27] = (gLinkRecvBuffer[0][15] & 0xF000) >> 12;
 
         for (i = 0; i < 28; i++)
         {
-            var0 = (gUnknown_0202C5B4 - 8) * 28 + i;
+            var0 = (gPokedexLinkChunkIndex - 8) * 28 + i;
             if (gPokedexFlags[var0] == SPECIES_UNSEEN && arr0[i] == 4)
                 gPokedexFlagExchangeBuffer[var0] = SPECIES_SHARED;
             else if (gPokedexFlags[var0] == SPECIES_SEEN && arr0[i] == 4)
                 gPokedexFlagExchangeBuffer[var0] = SPECIES_SHARED_AND_SEEN;
         }
 
-        if (gUnknown_0202C5B4 == 15)
+        if (gPokedexLinkChunkIndex == 15)
             return -1;
     }
 
     for (i = 0; i < 8; i++)
     {
         for (j = 0; j < 2; j++)
-            gUnknown_0201A4D0[i][j] = 0;
+            gLinkRecvBuffer[i][j] = 0;
     }
 
     return 0;
 }
 
-//Link transfer as client (See sub_639C for host)
-static int sub_65DC(void)
+//Link transfer as client (See MasterReceivePokedexFlags for host)
+static int ClientReceivePokedexFlags(void)
 {
     int i, j;
     u16 var0;
     u16 arr0[28];
 
-    if (gUnknown_0201B128 == 0)
+    if (gPokedexLinkTransferPhase == 0)
     {
-        switch (gUnknown_0202C544)
+        switch (gPokedexClientHandshakeState)
         {
             case 0:
-                if (gUnknown_0201A4D0[0][0] == 0xFEFE || gUnknown_0201A4D0[0][1] == 0xFEFE)
+                if (gLinkRecvBuffer[0][0] == 0xFEFE || gLinkRecvBuffer[0][1] == 0xFEFE)
                 {
-                    gUnknown_0202C544 = 1;
+                    gPokedexClientHandshakeState = 1;
                 }
                 break;
             case 1:
-                if (gUnknown_0201A4D0[0][0] == 0xECEC && gUnknown_0201A4D0[0][1] == 0xECEC)
+                if (gLinkRecvBuffer[0][0] == 0xECEC && gLinkRecvBuffer[0][1] == 0xECEC)
                 {
-                    gUnknown_0201B128 = -1;
+                    gPokedexLinkTransferPhase = -1;
                     Pokedex_PopupTypeIx = POKEDEX_POPUP_TRANSMITTING_ACTIVE;
-                    gUnknown_0201C180 = 1;
+                    gPokedexLinkSendCounter = 1;
                 }
-                else if (++gUnknown_0202BECC > 10)
+                else if (++gPokedexHandshakeRetryCount > 10)
                 {
                     return 1;
                 }
@@ -1651,57 +1651,57 @@ static int sub_65DC(void)
     }
     else
     {
-        u16 var1 = gUnknown_0201A4D0[0][0] - 8;
+        u16 var1 = gLinkRecvBuffer[0][0] - 8;
          if (var1 > 7)
             return 0;
 
-        gUnknown_0202C5B4 = gUnknown_0201A4D0[0][0];
-        arr0[0]  =  gUnknown_0201A4D0[0][2]  & 0xF;
-        arr0[1]  = (gUnknown_0201A4D0[0][2]  & 0xF0)   >> 4;
-        arr0[2]  = (gUnknown_0201A4D0[0][2]  & 0xF00)  >> 8;
-        arr0[3]  = (gUnknown_0201A4D0[0][2]  & 0xF000) >> 12;
-        arr0[4]  =  gUnknown_0201A4D0[0][4]  & 0xF;
-        arr0[5]  = (gUnknown_0201A4D0[0][4]  & 0xF0)   >> 4;
-        arr0[6]  = (gUnknown_0201A4D0[0][4]  & 0xF00)  >> 8;
-        arr0[7]  = (gUnknown_0201A4D0[0][4]  & 0xF000) >> 12;
-        arr0[8]  =  gUnknown_0201A4D0[0][6]  & 0xF;
-        arr0[9]  = (gUnknown_0201A4D0[0][6]  & 0xF0)   >> 4;
-        arr0[10] = (gUnknown_0201A4D0[0][6]  & 0xF00)  >> 8;
-        arr0[11] = (gUnknown_0201A4D0[0][6]  & 0xF000) >> 12;
-        arr0[12] =  gUnknown_0201A4D0[0][8]  & 0xF;
-        arr0[13] = (gUnknown_0201A4D0[0][8]  & 0xF0)   >> 4;
-        arr0[14] = (gUnknown_0201A4D0[0][8]  & 0xF00)  >> 8;
-        arr0[15] = (gUnknown_0201A4D0[0][8]  & 0xF000) >> 12;
-        arr0[16] =  gUnknown_0201A4D0[0][10] & 0xF;
-        arr0[17] = (gUnknown_0201A4D0[0][10] & 0xF0)   >> 4;
-        arr0[18] = (gUnknown_0201A4D0[0][10] & 0xF00)  >> 8;
-        arr0[19] = (gUnknown_0201A4D0[0][10] & 0xF000) >> 12;
-        arr0[20] =  gUnknown_0201A4D0[0][12] & 0xF;
-        arr0[21] = (gUnknown_0201A4D0[0][12] & 0xF0)   >> 4;
-        arr0[22] = (gUnknown_0201A4D0[0][12] & 0xF00)  >> 8;
-        arr0[23] = (gUnknown_0201A4D0[0][12] & 0xF000) >> 12;
-        arr0[24] =  gUnknown_0201A4D0[0][14] & 0xF;
-        arr0[25] = (gUnknown_0201A4D0[0][14] & 0xF0)   >> 4;
-        arr0[26] = (gUnknown_0201A4D0[0][14] & 0xF00)  >> 8;
-        arr0[27] = (gUnknown_0201A4D0[0][14] & 0xF000) >> 12;
+        gPokedexLinkChunkIndex = gLinkRecvBuffer[0][0];
+        arr0[0]  =  gLinkRecvBuffer[0][2]  & 0xF;
+        arr0[1]  = (gLinkRecvBuffer[0][2]  & 0xF0)   >> 4;
+        arr0[2]  = (gLinkRecvBuffer[0][2]  & 0xF00)  >> 8;
+        arr0[3]  = (gLinkRecvBuffer[0][2]  & 0xF000) >> 12;
+        arr0[4]  =  gLinkRecvBuffer[0][4]  & 0xF;
+        arr0[5]  = (gLinkRecvBuffer[0][4]  & 0xF0)   >> 4;
+        arr0[6]  = (gLinkRecvBuffer[0][4]  & 0xF00)  >> 8;
+        arr0[7]  = (gLinkRecvBuffer[0][4]  & 0xF000) >> 12;
+        arr0[8]  =  gLinkRecvBuffer[0][6]  & 0xF;
+        arr0[9]  = (gLinkRecvBuffer[0][6]  & 0xF0)   >> 4;
+        arr0[10] = (gLinkRecvBuffer[0][6]  & 0xF00)  >> 8;
+        arr0[11] = (gLinkRecvBuffer[0][6]  & 0xF000) >> 12;
+        arr0[12] =  gLinkRecvBuffer[0][8]  & 0xF;
+        arr0[13] = (gLinkRecvBuffer[0][8]  & 0xF0)   >> 4;
+        arr0[14] = (gLinkRecvBuffer[0][8]  & 0xF00)  >> 8;
+        arr0[15] = (gLinkRecvBuffer[0][8]  & 0xF000) >> 12;
+        arr0[16] =  gLinkRecvBuffer[0][10] & 0xF;
+        arr0[17] = (gLinkRecvBuffer[0][10] & 0xF0)   >> 4;
+        arr0[18] = (gLinkRecvBuffer[0][10] & 0xF00)  >> 8;
+        arr0[19] = (gLinkRecvBuffer[0][10] & 0xF000) >> 12;
+        arr0[20] =  gLinkRecvBuffer[0][12] & 0xF;
+        arr0[21] = (gLinkRecvBuffer[0][12] & 0xF0)   >> 4;
+        arr0[22] = (gLinkRecvBuffer[0][12] & 0xF00)  >> 8;
+        arr0[23] = (gLinkRecvBuffer[0][12] & 0xF000) >> 12;
+        arr0[24] =  gLinkRecvBuffer[0][14] & 0xF;
+        arr0[25] = (gLinkRecvBuffer[0][14] & 0xF0)   >> 4;
+        arr0[26] = (gLinkRecvBuffer[0][14] & 0xF00)  >> 8;
+        arr0[27] = (gLinkRecvBuffer[0][14] & 0xF000) >> 12;
 
         for (i = 0; i < 28; i++)
         {
-            var0 = (gUnknown_0202C5B4 - 8) * 28 + i;
+            var0 = (gPokedexLinkChunkIndex - 8) * 28 + i;
             if (gPokedexFlags[var0] == SPECIES_UNSEEN && arr0[i] == 4)
                 gPokedexFlagExchangeBuffer[var0] = SPECIES_SHARED;
             else if (gPokedexFlags[var0] == SPECIES_SEEN && arr0[i] == 4)
                 gPokedexFlagExchangeBuffer[var0] = SPECIES_SHARED_AND_SEEN;
         }
 
-        if (gUnknown_0202C5B4 == 15)
+        if (gPokedexLinkChunkIndex == 15)
             return -1;
     }
 
     for (i = 0; i < 8; i++)
     {
         for (j = 0; j < 2; j++)
-            gUnknown_0201A4D0[i][j] = 0;
+            gLinkRecvBuffer[i][j] = 0;
     }
 
     return 0;
@@ -1714,7 +1714,7 @@ static void PrintSelectedMonDexNum(s16 species)
     u16 var1;
     u16 var2;
 
-    DmaFill16(3, 0, gUnknown_03000000, 0x800);
+    DmaFill16(3, 0, gTempGfxBuffer, 0x800);
     var0 = 0;
     if (species == SPECIES_JIRACHI)
     {
@@ -1747,14 +1747,14 @@ static void PrintSelectedMonDexNum(s16 species)
             if (var2 == 0)
                 var2 = 4;
 
-            DmaCopy16(3, &gPokedexTextGlyphs_Gfx[var1], gUnknown_0202BE30, 0x20);
-            DmaCopy16(3, &gPokedexTextGlyphs_Gfx[var1 + 0x400], gUnknown_0201B130, 0x20);
-            sub_71DC(var2, var0, 0);
+            DmaCopy16(3, &gPokedexTextGlyphs_Gfx[var1], gGlyphUpperRowBuffer, 0x20);
+            DmaCopy16(3, &gPokedexTextGlyphs_Gfx[var1 + 0x400], gGlyphLowerRowBuffer, 0x20);
+            BlitGlyphToTileBuffer(var2, var0, 0);
             var0 += var2;
         }
 
-        CopyBgTilesRect(gUnknown_03000000, (void *)0x06004C00, 8, 2);
-        DmaFill16(3, 0, gUnknown_03000000, 0x800);
+        CopyBgTilesRect(gTempGfxBuffer, (void *)0x06004C00, 8, 2);
+        DmaFill16(3, 0, gTempGfxBuffer, 0x800);
         var0 = 0;
     }
     else
@@ -1772,14 +1772,14 @@ static void PrintSelectedMonDexNum(s16 species)
             if (var2 == 0)
                 var2 = 6;
 
-            DmaCopy16(3, &gPokedexTextGlyphs_Gfx[var1], gUnknown_0202BE30, 0x20);
-            DmaCopy16(3, &gPokedexTextGlyphs_Gfx[0x400 + var1], gUnknown_0201B130, 0x20);
-            sub_71DC(var2, var0, 0);
+            DmaCopy16(3, &gPokedexTextGlyphs_Gfx[var1], gGlyphUpperRowBuffer, 0x20);
+            DmaCopy16(3, &gPokedexTextGlyphs_Gfx[0x400 + var1], gGlyphLowerRowBuffer, 0x20);
+            BlitGlyphToTileBuffer(var2, var0, 0);
             var0 += var2;
         }
 
-        CopyBgTilesRect(gUnknown_03000000, (void *)0x06004D00, 9, 2);
-        DmaFill16(3, 0, gUnknown_03000000, 0x800);
+        CopyBgTilesRect(gTempGfxBuffer, (void *)0x06004D00, 9, 2);
+        DmaFill16(3, 0, gTempGfxBuffer, 0x800);
     }
     else
     {
@@ -1840,7 +1840,7 @@ void PrintDexNumbersFromListPosition(s16 listPosition)
     u16 var1;
     u16 var2;
 
-    DmaFill16(3, 0, gUnknown_03000000, 0x800);
+    DmaFill16(3, 0, gTempGfxBuffer, 0x800);
     var0 = 0;
     for (i = 0; i < ENTRIES_SHOWN_COUNT; i++)
     {
@@ -1883,22 +1883,22 @@ void PrintDexNumbersFromListPosition(s16 listPosition)
                 if (var2 == 0)
                     var2 = 4;
 
-                DmaCopy16(3, &gPokedexTextGlyphs_Gfx[var1], gUnknown_0202BE30, 0x20);
-                DmaCopy16(3, &gPokedexTextGlyphs_Gfx[0x400 + var1], gUnknown_0201B130, 0x20);
-                sub_71DC(var2, var0, 0);
+                DmaCopy16(3, &gPokedexTextGlyphs_Gfx[var1], gGlyphUpperRowBuffer, 0x20);
+                DmaCopy16(3, &gPokedexTextGlyphs_Gfx[0x400 + var1], gGlyphLowerRowBuffer, 0x20);
+                BlitGlyphToTileBuffer(var2, var0, 0);
                 var0 += var2;
             }
 
-            CopyBgTilesRect(gUnknown_03000000, (void *)0x06000000 + gUnknown_086A64F0[i], 8, 2);
-            DmaFill16(3, 0, gUnknown_03000000, 0x800);
+            CopyBgTilesRect(gTempGfxBuffer, (void *)0x06000000 + gPokedexListNameVramOffsets[i], 8, 2);
+            DmaFill16(3, 0, gTempGfxBuffer, 0x800);
             var0 = 0;
         }
         else
         {
             for (j = 0; j < 7; j++)
-                CopyBgTilesRect((void *)&gPokedexTextGlyphs_Gfx[ENGLISH_GLYPHS_START], (void *)0x06000000 + gUnknown_086A64F0[i] + j * 0x20, 1, 2);
+                CopyBgTilesRect((void *)&gPokedexTextGlyphs_Gfx[ENGLISH_GLYPHS_START], (void *)0x06000000 + gPokedexListNameVramOffsets[i] + j * 0x20, 1, 2);
 
-            CopyBgTilesRect((void *)gPokedexTextGlyphs_Gfx, (void *)0x06000000 + gUnknown_086A64F0[i] + j * 0x20, 1, 2);
+            CopyBgTilesRect((void *)gPokedexTextGlyphs_Gfx, (void *)0x06000000 + gPokedexListNameVramOffsets[i] + j * 0x20, 1, 2);
         }
     }
 }
@@ -1915,7 +1915,7 @@ static void PrintCaughtBallFromListPosition(s16 position)
     }
 }
 
-void sub_6F78(s16 species)
+void LoadMonPortrait(s16 species)
 {
     s16 state = gPokedexFlags[gPokedexSelectedMon];
     s16 var1 = species / 15;
@@ -1933,7 +1933,7 @@ void sub_6F78(s16 species)
         case SPECIES_SHARED:
         case SPECIES_SHARED_AND_SEEN:
             CopyBgTilesRect(gMonPortraitGroupGfx[var1] + var2 * 0x300, (void *)0x06013400, 24, 1);
-            sub_10170(gMonPortraitGroupPals[var1] + var2 * 0x20, (void *)OBJ_PLTT + 0x20, 0x20, 0xE);
+            DarkenPalette(gMonPortraitGroupPals[var1] + var2 * 0x20, (void *)OBJ_PLTT + 0x20, 0x20, 0xE);
             break;
         case SPECIES_CAUGHT:
             CopyBgTilesRect(gMonPortraitGroupGfx[var1] + var2 * 0x300, (void *)0x06013400, 24, 1);
@@ -1942,7 +1942,7 @@ void sub_6F78(s16 species)
     }
 }
 
-void sub_70E0(s16 species, u32 page)
+void PrintDexDescription(s16 species, u32 page)
 {
     int i, j;
     int var0;
@@ -1950,7 +1950,7 @@ void sub_70E0(s16 species, u32 page)
     u16 var2;
 
     var0 = 0;
-    DmaFill16(3, 0, gUnknown_03000000, 0x1800);
+    DmaFill16(3, 0, gTempGfxBuffer, 0x1800);
     for (i = 0; i < 3; i++)
     {
         for (j = 0; j < 42; j++)
@@ -1960,19 +1960,19 @@ void sub_70E0(s16 species, u32 page)
             if (var2 == 0)
                 var2 = 4;
 
-            DmaCopy16(3, &gPokedexTextGlyphs_Gfx[var1], gUnknown_0202BE30, 0x20);
-            DmaCopy16(3, &gPokedexTextGlyphs_Gfx[0x400 + var1], gUnknown_0201B130, 0x20);
-            sub_71DC(var2, var0, i);
+            DmaCopy16(3, &gPokedexTextGlyphs_Gfx[var1], gGlyphUpperRowBuffer, 0x20);
+            DmaCopy16(3, &gPokedexTextGlyphs_Gfx[0x400 + var1], gGlyphLowerRowBuffer, 0x20);
+            BlitGlyphToTileBuffer(var2, var0, i);
             var0 += var2;
         }
 
         var0 = 0;
     }
 
-    DmaCopy16(3, gUnknown_03000000, (void *)VRAM + 0x5C00, 0x1800);
+    DmaCopy16(3, gTempGfxBuffer, (void *)VRAM + 0x5C00, 0x1800);
 }
 
-void sub_71DC(s32 arg0, s32 arg1, s32 arg2) {
+void BlitGlyphToTileBuffer(s32 arg0, s32 arg1, s32 arg2) {
     int i;
     s32 temp_r2;
 
@@ -1984,79 +1984,79 @@ void sub_71DC(s32 arg0, s32 arg1, s32 arg2) {
         case 0:
             for(i = 0; i < 8; i++)
             {
-                gUnknown_03000000[i * 2 + temp_r2] |= gUnknown_0202BE30[i * 2];
-                gUnknown_03000000[(i * 2 + 1) + temp_r2] |= gUnknown_0202BE30[i * 2 + 1] & 0xFF;
-                gUnknown_03000000[i * 2 + temp_r2 + 0x200] |= gUnknown_0201B130[i * 2];
-                gUnknown_03000000[(i * 2 + 1) + temp_r2 + 0x200] |= gUnknown_0201B130[i * 2 + 1] & 0xFF;
+                gTempGfxBuffer[i * 2 + temp_r2] |= gGlyphUpperRowBuffer[i * 2];
+                gTempGfxBuffer[(i * 2 + 1) + temp_r2] |= gGlyphUpperRowBuffer[i * 2 + 1] & 0xFF;
+                gTempGfxBuffer[i * 2 + temp_r2 + 0x200] |= gGlyphLowerRowBuffer[i * 2];
+                gTempGfxBuffer[(i * 2 + 1) + temp_r2 + 0x200] |= gGlyphLowerRowBuffer[i * 2 + 1] & 0xFF;
             }
             return;
         case 1:
             for(i = 0; i <=7; i++)
             {
-                gUnknown_03000000[i * 2 + temp_r2] |= (gUnknown_0202BE30[i * 2] & 0xFFF) << 4;
-                gUnknown_03000000[(i * 2 + 1) + temp_r2] |= ((gUnknown_0202BE30[i * 2] & 0xF000) >> 0xC) | ((gUnknown_0202BE30[i * 2 + 1] & 0xFF) << 4);
-                gUnknown_03000000[i * 2 + temp_r2 + 0x200] |= (gUnknown_0201B130[i * 2] & 0xFFF) << 4;
-                gUnknown_03000000[(i * 2 + 1) + temp_r2 + 0x200] |= ((gUnknown_0201B130[i * 2] & 0xF000) >> 0xC) | ((gUnknown_0201B130[i * 2 + 1] & 0xFF) << 4);
+                gTempGfxBuffer[i * 2 + temp_r2] |= (gGlyphUpperRowBuffer[i * 2] & 0xFFF) << 4;
+                gTempGfxBuffer[(i * 2 + 1) + temp_r2] |= ((gGlyphUpperRowBuffer[i * 2] & 0xF000) >> 0xC) | ((gGlyphUpperRowBuffer[i * 2 + 1] & 0xFF) << 4);
+                gTempGfxBuffer[i * 2 + temp_r2 + 0x200] |= (gGlyphLowerRowBuffer[i * 2] & 0xFFF) << 4;
+                gTempGfxBuffer[(i * 2 + 1) + temp_r2 + 0x200] |= ((gGlyphLowerRowBuffer[i * 2] & 0xF000) >> 0xC) | ((gGlyphLowerRowBuffer[i * 2 + 1] & 0xFF) << 4);
             }
             return;
         case 2:
             for(i = 0; i <=7; i++)
             {
-                gUnknown_03000000[i * 2 + temp_r2] |= (gUnknown_0202BE30[i * 2] & 0xFF) << 8;
-                gUnknown_03000000[(i * 2 + 1) + temp_r2] |= ((gUnknown_0202BE30[i * 2] & 0xFF00) >> 8) | (gUnknown_0202BE30[i * 2 + 1] & 0xFF) << 8;
-                gUnknown_03000000[i * 2 + temp_r2 + 0x200] |= (gUnknown_0201B130[i * 2] & 0xFF) << 8;
-                gUnknown_03000000[(i * 2 + 1) + temp_r2 + 0x200] |= ((gUnknown_0201B130[i * 2] & 0xFF00) >> 8) | (gUnknown_0201B130[i * 2 + 1] & 0xFF) << 8;
+                gTempGfxBuffer[i * 2 + temp_r2] |= (gGlyphUpperRowBuffer[i * 2] & 0xFF) << 8;
+                gTempGfxBuffer[(i * 2 + 1) + temp_r2] |= ((gGlyphUpperRowBuffer[i * 2] & 0xFF00) >> 8) | (gGlyphUpperRowBuffer[i * 2 + 1] & 0xFF) << 8;
+                gTempGfxBuffer[i * 2 + temp_r2 + 0x200] |= (gGlyphLowerRowBuffer[i * 2] & 0xFF) << 8;
+                gTempGfxBuffer[(i * 2 + 1) + temp_r2 + 0x200] |= ((gGlyphLowerRowBuffer[i * 2] & 0xFF00) >> 8) | (gGlyphLowerRowBuffer[i * 2 + 1] & 0xFF) << 8;
             }
             return;
         case 3:
             for(i = 0; i <=7; i++)
             {
-                gUnknown_03000000[(i * 2) + temp_r2] |= (gUnknown_0202BE30[i * 2] & 0xF) << 0xC;
-                gUnknown_03000000[(i * 2 + 1) + temp_r2] |= ((gUnknown_0202BE30[i * 2] & 0xFFF0) >> 0x4) | ((gUnknown_0202BE30[i * 2 + 1] & 0xF) << 0xC);
-                gUnknown_03000000[(i * 2 + 0x10) + temp_r2] |= (gUnknown_0202BE30[i * 2 + 1] & 0xF0) >> 0x4;
+                gTempGfxBuffer[(i * 2) + temp_r2] |= (gGlyphUpperRowBuffer[i * 2] & 0xF) << 0xC;
+                gTempGfxBuffer[(i * 2 + 1) + temp_r2] |= ((gGlyphUpperRowBuffer[i * 2] & 0xFFF0) >> 0x4) | ((gGlyphUpperRowBuffer[i * 2 + 1] & 0xF) << 0xC);
+                gTempGfxBuffer[(i * 2 + 0x10) + temp_r2] |= (gGlyphUpperRowBuffer[i * 2 + 1] & 0xF0) >> 0x4;
 
-                gUnknown_03000000[(i * 2) + temp_r2 + 0x200] |= (gUnknown_0201B130[i * 2] & 0xF) << 0xC;
-                gUnknown_03000000[(i * 2 + 1) + temp_r2 + 0x200] |= ((gUnknown_0201B130[i * 2] & 0xFFF0) >> 0x4) | ((gUnknown_0201B130[i * 2 + 1] & 0xF) << 0xC);
-                gUnknown_03000000[(i * 2 + 0x10) + temp_r2 + 0x200] |= (gUnknown_0201B130[i * 2 + 1] & 0xF0) >> 0x4;
+                gTempGfxBuffer[(i * 2) + temp_r2 + 0x200] |= (gGlyphLowerRowBuffer[i * 2] & 0xF) << 0xC;
+                gTempGfxBuffer[(i * 2 + 1) + temp_r2 + 0x200] |= ((gGlyphLowerRowBuffer[i * 2] & 0xFFF0) >> 0x4) | ((gGlyphLowerRowBuffer[i * 2 + 1] & 0xF) << 0xC);
+                gTempGfxBuffer[(i * 2 + 0x10) + temp_r2 + 0x200] |= (gGlyphLowerRowBuffer[i * 2 + 1] & 0xF0) >> 0x4;
             }
             return;
         case 4:
             for(i = 0; i <=7; i++)
             {
-                gUnknown_03000000[(i * 2 + 1) + temp_r2] |= gUnknown_0202BE30[i * 2];
-                gUnknown_03000000[(i * 2 + 0x10) + temp_r2] |= gUnknown_0202BE30[i * 2 + 1] & 0xFF;
-                gUnknown_03000000[(i * 2 + 1) + temp_r2 + 0x200] |= gUnknown_0201B130[i * 2];
-                gUnknown_03000000[(i * 2 + 0x10) + temp_r2 + 0x200] |= gUnknown_0201B130[i * 2 + 1] & 0xFF;
+                gTempGfxBuffer[(i * 2 + 1) + temp_r2] |= gGlyphUpperRowBuffer[i * 2];
+                gTempGfxBuffer[(i * 2 + 0x10) + temp_r2] |= gGlyphUpperRowBuffer[i * 2 + 1] & 0xFF;
+                gTempGfxBuffer[(i * 2 + 1) + temp_r2 + 0x200] |= gGlyphLowerRowBuffer[i * 2];
+                gTempGfxBuffer[(i * 2 + 0x10) + temp_r2 + 0x200] |= gGlyphLowerRowBuffer[i * 2 + 1] & 0xFF;
             }
             return;
         case 5:
             for(i = 0; i <=7; i++)
             {
-                gUnknown_03000000[(i * 2 + 1) + temp_r2] |= (gUnknown_0202BE30[i * 2] & 0xFFF) << 4;
-                gUnknown_03000000[(i * 2 + 0x10) + temp_r2] |= ((gUnknown_0202BE30[i * 2] & 0xF000) >> 0xC) | ((gUnknown_0202BE30[i * 2 + 1] & 0xFF) << 4);
-                gUnknown_03000000[(i * 2 + 1) + temp_r2 + 0x200] |= (gUnknown_0201B130[i * 2] & 0xFFF) << 4;
-                gUnknown_03000000[(i * 2 + 0x10) + temp_r2 + 0x200] |= ((gUnknown_0201B130[i * 2] & 0xF000) >> 0xC) | ((gUnknown_0201B130[i * 2 + 1] & 0xFF) << 4);
+                gTempGfxBuffer[(i * 2 + 1) + temp_r2] |= (gGlyphUpperRowBuffer[i * 2] & 0xFFF) << 4;
+                gTempGfxBuffer[(i * 2 + 0x10) + temp_r2] |= ((gGlyphUpperRowBuffer[i * 2] & 0xF000) >> 0xC) | ((gGlyphUpperRowBuffer[i * 2 + 1] & 0xFF) << 4);
+                gTempGfxBuffer[(i * 2 + 1) + temp_r2 + 0x200] |= (gGlyphLowerRowBuffer[i * 2] & 0xFFF) << 4;
+                gTempGfxBuffer[(i * 2 + 0x10) + temp_r2 + 0x200] |= ((gGlyphLowerRowBuffer[i * 2] & 0xF000) >> 0xC) | ((gGlyphLowerRowBuffer[i * 2 + 1] & 0xFF) << 4);
 
             }
             return;
         case 6:
             for(i = 0; i <=7; i++)
             {
-                gUnknown_03000000[(i * 2 + 1) + temp_r2] |= (gUnknown_0202BE30[i * 2] & 0xFF) << 8;
-                gUnknown_03000000[(i * 2 + 0x10) + temp_r2] |= ((gUnknown_0202BE30[i * 2] & 0xFF00) >> 0x8) | ((gUnknown_0202BE30[i * 2 + 1] & 0xFF) << 8);
-                gUnknown_03000000[(i * 2 + 1) + temp_r2 + 0x200] |= (gUnknown_0201B130[i * 2] & 0xFF) << 8;
-                gUnknown_03000000[(i * 2 + 0x10) + temp_r2 + 0x200] |= ((gUnknown_0201B130[i * 2] & 0xFF00) >> 0x8) | ((gUnknown_0201B130[i * 2 + 1] & 0xFF) << 8);
+                gTempGfxBuffer[(i * 2 + 1) + temp_r2] |= (gGlyphUpperRowBuffer[i * 2] & 0xFF) << 8;
+                gTempGfxBuffer[(i * 2 + 0x10) + temp_r2] |= ((gGlyphUpperRowBuffer[i * 2] & 0xFF00) >> 0x8) | ((gGlyphUpperRowBuffer[i * 2 + 1] & 0xFF) << 8);
+                gTempGfxBuffer[(i * 2 + 1) + temp_r2 + 0x200] |= (gGlyphLowerRowBuffer[i * 2] & 0xFF) << 8;
+                gTempGfxBuffer[(i * 2 + 0x10) + temp_r2 + 0x200] |= ((gGlyphLowerRowBuffer[i * 2] & 0xFF00) >> 0x8) | ((gGlyphLowerRowBuffer[i * 2 + 1] & 0xFF) << 8);
             }
             return;
         case 7:
             for(i = 0; i <=7; i++)
             {
-                gUnknown_03000000[(i * 2 + 1) + temp_r2] |= (gUnknown_0202BE30[i * 2] & 0xF) << 0xC;
-                gUnknown_03000000[(i * 2 + 0x10) + temp_r2] |= ((gUnknown_0202BE30[i * 2] & 0xFFF0) >> 0x4) | ((gUnknown_0202BE30[i * 2 + 1] & 0xF) << 0xC);
-                gUnknown_03000000[(i * 2 + 0x11) + temp_r2] |= (gUnknown_0202BE30[i * 2 + 1] & 0xF0) >> 4;
-                gUnknown_03000000[(i * 2 + 1) + temp_r2 + 0x200] |= (gUnknown_0201B130[i * 2] & 0xF) << 0xC;
-                gUnknown_03000000[(i * 2 + 0x10) + temp_r2 + 0x200] |= ((gUnknown_0201B130[i * 2] & 0xFFF0) >> 0x4) | ((gUnknown_0201B130[i * 2 + 1] & 0xF) << 0xC);
-                gUnknown_03000000[(i * 2 + 0x11) + temp_r2 + 0x200] |= (gUnknown_0201B130[i * 2 + 1] & 0xF0) >> 4;
+                gTempGfxBuffer[(i * 2 + 1) + temp_r2] |= (gGlyphUpperRowBuffer[i * 2] & 0xF) << 0xC;
+                gTempGfxBuffer[(i * 2 + 0x10) + temp_r2] |= ((gGlyphUpperRowBuffer[i * 2] & 0xFFF0) >> 0x4) | ((gGlyphUpperRowBuffer[i * 2 + 1] & 0xF) << 0xC);
+                gTempGfxBuffer[(i * 2 + 0x11) + temp_r2] |= (gGlyphUpperRowBuffer[i * 2 + 1] & 0xF0) >> 4;
+                gTempGfxBuffer[(i * 2 + 1) + temp_r2 + 0x200] |= (gGlyphLowerRowBuffer[i * 2] & 0xF) << 0xC;
+                gTempGfxBuffer[(i * 2 + 0x10) + temp_r2 + 0x200] |= ((gGlyphLowerRowBuffer[i * 2] & 0xFFF0) >> 0x4) | ((gGlyphLowerRowBuffer[i * 2 + 1] & 0xF) << 0xC);
+                gTempGfxBuffer[(i * 2 + 0x11) + temp_r2 + 0x200] |= (gGlyphLowerRowBuffer[i * 2 + 1] & 0xF0) >> 4;
 
             }
             return;
@@ -2069,80 +2069,80 @@ void sub_71DC(s32 arg0, s32 arg1, s32 arg2) {
         case 0:
             for(i = 0; i <=7; i++)
             {
-                gUnknown_03000000[i * 2 + temp_r2] |= gUnknown_0202BE30[i * 2];
-                gUnknown_03000000[(i * 2 + 1) + temp_r2] |= gUnknown_0202BE30[i * 2 + 1] & 0xF;
-                gUnknown_03000000[i * 2 + temp_r2 + 0x200] |= gUnknown_0201B130[i * 2];
-                gUnknown_03000000[(i * 2 + 1) + temp_r2 + 0x200] |= gUnknown_0201B130[i * 2 + 1] & 0xF;
+                gTempGfxBuffer[i * 2 + temp_r2] |= gGlyphUpperRowBuffer[i * 2];
+                gTempGfxBuffer[(i * 2 + 1) + temp_r2] |= gGlyphUpperRowBuffer[i * 2 + 1] & 0xF;
+                gTempGfxBuffer[i * 2 + temp_r2 + 0x200] |= gGlyphLowerRowBuffer[i * 2];
+                gTempGfxBuffer[(i * 2 + 1) + temp_r2 + 0x200] |= gGlyphLowerRowBuffer[i * 2 + 1] & 0xF;
 
             }
             return;
         case 1:
             for(i = 0; i <=7; i++)
             {
-                gUnknown_03000000[i * 2 + temp_r2] |= (gUnknown_0202BE30[i * 2] & 0xFFF) << 4;
-                gUnknown_03000000[(i * 2 + 1) + temp_r2] |= ((gUnknown_0202BE30[i * 2] & 0xF000) >> 0xC) | ((gUnknown_0202BE30[i * 2 + 1] & 0xF) << 4);
-                gUnknown_03000000[i * 2 + temp_r2 + 0x200] |= (gUnknown_0201B130[i * 2] & 0xFFF) << 4;
-                gUnknown_03000000[(i * 2 + 1) + temp_r2 + 0x200] |= ((gUnknown_0201B130[i * 2] & 0xF000) >> 0xC) | ((gUnknown_0201B130[i * 2 + 1] & 0xF) << 4);
+                gTempGfxBuffer[i * 2 + temp_r2] |= (gGlyphUpperRowBuffer[i * 2] & 0xFFF) << 4;
+                gTempGfxBuffer[(i * 2 + 1) + temp_r2] |= ((gGlyphUpperRowBuffer[i * 2] & 0xF000) >> 0xC) | ((gGlyphUpperRowBuffer[i * 2 + 1] & 0xF) << 4);
+                gTempGfxBuffer[i * 2 + temp_r2 + 0x200] |= (gGlyphLowerRowBuffer[i * 2] & 0xFFF) << 4;
+                gTempGfxBuffer[(i * 2 + 1) + temp_r2 + 0x200] |= ((gGlyphLowerRowBuffer[i * 2] & 0xF000) >> 0xC) | ((gGlyphLowerRowBuffer[i * 2 + 1] & 0xF) << 4);
 
             }
             return;
         case 2:
             for(i = 0; i <=7; i++)
             {
-                gUnknown_03000000[i * 2 + temp_r2] |= (gUnknown_0202BE30[i * 2] & 0xFF) << 8;
-                gUnknown_03000000[(i * 2 + 1) + temp_r2] |= ((gUnknown_0202BE30[i * 2] & 0xFF00) >> 0x8) | ((gUnknown_0202BE30[i * 2 + 1] & 0xF) << 8);
-                gUnknown_03000000[i * 2 + temp_r2 + 0x200] |= (gUnknown_0201B130[i * 2] & 0xFF) << 8;
-                gUnknown_03000000[(i * 2 + 1) + temp_r2 + 0x200] |= ((gUnknown_0201B130[i * 2] & 0xFF00) >> 0x8) | ((gUnknown_0201B130[i * 2 + 1] & 0xF) << 8);
+                gTempGfxBuffer[i * 2 + temp_r2] |= (gGlyphUpperRowBuffer[i * 2] & 0xFF) << 8;
+                gTempGfxBuffer[(i * 2 + 1) + temp_r2] |= ((gGlyphUpperRowBuffer[i * 2] & 0xFF00) >> 0x8) | ((gGlyphUpperRowBuffer[i * 2 + 1] & 0xF) << 8);
+                gTempGfxBuffer[i * 2 + temp_r2 + 0x200] |= (gGlyphLowerRowBuffer[i * 2] & 0xFF) << 8;
+                gTempGfxBuffer[(i * 2 + 1) + temp_r2 + 0x200] |= ((gGlyphLowerRowBuffer[i * 2] & 0xFF00) >> 0x8) | ((gGlyphLowerRowBuffer[i * 2 + 1] & 0xF) << 8);
 
             }
             return;
         case 3:
             for(i = 0; i <=7; i++)
             {
-                gUnknown_03000000[i * 2 + temp_r2] |= (gUnknown_0202BE30[i * 2] & 0xF) << 0xC;
-                gUnknown_03000000[(i * 2 + 1) + temp_r2] |= ((gUnknown_0202BE30[i * 2] & 0xFFF0) >> 0x4) | ((gUnknown_0202BE30[i * 2 + 1] & 0xF) << 0xC);
-                gUnknown_03000000[i * 2 + temp_r2 + 0x200] |= (gUnknown_0201B130[i * 2] & 0xF) << 0xC;
-                gUnknown_03000000[(i * 2 + 1) + temp_r2 + 0x200] |= ((gUnknown_0201B130[i * 2] & 0xFFF0) >> 0x4) | ((gUnknown_0201B130[i * 2 + 1] & 0xF) << 0xC);
+                gTempGfxBuffer[i * 2 + temp_r2] |= (gGlyphUpperRowBuffer[i * 2] & 0xF) << 0xC;
+                gTempGfxBuffer[(i * 2 + 1) + temp_r2] |= ((gGlyphUpperRowBuffer[i * 2] & 0xFFF0) >> 0x4) | ((gGlyphUpperRowBuffer[i * 2 + 1] & 0xF) << 0xC);
+                gTempGfxBuffer[i * 2 + temp_r2 + 0x200] |= (gGlyphLowerRowBuffer[i * 2] & 0xF) << 0xC;
+                gTempGfxBuffer[(i * 2 + 1) + temp_r2 + 0x200] |= ((gGlyphLowerRowBuffer[i * 2] & 0xFFF0) >> 0x4) | ((gGlyphLowerRowBuffer[i * 2 + 1] & 0xF) << 0xC);
 
             }
             return;
         case 4:
             for(i = 0; i <=7; i++)
             {
-                gUnknown_03000000[(i * 2 + 1) + temp_r2] |= gUnknown_0202BE30[i * 2];
-                gUnknown_03000000[(i * 2 + 0x10) + temp_r2] |= gUnknown_0202BE30[i * 2 + 1] & 0xF;
-                gUnknown_03000000[(i * 2 + 1) + temp_r2 + 0x200] |= gUnknown_0201B130[i * 2];
-                gUnknown_03000000[(i * 2 + 0x10) + temp_r2 + 0x200] |= gUnknown_0201B130[i * 2 + 1] & 0xF;
+                gTempGfxBuffer[(i * 2 + 1) + temp_r2] |= gGlyphUpperRowBuffer[i * 2];
+                gTempGfxBuffer[(i * 2 + 0x10) + temp_r2] |= gGlyphUpperRowBuffer[i * 2 + 1] & 0xF;
+                gTempGfxBuffer[(i * 2 + 1) + temp_r2 + 0x200] |= gGlyphLowerRowBuffer[i * 2];
+                gTempGfxBuffer[(i * 2 + 0x10) + temp_r2 + 0x200] |= gGlyphLowerRowBuffer[i * 2 + 1] & 0xF;
 
             }
             return;
         case 5:
            for(i = 0; i <=7; i++)
             {
-                gUnknown_03000000[(i * 2 + 0x1) + temp_r2] |= (gUnknown_0202BE30[i * 2] & 0xFFF) << 4;
-                gUnknown_03000000[(i * 2 + 0x10) + temp_r2] |= ((gUnknown_0202BE30[i * 2] & 0xF000) >> 0xC) | ((gUnknown_0202BE30[i * 2 + 1] & 0xF) << 4);
-                gUnknown_03000000[(i * 2 + 0x1) + temp_r2 + 0x200] |= (gUnknown_0201B130[i * 2] & 0xFFF) << 4;
-                gUnknown_03000000[(i * 2 + 0x10) + temp_r2 + 0x200] |= ((gUnknown_0201B130[i * 2] & 0xF000) >> 0xC) | ((gUnknown_0201B130[i * 2 + 1] & 0xF) << 4);
+                gTempGfxBuffer[(i * 2 + 0x1) + temp_r2] |= (gGlyphUpperRowBuffer[i * 2] & 0xFFF) << 4;
+                gTempGfxBuffer[(i * 2 + 0x10) + temp_r2] |= ((gGlyphUpperRowBuffer[i * 2] & 0xF000) >> 0xC) | ((gGlyphUpperRowBuffer[i * 2 + 1] & 0xF) << 4);
+                gTempGfxBuffer[(i * 2 + 0x1) + temp_r2 + 0x200] |= (gGlyphLowerRowBuffer[i * 2] & 0xFFF) << 4;
+                gTempGfxBuffer[(i * 2 + 0x10) + temp_r2 + 0x200] |= ((gGlyphLowerRowBuffer[i * 2] & 0xF000) >> 0xC) | ((gGlyphLowerRowBuffer[i * 2 + 1] & 0xF) << 4);
 
             }
             return;
         case 6:
             for(i = 0; i <=7; i++)
             {
-                gUnknown_03000000[(i * 2 + 0x1) + temp_r2] |= (gUnknown_0202BE30[i * 2] & 0xFF) << 8;
-                gUnknown_03000000[(i * 2 + 0x10) + temp_r2] |= ((gUnknown_0202BE30[i * 2] & 0xFF00) >> 8) | ((gUnknown_0202BE30[i * 2 + 1] & 0xF) << 8);
-                gUnknown_03000000[(i * 2 + 0x1) + temp_r2 + 0x200] |= (gUnknown_0201B130[i * 2] & 0xFF) << 8;
-                gUnknown_03000000[(i * 2 + 0x10) + temp_r2 + 0x200] |= ((gUnknown_0201B130[i * 2] & 0xFF00) >> 0x8) | ((gUnknown_0201B130[i * 2 + 1] & 0xF) << 8);
+                gTempGfxBuffer[(i * 2 + 0x1) + temp_r2] |= (gGlyphUpperRowBuffer[i * 2] & 0xFF) << 8;
+                gTempGfxBuffer[(i * 2 + 0x10) + temp_r2] |= ((gGlyphUpperRowBuffer[i * 2] & 0xFF00) >> 8) | ((gGlyphUpperRowBuffer[i * 2 + 1] & 0xF) << 8);
+                gTempGfxBuffer[(i * 2 + 0x1) + temp_r2 + 0x200] |= (gGlyphLowerRowBuffer[i * 2] & 0xFF) << 8;
+                gTempGfxBuffer[(i * 2 + 0x10) + temp_r2 + 0x200] |= ((gGlyphLowerRowBuffer[i * 2] & 0xFF00) >> 0x8) | ((gGlyphLowerRowBuffer[i * 2 + 1] & 0xF) << 8);
 
             }
             return;
         case 7:
             for(i = 0; i <=7; i++)
             {
-                gUnknown_03000000[(i * 2 + 1) + temp_r2] |= (gUnknown_0202BE30[i * 2] & 0xF) << 0xC;
-                gUnknown_03000000[(i * 2 + 0x10) + temp_r2] |= ((gUnknown_0202BE30[i * 2] & 0xFFF0) >> 4) | ((gUnknown_0202BE30[i * 2 + 1] & 0xF) << 0xC);
-                gUnknown_03000000[(i * 2 + 1) + temp_r2 + 0x200] |= (gUnknown_0201B130[i * 2] & 0xF) << 0xC;
-                gUnknown_03000000[(i * 2 + 0x10) + temp_r2 + 0x200] |= ((gUnknown_0201B130[i * 2] & 0xFFF0) >> 4) | ((gUnknown_0201B130[i * 2 + 1] & 0xF) << 0xC);
+                gTempGfxBuffer[(i * 2 + 1) + temp_r2] |= (gGlyphUpperRowBuffer[i * 2] & 0xF) << 0xC;
+                gTempGfxBuffer[(i * 2 + 0x10) + temp_r2] |= ((gGlyphUpperRowBuffer[i * 2] & 0xFFF0) >> 4) | ((gGlyphUpperRowBuffer[i * 2 + 1] & 0xF) << 0xC);
+                gTempGfxBuffer[(i * 2 + 1) + temp_r2 + 0x200] |= (gGlyphLowerRowBuffer[i * 2] & 0xF) << 0xC;
+                gTempGfxBuffer[(i * 2 + 0x10) + temp_r2 + 0x200] |= ((gGlyphLowerRowBuffer[i * 2] & 0xFFF0) >> 4) | ((gGlyphLowerRowBuffer[i * 2 + 1] & 0xF) << 0xC);
 
             }
             return;
@@ -2153,69 +2153,69 @@ void sub_71DC(s32 arg0, s32 arg1, s32 arg2) {
         case 0:
             for(i = 0; i <=7; i++)
             {
-                gUnknown_03000000[(i * 2) + temp_r2] |= gUnknown_0202BE30[i * 2];
-                gUnknown_03000000[(i * 2) + temp_r2 + 0x200] |= gUnknown_0201B130[i * 2];
+                gTempGfxBuffer[(i * 2) + temp_r2] |= gGlyphUpperRowBuffer[i * 2];
+                gTempGfxBuffer[(i * 2) + temp_r2 + 0x200] |= gGlyphLowerRowBuffer[i * 2];
             }
             return;
         case 1:
            for(i = 0; i <=7; i++)
             {
-                gUnknown_03000000[(i * 2) + temp_r2] |= (gUnknown_0202BE30[i * 2] & 0xFFF) << 4;
-                gUnknown_03000000[(i * 2 + 0x1) + temp_r2] |= (gUnknown_0202BE30[i * 2] & 0xF000) >> 0xC;
-                gUnknown_03000000[(i * 2) + temp_r2 + 0x200] |= (gUnknown_0201B130[i * 2] & 0xFFF) << 4;
-                gUnknown_03000000[(i * 2 + 0x1) + temp_r2 + 0x200] |= (gUnknown_0201B130[i * 2] & 0xF000) >> 0xC;
+                gTempGfxBuffer[(i * 2) + temp_r2] |= (gGlyphUpperRowBuffer[i * 2] & 0xFFF) << 4;
+                gTempGfxBuffer[(i * 2 + 0x1) + temp_r2] |= (gGlyphUpperRowBuffer[i * 2] & 0xF000) >> 0xC;
+                gTempGfxBuffer[(i * 2) + temp_r2 + 0x200] |= (gGlyphLowerRowBuffer[i * 2] & 0xFFF) << 4;
+                gTempGfxBuffer[(i * 2 + 0x1) + temp_r2 + 0x200] |= (gGlyphLowerRowBuffer[i * 2] & 0xF000) >> 0xC;
             }
             return;
         case 2:
             for(i = 0; i <=7; i++)
             {
-                gUnknown_03000000[(i * 2) + temp_r2] |= (gUnknown_0202BE30[i * 2] & 0xFF) << 8;
-                gUnknown_03000000[(i * 2 + 0x1) + temp_r2] |= (gUnknown_0202BE30[i * 2] & 0xFF00) >> 8;
-                gUnknown_03000000[(i * 2) + temp_r2 + 0x200] |= (gUnknown_0201B130[i * 2] & 0xFF) << 8;
-                gUnknown_03000000[(i * 2 + 0x1) + temp_r2 + 0x200] |= (gUnknown_0201B130[i * 2] & 0xFF00) >> 8;
+                gTempGfxBuffer[(i * 2) + temp_r2] |= (gGlyphUpperRowBuffer[i * 2] & 0xFF) << 8;
+                gTempGfxBuffer[(i * 2 + 0x1) + temp_r2] |= (gGlyphUpperRowBuffer[i * 2] & 0xFF00) >> 8;
+                gTempGfxBuffer[(i * 2) + temp_r2 + 0x200] |= (gGlyphLowerRowBuffer[i * 2] & 0xFF) << 8;
+                gTempGfxBuffer[(i * 2 + 0x1) + temp_r2 + 0x200] |= (gGlyphLowerRowBuffer[i * 2] & 0xFF00) >> 8;
             }
             return;
         case 3:
             for(i = 0; i <=7; i++)
             {
-                gUnknown_03000000[(i * 2) + temp_r2] |= (gUnknown_0202BE30[i * 2] & 0xF) << 0xC;
-                gUnknown_03000000[(i * 2 + 0x1) + temp_r2] |= (gUnknown_0202BE30[i * 2] & 0xFFF0) >> 4;
-                gUnknown_03000000[(i * 2) + temp_r2 + 0x200] |= (gUnknown_0201B130[i * 2] & 0xF) << 0xC;
-                gUnknown_03000000[(i * 2 + 0x1) + temp_r2 + 0x200] |= (gUnknown_0201B130[i * 2] & 0xFFF0) >> 4;
+                gTempGfxBuffer[(i * 2) + temp_r2] |= (gGlyphUpperRowBuffer[i * 2] & 0xF) << 0xC;
+                gTempGfxBuffer[(i * 2 + 0x1) + temp_r2] |= (gGlyphUpperRowBuffer[i * 2] & 0xFFF0) >> 4;
+                gTempGfxBuffer[(i * 2) + temp_r2 + 0x200] |= (gGlyphLowerRowBuffer[i * 2] & 0xF) << 0xC;
+                gTempGfxBuffer[(i * 2 + 0x1) + temp_r2 + 0x200] |= (gGlyphLowerRowBuffer[i * 2] & 0xFFF0) >> 4;
             }
             return;
         case 4:
             for(i = 0; i <=7; i++)
             {
-                gUnknown_03000000[(i * 2 + 1) + temp_r2] |= gUnknown_0202BE30[i * 2];
-                gUnknown_03000000[(i * 2 + 1) + temp_r2 + 0x200] |= gUnknown_0201B130[i * 2];
+                gTempGfxBuffer[(i * 2 + 1) + temp_r2] |= gGlyphUpperRowBuffer[i * 2];
+                gTempGfxBuffer[(i * 2 + 1) + temp_r2 + 0x200] |= gGlyphLowerRowBuffer[i * 2];
             }
             return;
         case 5:
             for(i = 0; i <=7; i++)
             {
-                gUnknown_03000000[(i * 2 + 0x1) + temp_r2] |= (gUnknown_0202BE30[i * 2] & 0xFFF) << 4;
-                gUnknown_03000000[(i * 2 + 0x10) + temp_r2] |= (gUnknown_0202BE30[i * 2] & 0xF000) >> 0xC;
-                gUnknown_03000000[(i * 2 + 0x1) + temp_r2 + 0x200] |= (gUnknown_0201B130[i * 2] & 0xFFF) << 4;
-                gUnknown_03000000[(i * 2 + 0x10) + temp_r2 + 0x200] |= (gUnknown_0201B130[i * 2] & 0xF000) >> 0xC;
+                gTempGfxBuffer[(i * 2 + 0x1) + temp_r2] |= (gGlyphUpperRowBuffer[i * 2] & 0xFFF) << 4;
+                gTempGfxBuffer[(i * 2 + 0x10) + temp_r2] |= (gGlyphUpperRowBuffer[i * 2] & 0xF000) >> 0xC;
+                gTempGfxBuffer[(i * 2 + 0x1) + temp_r2 + 0x200] |= (gGlyphLowerRowBuffer[i * 2] & 0xFFF) << 4;
+                gTempGfxBuffer[(i * 2 + 0x10) + temp_r2 + 0x200] |= (gGlyphLowerRowBuffer[i * 2] & 0xF000) >> 0xC;
             }
             return;
         case 6:
             for(i = 0; i <=7; i++)
             {
-                gUnknown_03000000[(i * 2 + 0x1) + temp_r2] |= (gUnknown_0202BE30[i * 2] & 0xFF) << 8;
-                gUnknown_03000000[(i * 2 + 0x10) + temp_r2] |= (gUnknown_0202BE30[i * 2] & 0xFF00) >> 8;
-                gUnknown_03000000[(i * 2 + 0x1) + temp_r2 + 0x200] |= (gUnknown_0201B130[i * 2] & 0xFF) << 8;
-                gUnknown_03000000[(i * 2 + 0x10) + temp_r2 + 0x200] |= (gUnknown_0201B130[i * 2] & 0xFF00) >> 8;
+                gTempGfxBuffer[(i * 2 + 0x1) + temp_r2] |= (gGlyphUpperRowBuffer[i * 2] & 0xFF) << 8;
+                gTempGfxBuffer[(i * 2 + 0x10) + temp_r2] |= (gGlyphUpperRowBuffer[i * 2] & 0xFF00) >> 8;
+                gTempGfxBuffer[(i * 2 + 0x1) + temp_r2 + 0x200] |= (gGlyphLowerRowBuffer[i * 2] & 0xFF) << 8;
+                gTempGfxBuffer[(i * 2 + 0x10) + temp_r2 + 0x200] |= (gGlyphLowerRowBuffer[i * 2] & 0xFF00) >> 8;
             }
             return;
         case 7:
             for(i = 0; i <=7; i++)
             {
-                gUnknown_03000000[(i * 2 + 0x1) + temp_r2] |= (gUnknown_0202BE30[i * 2] & 0xF) << 0xC;
-                gUnknown_03000000[(i * 2 + 0x10) + temp_r2] |= (gUnknown_0202BE30[i * 2] & 0xFFF0) >> 4;
-                gUnknown_03000000[(i * 2 + 0x1) + temp_r2 + 0x200] |= (gUnknown_0201B130[i * 2] & 0xF) << 0xC;
-                gUnknown_03000000[(i * 2 + 0x10) + temp_r2 + 0x200] |= (gUnknown_0201B130[i * 2] & 0xFFF0) >> 4;
+                gTempGfxBuffer[(i * 2 + 0x1) + temp_r2] |= (gGlyphUpperRowBuffer[i * 2] & 0xF) << 0xC;
+                gTempGfxBuffer[(i * 2 + 0x10) + temp_r2] |= (gGlyphUpperRowBuffer[i * 2] & 0xFFF0) >> 4;
+                gTempGfxBuffer[(i * 2 + 0x1) + temp_r2 + 0x200] |= (gGlyphLowerRowBuffer[i * 2] & 0xF) << 0xC;
+                gTempGfxBuffer[(i * 2 + 0x10) + temp_r2 + 0x200] |= (gGlyphLowerRowBuffer[i * 2] & 0xFFF0) >> 4;
             }
             return;
         }
@@ -2225,65 +2225,65 @@ void sub_71DC(s32 arg0, s32 arg1, s32 arg2) {
         case 0:
             for(i = 0; i <=7; i++)
             {
-                gUnknown_03000000[(i * 2) + temp_r2] |= (gUnknown_0202BE30[i * 2] & 0xFFF);
-                gUnknown_03000000[(i * 2) + temp_r2 + 0x200] |= (gUnknown_0201B130[i * 2] & 0xFFF);
+                gTempGfxBuffer[(i * 2) + temp_r2] |= (gGlyphUpperRowBuffer[i * 2] & 0xFFF);
+                gTempGfxBuffer[(i * 2) + temp_r2 + 0x200] |= (gGlyphLowerRowBuffer[i * 2] & 0xFFF);
             }
             return;
         case 1:
             for(i = 0; i <=7; i++)
             {
-                gUnknown_03000000[(i * 2) + temp_r2] |= (gUnknown_0202BE30[i * 2] & 0xFFF) << 4;
-                gUnknown_03000000[(i * 2) + temp_r2 + 0x200] |= (gUnknown_0201B130[i * 2] & 0xFFF) << 4;
+                gTempGfxBuffer[(i * 2) + temp_r2] |= (gGlyphUpperRowBuffer[i * 2] & 0xFFF) << 4;
+                gTempGfxBuffer[(i * 2) + temp_r2 + 0x200] |= (gGlyphLowerRowBuffer[i * 2] & 0xFFF) << 4;
             }
             return;
         case 2:
             for(i = 0; i <=7; i++)
             {
-                gUnknown_03000000[(i * 2) + temp_r2] |= (gUnknown_0202BE30[i * 2] & 0xFF) << 8;
-                gUnknown_03000000[(i * 2 + 0x1) + temp_r2] |= (gUnknown_0202BE30[i * 2] & 0xF00) >> 8;
-                gUnknown_03000000[(i * 2) + temp_r2 + 0x200] |= (gUnknown_0201B130[i * 2] & 0xFF) << 8;
-                gUnknown_03000000[(i * 2 + 0x1) + temp_r2 + 0x200] |= (gUnknown_0201B130[i * 2] & 0xF00) >> 8;
+                gTempGfxBuffer[(i * 2) + temp_r2] |= (gGlyphUpperRowBuffer[i * 2] & 0xFF) << 8;
+                gTempGfxBuffer[(i * 2 + 0x1) + temp_r2] |= (gGlyphUpperRowBuffer[i * 2] & 0xF00) >> 8;
+                gTempGfxBuffer[(i * 2) + temp_r2 + 0x200] |= (gGlyphLowerRowBuffer[i * 2] & 0xFF) << 8;
+                gTempGfxBuffer[(i * 2 + 0x1) + temp_r2 + 0x200] |= (gGlyphLowerRowBuffer[i * 2] & 0xF00) >> 8;
             }
             return;
         case 3:
             for(i = 0; i <=7; i++)
             {
-                gUnknown_03000000[(i * 2) + temp_r2] |= (gUnknown_0202BE30[i * 2] & 0xF) << 0xC;
-                gUnknown_03000000[(i * 2 + 0x1) + temp_r2] |= (gUnknown_0202BE30[i * 2] & 0xFF0) >> 4;
-                gUnknown_03000000[(i * 2) + temp_r2 + 0x200] |= (gUnknown_0201B130[i * 2] & 0xF) << 0xC;
-                gUnknown_03000000[(i * 2 + 0x1) + temp_r2 + 0x200] |= (gUnknown_0201B130[i * 2] & 0xFF0) >> 4;
+                gTempGfxBuffer[(i * 2) + temp_r2] |= (gGlyphUpperRowBuffer[i * 2] & 0xF) << 0xC;
+                gTempGfxBuffer[(i * 2 + 0x1) + temp_r2] |= (gGlyphUpperRowBuffer[i * 2] & 0xFF0) >> 4;
+                gTempGfxBuffer[(i * 2) + temp_r2 + 0x200] |= (gGlyphLowerRowBuffer[i * 2] & 0xF) << 0xC;
+                gTempGfxBuffer[(i * 2 + 0x1) + temp_r2 + 0x200] |= (gGlyphLowerRowBuffer[i * 2] & 0xFF0) >> 4;
             }
             return;
         case 4:
             for(i = 0; i <=7; i++)
             {
-                gUnknown_03000000[(i * 2 + 1) + temp_r2] |= (gUnknown_0202BE30[i * 2] & 0xFFF);
-                gUnknown_03000000[(i * 2 + 1) + temp_r2 + 0x200] |= (gUnknown_0201B130[i * 2] & 0xFFF);
+                gTempGfxBuffer[(i * 2 + 1) + temp_r2] |= (gGlyphUpperRowBuffer[i * 2] & 0xFFF);
+                gTempGfxBuffer[(i * 2 + 1) + temp_r2 + 0x200] |= (gGlyphLowerRowBuffer[i * 2] & 0xFFF);
             }
             return;
         case 5:
             for(i = 0; i <=7; i++)
             {
-                gUnknown_03000000[(i * 2 + 1) + temp_r2] |= (gUnknown_0202BE30[i * 2] & 0xFFF) << 4;
-                gUnknown_03000000[(i * 2 + 1) + temp_r2 + 0x200] |= (gUnknown_0201B130[i * 2] & 0xFFF) << 4;
+                gTempGfxBuffer[(i * 2 + 1) + temp_r2] |= (gGlyphUpperRowBuffer[i * 2] & 0xFFF) << 4;
+                gTempGfxBuffer[(i * 2 + 1) + temp_r2 + 0x200] |= (gGlyphLowerRowBuffer[i * 2] & 0xFFF) << 4;
             }
             return;
         case 6:
             for(i = 0; i <=7; i++)
             {
-                gUnknown_03000000[(i * 2 + 1) + temp_r2] |= (gUnknown_0202BE30[i * 2] & 0xFF) << 8;
-                gUnknown_03000000[(i * 2 + 0x10) + temp_r2] |= (gUnknown_0202BE30[i * 2] & 0xF00) >> 8;
-                gUnknown_03000000[(i * 2 + 1) + temp_r2 + 0x200] |= (gUnknown_0201B130[i * 2] & 0xFF) << 8;
-                gUnknown_03000000[(i * 2 + 0x10) + temp_r2 + 0x200] |= (gUnknown_0201B130[i * 2] & 0xF00) >> 8;
+                gTempGfxBuffer[(i * 2 + 1) + temp_r2] |= (gGlyphUpperRowBuffer[i * 2] & 0xFF) << 8;
+                gTempGfxBuffer[(i * 2 + 0x10) + temp_r2] |= (gGlyphUpperRowBuffer[i * 2] & 0xF00) >> 8;
+                gTempGfxBuffer[(i * 2 + 1) + temp_r2 + 0x200] |= (gGlyphLowerRowBuffer[i * 2] & 0xFF) << 8;
+                gTempGfxBuffer[(i * 2 + 0x10) + temp_r2 + 0x200] |= (gGlyphLowerRowBuffer[i * 2] & 0xF00) >> 8;
             }
             return;
         case 7:
             for(i = 0; i <=7; i++)
             {
-                gUnknown_03000000[(i * 2 + 1) + temp_r2] |= (gUnknown_0202BE30[i * 2] & 0xF) << 0xC;
-                gUnknown_03000000[(i * 2 + 0x10) + temp_r2] |= (gUnknown_0202BE30[i * 2] & 0xFF0) >> 4;
-                gUnknown_03000000[(i * 2 + 1) + temp_r2 + 0x200] |= (gUnknown_0201B130[i * 2] & 0xF) << 0xC;
-                gUnknown_03000000[(i * 2 + 0x10) + temp_r2 + 0x200] |= (gUnknown_0201B130[i * 2] & 0xFF0) >> 4;
+                gTempGfxBuffer[(i * 2 + 1) + temp_r2] |= (gGlyphUpperRowBuffer[i * 2] & 0xF) << 0xC;
+                gTempGfxBuffer[(i * 2 + 0x10) + temp_r2] |= (gGlyphUpperRowBuffer[i * 2] & 0xFF0) >> 4;
+                gTempGfxBuffer[(i * 2 + 1) + temp_r2 + 0x200] |= (gGlyphLowerRowBuffer[i * 2] & 0xF) << 0xC;
+                gTempGfxBuffer[(i * 2 + 0x10) + temp_r2 + 0x200] |= (gGlyphLowerRowBuffer[i * 2] & 0xFF0) >> 4;
             }
             return;
         }
@@ -2293,61 +2293,61 @@ void sub_71DC(s32 arg0, s32 arg1, s32 arg2) {
         case 0:
             for(i = 0; i <=7; i++)
             {
-                gUnknown_03000000[i * 2 + temp_r2] |= (gUnknown_0202BE30[i * 2] & 0xFF);
-                gUnknown_03000000[i * 2 + temp_r2 + 0x200] |= (gUnknown_0201B130[i * 2] & 0xFF);
+                gTempGfxBuffer[i * 2 + temp_r2] |= (gGlyphUpperRowBuffer[i * 2] & 0xFF);
+                gTempGfxBuffer[i * 2 + temp_r2 + 0x200] |= (gGlyphLowerRowBuffer[i * 2] & 0xFF);
             }
             return;
         case 1:
             for(i = 0; i <=7; i++)
             {
-                gUnknown_03000000[i * 2 + temp_r2] |= (gUnknown_0202BE30[i * 2] & 0xFF) << 4;
-                gUnknown_03000000[i * 2 + temp_r2 + 0x200] |= (gUnknown_0201B130[i * 2] & 0xFF) << 4;
+                gTempGfxBuffer[i * 2 + temp_r2] |= (gGlyphUpperRowBuffer[i * 2] & 0xFF) << 4;
+                gTempGfxBuffer[i * 2 + temp_r2 + 0x200] |= (gGlyphLowerRowBuffer[i * 2] & 0xFF) << 4;
             }
             return;
         case 2:
             for(i = 0; i <=7; i++)
             {
-                gUnknown_03000000[i * 2 + temp_r2] |= (gUnknown_0202BE30[i * 2] & 0xFF) << 8;
-                gUnknown_03000000[i * 2 + temp_r2 + 0x200] |= (gUnknown_0201B130[i * 2] & 0xFF) << 8;
+                gTempGfxBuffer[i * 2 + temp_r2] |= (gGlyphUpperRowBuffer[i * 2] & 0xFF) << 8;
+                gTempGfxBuffer[i * 2 + temp_r2 + 0x200] |= (gGlyphLowerRowBuffer[i * 2] & 0xFF) << 8;
             }
             return;
         case 3:
             for(i = 0; i <=7; i++)
             {
-                gUnknown_03000000[i * 2 + temp_r2] |= (gUnknown_0202BE30[i * 2] & 0xF) << 0xC;
-                gUnknown_03000000[(i * 2 + 1) + temp_r2] |= (gUnknown_0202BE30[i * 2] & 0xF0) >> 4;
-                gUnknown_03000000[i * 2 + temp_r2 + 0x200] |= (gUnknown_0201B130[i * 2] & 0xF) << 0xC;
-                gUnknown_03000000[(i * 2 + 1) + temp_r2 + 0x200] |= (gUnknown_0201B130[i * 2] & 0xF0) >> 4;
+                gTempGfxBuffer[i * 2 + temp_r2] |= (gGlyphUpperRowBuffer[i * 2] & 0xF) << 0xC;
+                gTempGfxBuffer[(i * 2 + 1) + temp_r2] |= (gGlyphUpperRowBuffer[i * 2] & 0xF0) >> 4;
+                gTempGfxBuffer[i * 2 + temp_r2 + 0x200] |= (gGlyphLowerRowBuffer[i * 2] & 0xF) << 0xC;
+                gTempGfxBuffer[(i * 2 + 1) + temp_r2 + 0x200] |= (gGlyphLowerRowBuffer[i * 2] & 0xF0) >> 4;
             }
             return;
         case 4:
             for(i = 0; i <=7; i++)
             {
-                gUnknown_03000000[(i * 2 + 1) + temp_r2] |= (gUnknown_0202BE30[i * 2] & 0xFF);
-                gUnknown_03000000[(i * 2 + 1) + temp_r2 + 0x200] |= (gUnknown_0201B130[i * 2] & 0xFF);
+                gTempGfxBuffer[(i * 2 + 1) + temp_r2] |= (gGlyphUpperRowBuffer[i * 2] & 0xFF);
+                gTempGfxBuffer[(i * 2 + 1) + temp_r2 + 0x200] |= (gGlyphLowerRowBuffer[i * 2] & 0xFF);
             }
             return;
         case 5:
             for(i = 0; i <=7; i++)
             {
-                gUnknown_03000000[(i * 2 + 1) + temp_r2] |= (gUnknown_0202BE30[i * 2] & 0xFF) << 0x4;
-                gUnknown_03000000[(i * 2 + 1) + temp_r2 + 0x200] |= (gUnknown_0201B130[i * 2] & 0xFF) << 0x4;
+                gTempGfxBuffer[(i * 2 + 1) + temp_r2] |= (gGlyphUpperRowBuffer[i * 2] & 0xFF) << 0x4;
+                gTempGfxBuffer[(i * 2 + 1) + temp_r2 + 0x200] |= (gGlyphLowerRowBuffer[i * 2] & 0xFF) << 0x4;
             }
             return;
         case 6:
             for(i = 0; i <=7; i++)
             {
-                gUnknown_03000000[(i * 2 + 1) + temp_r2] |= (gUnknown_0202BE30[i * 2] & 0xFF) << 0x8;
-                gUnknown_03000000[(i * 2 + 1) + temp_r2 + 0x200] |= (gUnknown_0201B130[i * 2] & 0xFF) << 0x8;
+                gTempGfxBuffer[(i * 2 + 1) + temp_r2] |= (gGlyphUpperRowBuffer[i * 2] & 0xFF) << 0x8;
+                gTempGfxBuffer[(i * 2 + 1) + temp_r2 + 0x200] |= (gGlyphLowerRowBuffer[i * 2] & 0xFF) << 0x8;
             }
             return;
         case 7:
             for(i = 0; i <=7; i++)
             {
-                gUnknown_03000000[(i * 2 + 1) + temp_r2] |= (gUnknown_0202BE30[i * 2] & 0xF) << 0xC;
-                gUnknown_03000000[(i * 2 + 0x10) + temp_r2] |= (gUnknown_0202BE30[i * 2] & 0xF0) >> 4;
-                gUnknown_03000000[(i * 2 + 1) + temp_r2 + 0x200] |= (gUnknown_0201B130[i * 2] & 0xF) << 0xC;
-                gUnknown_03000000[(i * 2 + 0x10) + temp_r2 + 0x200] |= (gUnknown_0201B130[i * 2] & 0xF0) >> 4;
+                gTempGfxBuffer[(i * 2 + 1) + temp_r2] |= (gGlyphUpperRowBuffer[i * 2] & 0xF) << 0xC;
+                gTempGfxBuffer[(i * 2 + 0x10) + temp_r2] |= (gGlyphUpperRowBuffer[i * 2] & 0xF0) >> 4;
+                gTempGfxBuffer[(i * 2 + 1) + temp_r2 + 0x200] |= (gGlyphLowerRowBuffer[i * 2] & 0xF) << 0xC;
+                gTempGfxBuffer[(i * 2 + 0x10) + temp_r2 + 0x200] |= (gGlyphLowerRowBuffer[i * 2] & 0xF0) >> 4;
             }
             break;
         }
@@ -2356,7 +2356,7 @@ void sub_71DC(s32 arg0, s32 arg1, s32 arg2) {
 }
 
 
-void sub_88E4(void)
+void LoadPokedexFlagsFromSave(void)
 {
     int i;
 
@@ -2386,7 +2386,7 @@ void sub_88E4(void)
     }
 }
 
-void sub_8974(s16 species)
+void LoadMonAnimationSprite(s16 species)
 {
     int var0;
     s16 quotient;
@@ -2399,16 +2399,16 @@ void sub_8974(s16 species)
 
     if (var0 < 100)
     {
-        gUnknown_0202BF14 = 0;
+        gPokedexSpriteCategory = 0;
         quotient = var0 / 5;
         remainder = var0 % 5;
 
-        CopyBgTilesRect(gUnknown_086BB6F4[quotient] + remainder * 0xD80, (void *)(OBJ_VRAM0 + 0x3800), 108, 1);
-        DmaCopy16(3, gUnknown_086B15B4[quotient] + remainder * 0x20, (void *)OBJ_PLTT + 0x40, 0x20);
+        CopyBgTilesRect(gCatchSpriteGfxPtrs[quotient] + remainder * 0xD80, (void *)(OBJ_VRAM0 + 0x3800), 108, 1);
+        DmaCopy16(3, gMonIconPalettes[quotient] + remainder * 0x20, (void *)OBJ_PLTT + 0x40, 0x20);
     }
     else
     {
-        gUnknown_0202BF14 = 1;
+        gPokedexSpriteCategory = 1;
         quotient = (var0 - 100) / 6;
         remainder = (var0 - 100) % 6;
 
@@ -2417,14 +2417,14 @@ void sub_8974(s16 species)
     }
 }
 
-s16 sub_8A78(s16 species)
+s16 CheckMonHasAnimation(s16 species)
 {
     if (gPokedexFlags[species] == 4 && gDexAnimationIx[species] != -1)
-        gUnknown_0202A588 = 1;
+        gPokedexShowAnimSprite = 1;
     else
-        gUnknown_0202A588 = 0;
+        gPokedexShowAnimSprite = 0;
 
-    return gUnknown_0202A588;
+    return gPokedexShowAnimSprite;
 }
 
 void ResetPokedex(void)

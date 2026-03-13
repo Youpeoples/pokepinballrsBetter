@@ -6,8 +6,8 @@
 #include "constants/bg_music.h"
 
 static void TitleScreen_CheckDeleteKeyComboPressed(void);
-static void sub_1157C(void);
-static void sub_11640(void);
+static void CheckEReaderAccessCombo(void);
+static void RenderTitlePressStartSprites(void);
 
 // If the user doesn't press any buttons at the title screen,
 // it will transition to a demo gameplay experience.
@@ -71,18 +71,18 @@ void LoadTitlescreenGraphics(void)
     autoDisplayMenu = gAutoDisplayTitlescreenMenu;
     if (autoDisplayMenu == TRUE)
     {
-        gUnknown_202BE24 = 0;
+        gTitleReturnedFromMenu = 0;
         gTitlescreen.pressStartAndFlippersVisible = FALSE;
         gTitlescreen.menuVisible = autoDisplayMenu;
         gMain.subState = SUBSTATE_3;
-        sub_0CBC();
-        sub_FD5C(NULL);
+        EnableVBlankInterrupts();
+        FadeInFromWhite(NULL);
     }
     else
     {
         gMain.subState = SUBSTATE_WAIT_FOR_START_BUTTON;
-        sub_0CBC();
-        sub_FD5C(sub_11640);
+        EnableVBlankInterrupts();
+        FadeInFromWhite(RenderTitlePressStartSprites);
     }
 
     m4aSongNumStart(MUS_TITLE);
@@ -93,19 +93,19 @@ void InitTitlescreenStates(void)
     int i;
 
     gTitlescreen.animTimer = 0;
-    gTitlescreen.unk2 = 0;
-    gTitlescreen.unk6 = 0;
-    gTitlescreen.unk8 = 0;
-    gTitlescreen.unk10 = 4;
+    gTitlescreen.animPhase = 0;
+    gTitlescreen.menuAction = 0;
+    gTitlescreen.pressStartAnimFrame = 0;
+    gTitlescreen.deleteSaveGroupId = 4;
     gTitlescreen.pressStartAndFlippersVisible = TRUE;
     gTitlescreen.deleteSaveWindowVisible = FALSE;
-    gTitlescreen.unkA = 6;
-    gTitlescreen.unkC = 0;
-    gTitlescreen.unkE = 3;
+    gTitlescreen.menuSpriteGroupId = 6;
+    gTitlescreen.cursorSpriteGroupId = 0;
+    gTitlescreen.selectorSpriteGroupId = 3;
     gTitlescreen.menuVisible = FALSE;
-    gTitlescreen.unkD = 0;
-    gTitlescreen.unkF = 0;
-    gUnknown_0202C588 = 1;
+    gTitlescreen.cursorArrowVisible = 0;
+    gTitlescreen.selectorVisible = 0;
+    gHighScoreEntrySource = 1;
     gEraseSaveDataAccessStep = 0;
     gEraseSaveDataAccessCounter = 0;
     gEReaderAccessStep = 0;
@@ -114,56 +114,56 @@ void InitTitlescreenStates(void)
     if (gMain.hasSavedGame == TRUE)
     {
         for (i = 0; i < 7; i++)
-            gUnknown_0202BE00[i] = gUnknown_086A975C[i];
+            gTitleSavedMenuSpriteSets[i] = gTitleSavedDefaultSprites[i];
 
         gTitlescreen.menuCursorIndex = 1;
-        gTitlescreen.unk7 = 1;
+        gTitlescreen.hasSavedGame = 1;
     }
     else
     {
         for (i = 0; i < 7; i++)
-            gUnknown_0201C190[i] = gUnknown_086A96F8[i];
+            gTitleNoSaveMenuSpriteSets[i] = gTitleNoSaveDefaultSprites[i];
 
         gTitlescreen.menuCursorIndex = 0;
-        gTitlescreen.unk7 = 0;
-        gMain.unkD = 0;
+        gTitlescreen.hasSavedGame = 0;
+        gMain.continueFromSave = 0;
     }
 
     gTitlescreen.idleFramesCounter = 0;
     gTitlescreen.idleFadeoutCounter = 1;
-    gUnknown_020028A4 = 0;
+    gTitleTransitionActive = 0;
     if (JOY_HELD(RESTART_GAME_BUTTONS) == RESTART_GAME_BUTTONS)
-        gUnknown_020028A5 = 1;
+        gTitleRestartDebounce = 1;
     else
-        gUnknown_020028A5 = 0;
+        gTitleRestartDebounce = 0;
 
-    gUnknown_202BE24 = 0;
+    gTitleReturnedFromMenu = 0;
 }
 
 void TitleScreen1_WaitForStartButton(void)
 {
     if (JOY_HELD(RESTART_GAME_BUTTONS) == RESTART_GAME_BUTTONS)
     {
-        if (!gUnknown_020028A5)
+        if (!gTitleRestartDebounce)
         {
-            gUnknown_020028A4 = 1;
-            gTitlescreen.unk6 = 9;
+            gTitleTransitionActive = 1;
+            gTitlescreen.menuAction = 9;
             gMain.subState = SUBSTATE_11;
         }
     }
     else
     {
-        gUnknown_020028A5 = 0;
+        gTitleRestartDebounce = 0;
     }
 
-    if (!gUnknown_020028A4)
+    if (!gTitleTransitionActive)
     {
         gTitlescreen.animTimer++;
-        if (gTitlescreen.animTimer >= gUnknown_086A9662[gTitlescreen.unk8])
+        if (gTitlescreen.animTimer >= gTitlePressStartAnimDurations[gTitlescreen.pressStartAnimFrame])
         {
             gTitlescreen.animTimer = 0;
-            if (++gTitlescreen.unk8 > 3)
-                gTitlescreen.unk8 = 0;
+            if (++gTitlescreen.pressStartAnimFrame > 3)
+                gTitlescreen.pressStartAnimFrame = 0;
         }
 
         if (JOY_HELD(KEYS_MASK))
@@ -173,12 +173,12 @@ void TitleScreen1_WaitForStartButton(void)
         {
             m4aSongNumStart(SE_MENU_SELECT);
             gTitlescreen.animTimer = 0;
-            gTitlescreen.unk2 = 0;
+            gTitlescreen.animPhase = 0;
             gMain.subState = SUBSTATE_2;
         }
 
         TitleScreen_CheckDeleteKeyComboPressed();
-        sub_1157C();
+        CheckEReaderAccessCombo();
 
         gTitlescreen.idleFramesCounter++;
         if (gTitlescreen.idleFramesCounter > NUM_IDLE_FRAMES)
@@ -192,35 +192,35 @@ void TitleScreen1_WaitForStartButton(void)
             if (gTitlescreen.idleFadeoutCounter > 9)
             {
                 gTitlescreen.idleFramesCounter = 0;
-                gTitlescreen.unk6 = 7;
+                gTitlescreen.menuAction = 7;
                 gMain.subState = SUBSTATE_11;
             }
         }
     }
 
-    sub_11640();
+    RenderTitlePressStartSprites();
 }
 
 void TitleScreen2_8010CF0(void)
 {
     if (JOY_HELD(RESTART_GAME_BUTTONS) == RESTART_GAME_BUTTONS)
     {
-        gUnknown_020028A4 = 1;
-        gTitlescreen.unk6 = 9;
+        gTitleTransitionActive = 1;
+        gTitlescreen.menuAction = 9;
         gMain.subState = SUBSTATE_11;
     }
 
-    if (!gUnknown_020028A4)
+    if (!gTitleTransitionActive)
     {
         gTitlescreen.animTimer++;
-        if (gTitlescreen.animTimer >= gUnknown_086A9666[gTitlescreen.unk2][1])
+        if (gTitlescreen.animTimer >= gTitleMenuSlideInAnimData[gTitlescreen.animPhase][1])
         {
             gTitlescreen.animTimer = 0;
-            gTitlescreen.unk8 = gUnknown_086A9666[gTitlescreen.unk2][0];
-            if (++gTitlescreen.unk2 > 5)
+            gTitlescreen.pressStartAnimFrame = gTitleMenuSlideInAnimData[gTitlescreen.animPhase][0];
+            if (++gTitlescreen.animPhase > 5)
             {
-                gTitlescreen.unk2 = 0;
-                gUnknown_202BE24 = 0;
+                gTitlescreen.animPhase = 0;
+                gTitleReturnedFromMenu = 0;
                 gTitlescreen.pressStartAndFlippersVisible = FALSE;
                 gTitlescreen.menuVisible = TRUE;
                 gMain.subState = SUBSTATE_3;
@@ -228,27 +228,27 @@ void TitleScreen2_8010CF0(void)
         }
     }
 
-    sub_11640();
+    RenderTitlePressStartSprites();
 }
 
 void TitleScreen9_8010D84(void)
 {
     if (JOY_HELD(RESTART_GAME_BUTTONS) == RESTART_GAME_BUTTONS)
     {
-        gUnknown_020028A4 = 1;
-        gTitlescreen.unk6 = 9;
+        gTitleTransitionActive = 1;
+        gTitlescreen.menuAction = 9;
         gMain.subState = SUBSTATE_EXEC_MENU_SELECTION;
     }
 
-    if (!gUnknown_020028A4)
+    if (!gTitleTransitionActive)
     {
         if (JOY_NEW(A_BUTTON))
         {
             m4aSongNumStart(SE_MENU_SELECT);
-            sub_11B74();
-            sub_02B4();
+            DeleteSaveFile();
+            FadeOutScreen();
             m4aMPlayAllStop();
-            sub_0D10();
+            DisableVBlankInterrupts();
             gMain.subState = SUBSTATE_LOAD_GRAPHICS;
         }
         else if (JOY_NEW(B_BUTTON))
@@ -259,56 +259,56 @@ void TitleScreen9_8010D84(void)
         }
     }
 
-    sub_11640();
+    RenderTitlePressStartSprites();
 }
 
 void TitleScreen3_8010E00(void)
 {
     if (JOY_HELD(RESTART_GAME_BUTTONS) == RESTART_GAME_BUTTONS)
     {
-        gUnknown_020028A4 = 1;
-        gTitlescreen.unk6 = 9;
+        gTitleTransitionActive = 1;
+        gTitlescreen.menuAction = 9;
         gMain.subState = SUBSTATE_11;
     }
 
-    if (gUnknown_020028A4)
+    if (gTitleTransitionActive)
         return;
 
-    if (!gTitlescreen.unk7)
+    if (!gTitlescreen.hasSavedGame)
     {
         gTitlescreen.animTimer++;
-        if (gTitlescreen.animTimer >= gUnknown_086A9748[gTitlescreen.unk2])
+        if (gTitlescreen.animTimer >= gTitleMenuRetractDurations[gTitlescreen.animPhase])
         {
             gTitlescreen.animTimer = 0;
-            gUnknown_0201C190[6] = gUnknown_086A9714[gTitlescreen.unk2];
-            if (++gTitlescreen.unk2 > 11)
+            gTitleNoSaveMenuSpriteSets[6] = gTitleNoSaveAnimSprites[gTitlescreen.animPhase];
+            if (++gTitlescreen.animPhase > 11)
             {
-                gTitlescreen.unk2 = 0;
-                gTitlescreen.unkD = 1;
-                gTitlescreen.unkF = 1;
+                gTitlescreen.animPhase = 0;
+                gTitlescreen.cursorArrowVisible = 1;
+                gTitlescreen.selectorVisible = 1;
                 gMain.subState = SUBSTATE_MENU_INPUT_NO_SAVED_GAME;
             }
         }
 
-        sub_1175C();
+        RenderTitleMenuNoSavedGame();
     }
     else
     {
         gTitlescreen.animTimer++;
-        if (gTitlescreen.animTimer >= gUnknown_086A9748[gTitlescreen.unk2])
+        if (gTitlescreen.animTimer >= gTitleMenuRetractDurations[gTitlescreen.animPhase])
         {
             gTitlescreen.animTimer = 0;
-            gUnknown_0202BE00[6] = gUnknown_086A9778[gTitlescreen.unk2];
-            if (++gTitlescreen.unk2 > 11)
+            gTitleSavedMenuSpriteSets[6] = gTitleSavedAnimSprites[gTitlescreen.animPhase];
+            if (++gTitlescreen.animPhase > 11)
             {
-                gTitlescreen.unk2 = 0;
-                gTitlescreen.unkD = 1;
-                gTitlescreen.unkF = 1;
+                gTitlescreen.animPhase = 0;
+                gTitlescreen.cursorArrowVisible = 1;
+                gTitlescreen.selectorVisible = 1;
                 gMain.subState = SUBSTATE_MENU_INPUT_SAVED_GAME;
             }
         }
 
-        sub_11968();
+        RenderTitleMenuSavedGame();
     }
 }
 
@@ -316,22 +316,22 @@ void TitleScreen4_MenuInputNoSavedGame(void)
 {
     if (JOY_HELD(RESTART_GAME_BUTTONS) == RESTART_GAME_BUTTONS)
     {
-        gUnknown_020028A4 = 1;
-        gTitlescreen.unk6 = 9;
+        gTitleTransitionActive = 1;
+        gTitlescreen.menuAction = 9;
         gMain.subState = SUBSTATE_EXEC_MENU_SELECTION;
     }
 
-    if (!gUnknown_020028A4)
+    if (!gTitleTransitionActive)
     {
         gTitlescreen.animTimer++;
-        if (gTitlescreen.animTimer >= gUnknown_086A9672[gTitlescreen.unk2][1])
+        if (gTitlescreen.animTimer >= gTitleMenuSlideOutAnimData[gTitlescreen.animPhase][1])
         {
             gTitlescreen.animTimer = 0;
-            if (++gTitlescreen.unk2 > 6)
-                gTitlescreen.unk2 = 0;
+            if (++gTitlescreen.animPhase > 6)
+                gTitlescreen.animPhase = 0;
 
-            gTitlescreen.unkC = gUnknown_086A9672[gTitlescreen.unk2][0];
-            gTitlescreen.unkE = gUnknown_086A9672[gTitlescreen.unk2][0] + 3;
+            gTitlescreen.cursorSpriteGroupId = gTitleMenuSlideOutAnimData[gTitlescreen.animPhase][0];
+            gTitlescreen.selectorSpriteGroupId = gTitleMenuSlideOutAnimData[gTitlescreen.animPhase][0] + 3;
         }
 
         if (JOY_NEW(DPAD_UP))
@@ -351,86 +351,86 @@ void TitleScreen4_MenuInputNoSavedGame(void)
         {
             m4aSongNumStart(SE_MENU_SELECT);
             gTitlescreen.animTimer = 0;
-            gTitlescreen.unk2 = 0;
+            gTitlescreen.animPhase = 0;
             gMain.subState = SUBSTATE_7;
         }
         else if (JOY_NEW(B_BUTTON))
         {
             m4aSongNumStart(SE_MENU_CANCEL);
             gTitlescreen.animTimer = 0;
-            gTitlescreen.unk2 = 12;
-            gTitlescreen.unkD = 0;
-            gTitlescreen.unkF = 0;
+            gTitlescreen.animPhase = 12;
+            gTitlescreen.cursorArrowVisible = 0;
+            gTitlescreen.selectorVisible = 0;
             gMain.subState = SUBSTATE_ANIM_CLOSE_MENU;
         }
 
-        sub_1157C();
+        CheckEReaderAccessCombo();
     }
 
-    sub_1175C();
+    RenderTitleMenuNoSavedGame();
 }
 
 void TitleScreen7_8011020(void)
 {
     if (JOY_HELD(RESTART_GAME_BUTTONS) == RESTART_GAME_BUTTONS)
     {
-        gUnknown_020028A4 = 1;
-        gTitlescreen.unk6 = 9;
+        gTitleTransitionActive = 1;
+        gTitlescreen.menuAction = 9;
         gMain.subState = SUBSTATE_11;
     }
 
-    if (!gUnknown_020028A4)
+    if (!gTitleTransitionActive)
     {
         u16 animTimer = gTitlescreen.animTimer;
         u16 mask = 0x3;
         if (!(animTimer & mask))
         {
-            if (!gTitlescreen.unk2)
+            if (!gTitlescreen.animPhase)
             {
-                gTitlescreen.unk2 = 1;
-                CopyBgTilesRect((void *)(OBJ_VRAM0 + 0x1E0 + gTitlescreen.menuCursorIndex * 0x800), gUnknown_03000000, 8, 2);
+                gTitlescreen.animPhase = 1;
+                CopyBgTilesRect((void *)(OBJ_VRAM0 + 0x1E0 + gTitlescreen.menuCursorIndex * 0x800), gTempGfxBuffer, 8, 2);
                 CopyBgTilesRect((void *)(OBJ_VRAM0 + 0x61E0), (void *)(OBJ_VRAM0 + 0x1E0 + gTitlescreen.menuCursorIndex * 0x800), 8, 2);
             }
             else
             {
-                gTitlescreen.unk2 = 0;
-                CopyBgTilesRect(gUnknown_03000000, (void *)(OBJ_VRAM0 + 0x1E0 + gTitlescreen.menuCursorIndex * 0x800), 8, 2);
+                gTitlescreen.animPhase = 0;
+                CopyBgTilesRect(gTempGfxBuffer, (void *)(OBJ_VRAM0 + 0x1E0 + gTitlescreen.menuCursorIndex * 0x800), 8, 2);
             }
         }
 
         if (gTitlescreen.animTimer > 20)
         {
-            gMain.unkD = 0;
-            gTitlescreen.unk6 = gUnknown_086A96A4[gTitlescreen.menuCursorIndex];
+            gMain.continueFromSave = 0;
+            gTitlescreen.menuAction = gTitleNoSaveMenuActions[gTitlescreen.menuCursorIndex];
             gMain.subState = SUBSTATE_EXEC_MENU_SELECTION;
         }
 
         gTitlescreen.animTimer++;
     }
 
-    sub_1175C();
+    RenderTitleMenuNoSavedGame();
 }
 
 void TitleScreen5_MenuInputSavedGame(void)
 {
     if (JOY_HELD(RESTART_GAME_BUTTONS) == RESTART_GAME_BUTTONS)
     {
-        gUnknown_020028A4 = 1;
-        gTitlescreen.unk6 = 9;
+        gTitleTransitionActive = 1;
+        gTitlescreen.menuAction = 9;
         gMain.subState = SUBSTATE_EXEC_MENU_SELECTION;
     }
 
-    if (!gUnknown_020028A4)
+    if (!gTitleTransitionActive)
     {
         gTitlescreen.animTimer++;
-        if (gTitlescreen.animTimer >= gUnknown_086A9672[gTitlescreen.unk2][1])
+        if (gTitlescreen.animTimer >= gTitleMenuSlideOutAnimData[gTitlescreen.animPhase][1])
         {
             gTitlescreen.animTimer = 0;
-            if (++gTitlescreen.unk2 > 6)
-                gTitlescreen.unk2 = 0;
+            if (++gTitlescreen.animPhase > 6)
+                gTitlescreen.animPhase = 0;
 
-            gTitlescreen.unkC = gUnknown_086A9672[gTitlescreen.unk2][0];
-            gTitlescreen.unkE = gUnknown_086A9672[gTitlescreen.unk2][0] + 3;
+            gTitlescreen.cursorSpriteGroupId = gTitleMenuSlideOutAnimData[gTitlescreen.animPhase][0];
+            gTitlescreen.selectorSpriteGroupId = gTitleMenuSlideOutAnimData[gTitlescreen.animPhase][0] + 3;
         }
 
         if (JOY_NEW(DPAD_UP))
@@ -450,35 +450,35 @@ void TitleScreen5_MenuInputSavedGame(void)
         {
             m4aSongNumStart(SE_MENU_SELECT);
             gTitlescreen.animTimer = 0;
-            gTitlescreen.unk2 = 0;
+            gTitlescreen.animPhase = 0;
             gMain.subState = SUBSTATE_8;
         }
         else if (JOY_NEW(B_BUTTON))
         {
             m4aSongNumStart(SE_MENU_CANCEL);
             gTitlescreen.animTimer = 0;
-            gTitlescreen.unk2 = 12;
-            gTitlescreen.unkD = 0;
-            gTitlescreen.unkF = 0;
+            gTitlescreen.animPhase = 12;
+            gTitlescreen.cursorArrowVisible = 0;
+            gTitlescreen.selectorVisible = 0;
             gMain.subState = SUBSTATE_ANIM_CLOSE_MENU;
         }
 
-        sub_1157C();
+        CheckEReaderAccessCombo();
     }
 
-    sub_11968();
+    RenderTitleMenuSavedGame();
 }
 
 void TitleScreen8_8011228(void)
 {
     if (JOY_HELD(RESTART_GAME_BUTTONS) == RESTART_GAME_BUTTONS)
     {
-        gUnknown_020028A4 = 1;
-        gTitlescreen.unk6 = 9;
+        gTitleTransitionActive = 1;
+        gTitlescreen.menuAction = 9;
         gMain.subState = SUBSTATE_11;
     }
 
-    if (!gUnknown_020028A4)
+    if (!gTitleTransitionActive)
     {
         u16 animTimer = gTitlescreen.animTimer;
         u16 mask = 0x3;
@@ -486,119 +486,119 @@ void TitleScreen8_8011228(void)
         // Blink menu item
         if (!(animTimer & mask))
         {
-            if (!gTitlescreen.unk2)
+            if (!gTitlescreen.animPhase)
             {
-                gTitlescreen.unk2 = 1;
-                CopyBgTilesRect((void *)(OBJ_VRAM0 + 0x1E0 + gTitlescreen.menuCursorIndex * 0x800), gUnknown_03000000, 8, 2);
+                gTitlescreen.animPhase = 1;
+                CopyBgTilesRect((void *)(OBJ_VRAM0 + 0x1E0 + gTitlescreen.menuCursorIndex * 0x800), gTempGfxBuffer, 8, 2);
                 CopyBgTilesRect((void *)(OBJ_VRAM0 + 0x61E0), (void *)(OBJ_VRAM0 + 0x1E0 + gTitlescreen.menuCursorIndex * 0x800), 8, 2);
             }
             else
             {
-                gTitlescreen.unk2 = 0;
-                CopyBgTilesRect(gUnknown_03000000, (void *)(OBJ_VRAM0 + 0x1E0 + gTitlescreen.menuCursorIndex * 0x800), 8, 2);
+                gTitlescreen.animPhase = 0;
+                CopyBgTilesRect(gTempGfxBuffer, (void *)(OBJ_VRAM0 + 0x1E0 + gTitlescreen.menuCursorIndex * 0x800), 8, 2);
             }
         }
 
         if (gTitlescreen.animTimer > 20)
         {
             if (gTitlescreen.menuCursorIndex == 1)
-                gMain.unkD = 1;
+                gMain.continueFromSave = 1;
             else
-                gMain.unkD = 0;
+                gMain.continueFromSave = 0;
 
-            gTitlescreen.unk6 = gUnknown_086A96D4[gTitlescreen.menuCursorIndex];
+            gTitlescreen.menuAction = gTitleSavedMenuActions[gTitlescreen.menuCursorIndex];
             gMain.subState = SUBSTATE_EXEC_MENU_SELECTION;
         }
 
         gTitlescreen.animTimer++;
     }
 
-    sub_11968();
+    RenderTitleMenuSavedGame();
 }
 
 void TitleScreen6_AnimCloseMenu(void)
 {
     if (JOY_HELD(RESTART_GAME_BUTTONS) == RESTART_GAME_BUTTONS)
     {
-        gUnknown_020028A4 = 1;
-        gTitlescreen.unk6 = 9;
+        gTitleTransitionActive = 1;
+        gTitlescreen.menuAction = 9;
         gMain.subState = SUBSTATE_11;
     }
 
-    if (gUnknown_020028A4)
+    if (gTitleTransitionActive)
         return;
 
-    if (!gTitlescreen.unk7)
+    if (!gTitlescreen.hasSavedGame)
     {
         gTitlescreen.animTimer++;
-        if (gTitlescreen.animTimer >= gUnknown_086A9748[gTitlescreen.unk2])
+        if (gTitlescreen.animTimer >= gTitleMenuRetractDurations[gTitlescreen.animPhase])
         {
             gTitlescreen.animTimer = 0;
-            if (--gTitlescreen.unk2 < 0)
+            if (--gTitlescreen.animPhase < 0)
             {
-                gTitlescreen.unk2 = 0;
+                gTitlescreen.animPhase = 0;
                 gTitlescreen.menuCursorIndex = 0;
-                gUnknown_202BE24 = 1;
+                gTitleReturnedFromMenu = 1;
                 gTitlescreen.pressStartAndFlippersVisible = TRUE;
                 gTitlescreen.menuVisible = FALSE;
                 gMain.subState = SUBSTATE_WAIT_FOR_START_BUTTON;
             }
 
-            gUnknown_0201C190[6] = gUnknown_086A9714[gTitlescreen.unk2];
+            gTitleNoSaveMenuSpriteSets[6] = gTitleNoSaveAnimSprites[gTitlescreen.animPhase];
         }
 
-        sub_1175C();
+        RenderTitleMenuNoSavedGame();
     }
     else
     {
         gTitlescreen.animTimer++;
-        if (gTitlescreen.animTimer >= gUnknown_086A9748[gTitlescreen.unk2])
+        if (gTitlescreen.animTimer >= gTitleMenuRetractDurations[gTitlescreen.animPhase])
         {
             gTitlescreen.animTimer = 0;
-            if (--gTitlescreen.unk2 < 0)
+            if (--gTitlescreen.animPhase < 0)
             {
-                gTitlescreen.unk2 = 0;
+                gTitlescreen.animPhase = 0;
                 gTitlescreen.menuCursorIndex = 1;
-                gUnknown_202BE24 = 1;
+                gTitleReturnedFromMenu = 1;
                 gTitlescreen.pressStartAndFlippersVisible = TRUE;
                 gTitlescreen.menuVisible = FALSE;
                 gMain.subState = SUBSTATE_WAIT_FOR_START_BUTTON;
             }
 
-            gUnknown_0202BE00[6] = gUnknown_086A9778[gTitlescreen.unk2];
+            gTitleSavedMenuSpriteSets[6] = gTitleSavedAnimSprites[gTitlescreen.animPhase];
         }
 
-        sub_11968();
+        RenderTitleMenuSavedGame();
     }
 }
 
 void TitleScreen10_ExecMenuSelection(void)
 {
-    if (!gTitlescreen.unk7)
-        sub_FE04(sub_1175C);
+    if (!gTitlescreen.hasSavedGame)
+        FadeOutToWhite(RenderTitleMenuNoSavedGame);
     else
-        sub_FE04(sub_11968);
+        FadeOutToWhite(RenderTitleMenuSavedGame);
 
     m4aMPlayAllStop();
-    sub_0D10();
+    DisableVBlankInterrupts();
 
-    if (gUnknown_086A964C[gTitlescreen.unk6] == STATE_SCORES_MAIN)
-        gUnknown_0202C588 = 0;
+    if (gTitleMenuStateTable[gTitlescreen.menuAction] == STATE_SCORES_MAIN)
+        gHighScoreEntrySource = 0;
     else
-        gUnknown_0202C588 = 1;
+        gHighScoreEntrySource = 1;
 
     gAutoDisplayTitlescreenMenu = FALSE;
-    SetMainGameState(gUnknown_086A964C[gTitlescreen.unk6]);
+    SetMainGameState(gTitleMenuStateTable[gTitlescreen.menuAction]);
 }
 
 void TitleScreen11_80114B4(void)
 {
-    sub_FE04(sub_11640);
+    FadeOutToWhite(RenderTitlePressStartSprites);
     m4aMPlayAllStop();
-    sub_0D10();
-    gUnknown_0202C588 = 1;
+    DisableVBlankInterrupts();
+    gHighScoreEntrySource = 1;
     gAutoDisplayTitlescreenMenu = FALSE;
-    SetMainGameState(gUnknown_086A964C[gTitlescreen.unk6]);
+    SetMainGameState(gTitleMenuStateTable[gTitlescreen.menuAction]);
 }
 
 static void TitleScreen_CheckDeleteKeyComboPressed(void)
@@ -627,7 +627,7 @@ static void TitleScreen_CheckDeleteKeyComboPressed(void)
     }
 }
 
-static void sub_1157C(void)
+static void CheckEReaderAccessCombo(void)
 {
     // To access the e-reader screen, alternate pressing R_BUTTON and L_BUTTON 6 times while holding DPAD_RIGHT.
     s16 buttonMask = gEReaderAccessButtonSequence[gEReaderAccessStep];
@@ -640,7 +640,7 @@ static void sub_1157C(void)
             gEReaderAccessStep = 0;
             gEReaderAccessCounter = 0;
             m4aSongNumStart(SE_MENU_SELECT);
-            gTitlescreen.unk6 = 5;
+            gTitlescreen.menuAction = 5;
             if (gMain.subState == SUBSTATE_WAIT_FOR_START_BUTTON)
                 gMain.subState = SUBSTATE_11;
             else
@@ -664,23 +664,23 @@ static void sub_1157C(void)
     }
 }
 
-static void sub_11640(void)
+static void RenderTitlePressStartSprites(void)
 {
     int i;
     const struct SpriteSet *spriteSet;
-    struct SpriteGroup *startAndFlippersGroup = &gMain_spriteGroups[gTitlescreen.unk8];
-    struct SpriteGroup *deleteMenuGroup = &gMain_spriteGroups[gTitlescreen.unk10];
+    struct SpriteGroup *startAndFlippersGroup = &gMain_spriteGroups[gTitlescreen.pressStartAnimFrame];
+    struct SpriteGroup *deleteMenuGroup = &gMain_spriteGroups[gTitlescreen.deleteSaveGroupId];
 
     startAndFlippersGroup->available = gTitlescreen.pressStartAndFlippersVisible;
     deleteMenuGroup->available = gTitlescreen.deleteSaveWindowVisible;
 
-    LoadSpriteSets(gUnknown_086A96E4, 5, gMain_spriteGroups);
+    LoadSpriteSets(gTitlePressStartSpriteSets, 5, gMain_spriteGroups);
 
     if (startAndFlippersGroup->available == TRUE)
     {
         startAndFlippersGroup->baseX = 120;
         startAndFlippersGroup->baseY = 102;
-        spriteSet = gUnknown_086A96E4[gTitlescreen.unk8];
+        spriteSet = gTitlePressStartSpriteSets[gTitlescreen.pressStartAnimFrame];
         for (i = 0; i < spriteSet->count; i++)
         {
             gOamBuffer[startAndFlippersGroup->oam[i].oamId].x = startAndFlippersGroup->oam[i].xOffset + startAndFlippersGroup->baseX;
@@ -713,7 +713,7 @@ struct UnknownStruct1
     u8 filler2[6];
 };
 
-void sub_1175C(void)
+void RenderTitleMenuNoSavedGame(void)
 {
     struct SpriteGroup *menuSpriteGroup;
     struct SpriteGroup *r9;
@@ -726,21 +726,21 @@ void sub_1175C(void)
     REG_BLDCNT = gMain.blendControl;
     REG_BLDALPHA = gMain.blendAlpha;
 
-    menuSpriteGroup = &gMain.spriteGroups[gTitlescreen.unkA];
-    r9 = &gMain.spriteGroups[gTitlescreen.unkC];
-    r8 = &gMain.spriteGroups[gTitlescreen.unkE];
+    menuSpriteGroup = &gMain.spriteGroups[gTitlescreen.menuSpriteGroupId];
+    r9 = &gMain.spriteGroups[gTitlescreen.cursorSpriteGroupId];
+    r8 = &gMain.spriteGroups[gTitlescreen.selectorSpriteGroupId];
 
     menuSpriteGroup->available = gTitlescreen.menuVisible;
-    r9->available = gTitlescreen.unkD;
-    r8->available = gTitlescreen.unkF;
+    r9->available = gTitlescreen.cursorArrowVisible;
+    r8->available = gTitlescreen.selectorVisible;
 
-    LoadSpriteSets((const struct SpriteSet *const *)gUnknown_0201C190, 7, gMain.spriteGroups);
+    LoadSpriteSets((const struct SpriteSet *const *)gTitleNoSaveMenuSpriteSets, 7, gMain.spriteGroups);
 
     if (menuSpriteGroup->available == 1)
     {
         menuSpriteGroup->baseX = 0x78;
         menuSpriteGroup->baseY = 0x66;
-        r12 = (const struct UnknownStruct1 *)gUnknown_0201C190[6];
+        r12 = (const struct UnknownStruct1 *)gTitleNoSaveMenuSpriteSets[6];
         for (sp0 = 0; sp0 < r12->count; sp0++)
         {
             struct OamDataSimple *r4 = &menuSpriteGroup->oam[sp0];
@@ -757,8 +757,8 @@ void sub_1175C(void)
     {
         struct OamDataSimple *r5;
 
-        r9->baseX = gUnknown_086A9684[gTitlescreen.menuCursorIndex].x;
-        r9->baseY = gUnknown_086A9684[gTitlescreen.menuCursorIndex].y;
+        r9->baseX = gTitleNoSaveArrowPositions[gTitlescreen.menuCursorIndex].x;
+        r9->baseY = gTitleNoSaveArrowPositions[gTitlescreen.menuCursorIndex].y;
 
         r5 = &r9->oam[0];
 
@@ -770,8 +770,8 @@ void sub_1175C(void)
     {
         struct OamDataSimple *r5;
 
-        r8->baseX = gUnknown_086A9694[gTitlescreen.menuCursorIndex].x;
-        r8->baseY = gUnknown_086A9694[gTitlescreen.menuCursorIndex].y;
+        r8->baseX = gTitleNoSaveSelectorPositions[gTitlescreen.menuCursorIndex].x;
+        r8->baseY = gTitleNoSaveSelectorPositions[gTitlescreen.menuCursorIndex].y;
 
         r5 = &r8->oam[0];
 
@@ -784,7 +784,7 @@ void sub_1175C(void)
     r8->available = FALSE;
 }
 
-void sub_11968(void)
+void RenderTitleMenuSavedGame(void)
 {
     struct SpriteGroup *r10;
     struct SpriteGroup *r9;
@@ -797,21 +797,21 @@ void sub_11968(void)
     REG_BLDCNT = gMain.blendControl;
     REG_BLDALPHA = gMain.blendAlpha;
 
-    r10 = &gMain.spriteGroups[gTitlescreen.unkA];
-    r9 = &gMain.spriteGroups[gTitlescreen.unkC];
-    r8 = &gMain.spriteGroups[gTitlescreen.unkE];
+    r10 = &gMain.spriteGroups[gTitlescreen.menuSpriteGroupId];
+    r9 = &gMain.spriteGroups[gTitlescreen.cursorSpriteGroupId];
+    r8 = &gMain.spriteGroups[gTitlescreen.selectorSpriteGroupId];
 
     r10->available = gTitlescreen.menuVisible;
-    r9->available = gTitlescreen.unkD;
-    r8->available = gTitlescreen.unkF;
+    r9->available = gTitlescreen.cursorArrowVisible;
+    r8->available = gTitlescreen.selectorVisible;
 
-    LoadSpriteSets((const struct SpriteSet *const *)gUnknown_0202BE00, 7, gMain.spriteGroups);
+    LoadSpriteSets((const struct SpriteSet *const *)gTitleSavedMenuSpriteSets, 7, gMain.spriteGroups);
 
     if (r10->available == 1)
     {
         r10->baseX = 0x78;
         r10->baseY = 0x66;
-        r12 = (const struct UnknownStruct1 *)gUnknown_0202BE00[6];
+        r12 = (const struct UnknownStruct1 *)gTitleSavedMenuSpriteSets[6];
         for (sp0 = 0; sp0 < r12->count; sp0++)
         {
             struct OamDataSimple *r4 = &r10->oam[sp0];
@@ -828,8 +828,8 @@ void sub_11968(void)
     {
         struct OamDataSimple *r5;
 
-        r9->baseX = gUnknown_086A96AC[gTitlescreen.menuCursorIndex].x;
-        r9->baseY = gUnknown_086A96AC[gTitlescreen.menuCursorIndex].y;
+        r9->baseX = gTitleSavedArrowPositions[gTitlescreen.menuCursorIndex].x;
+        r9->baseY = gTitleSavedArrowPositions[gTitlescreen.menuCursorIndex].y;
 
         r5 = &r9->oam[0];
 
@@ -841,8 +841,8 @@ void sub_11968(void)
     {
         struct OamDataSimple *r5;
 
-        r8->baseX = gUnknown_086A96C0[gTitlescreen.menuCursorIndex].x;
-        r8->baseY = gUnknown_086A96C0[gTitlescreen.menuCursorIndex].y;
+        r8->baseX = gTitleSavedSelectorPositions[gTitlescreen.menuCursorIndex].x;
+        r8->baseY = gTitleSavedSelectorPositions[gTitlescreen.menuCursorIndex].y;
 
         r5 = &r8->oam[0];
 
@@ -855,7 +855,7 @@ void sub_11968(void)
     r8->available = FALSE;
 }
 
-void sub_11B74(void)
+void DeleteSaveFile(void)
 {
     ResetSaveFile();
     SaveFile_WriteToSram();

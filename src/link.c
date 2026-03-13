@@ -87,7 +87,7 @@ enum
 
 // static function declarations
 static void EnableSerial(void);
-static void sub_19CC(void);
+static void LinkMainCallback(void);
 static void LinkVBlankIntr(void);
 static void nullsub_15(void);
 static void CheckMasterOrSlave(void);
@@ -112,13 +112,13 @@ extern u8 sChecksumAvailable;
 extern u16 gLinkSavedIme;
 extern u8 sNumVBlanksWithoutSerialIntr;
 extern u8 sSendBufferEmpty;
-extern u8 gUnknown_02002826;
-extern u8 gUnknown_02002827; // sHandshakePlayerCount ?
+extern u8 sLinkFlowControlDelay;
+extern u8 sHandshakePlayerCount; // sHandshakePlayerCount ?
 extern u16 sSendNonzeroCheck;
-extern u16 gUnknown_0200282A;
+extern u16 sRecvNonzeroCheck;
 extern u8 gLastSendQueueCount;
-extern u8 gUnknown_0202A554; // ???
-extern s8 gUnknown_0202C5E0;
+extern u8 sRecvQueueSnapshot; // ???
+extern s8 sLinkMasterHandshakeState;
 
 // static const definitions
 
@@ -131,7 +131,7 @@ static void EnableSerial(void)
     REG_SIOCNT |= SIO_115200_BPS | SIO_INTR_ENABLE;
 
     gLinkSavedIme = REG_IME;
-    SetMainCallback(sub_19CC);
+    SetMainCallback(LinkMainCallback);
     SetVBlankIntrFunc(LinkVBlankIntr);
     REG_IME = 0;
     REG_IE |= INTR_FLAG_SERIAL;
@@ -143,30 +143,30 @@ static void EnableSerial(void)
 
     sNumVBlanksWithoutSerialIntr = 0;
     sSendBufferEmpty = 0;
-    gUnknown_02002827 = 0;
+    sHandshakePlayerCount = 0;
     gLastSendQueueCount = 0;
-    gUnknown_0202A554 = 0;
-    gUnknown_0202C5E0 = 0;
-    gUnknown_0202ADD0 = 0;
-    gUnknown_0201A444 = 0;
-    gUnknown_0202BDF0 = 0;
-    gUnknown_0201C1AC = 0;
-    gUnknown_0202ADDC = 0;
-    gUnknown_0202BEC8 = 0;
+    sRecvQueueSnapshot = 0;
+    sLinkMasterHandshakeState = 0;
+    gLinkStatusResult = 0;
+    gLinkTimeoutCounter = 0;
+    gLinkConnectionState = 0;
+    gLinkPlayerCount = 0;
+    gLinkNegotiationFlags = 0;
+    gLinkAdvanceState = 0;
     sChecksumAvailable = 0;
     sSendNonzeroCheck = 0;
-    gUnknown_0200282A = 0;
+    sRecvNonzeroCheck = 0;
 }
 
-extern void sub_19B4(void) // TODO
+extern void InitLinkHardware(void) // TODO
 {
-    sub_24DC();
-    sub_250C();
+    ResetSerialIO();
+    SetupDefaultInterrupts();
     EnableSerial();
     DisableSerial();
 }
 
-static void sub_19CC(void) // TODO
+static void LinkMainCallback(void) // TODO
 {
     if ((REG_DISPSTAT & 0x8) != 0)
     {
@@ -182,7 +182,7 @@ static void sub_19CC(void) // TODO
         REG_BG3HOFS = gMain.bgOffsets[3].xOffset;
         REG_BG3VOFS = gMain.bgOffsets[3].yOffset;
 
-        if (gMain.unk36)
+        if (gMain.blendEnabled)
         {
             REG_BLDCNT = gMain.blendControl;
             REG_BLDALPHA = gMain.blendAlpha;
@@ -238,16 +238,16 @@ extern s32 LinkMain1(u8 *shouldAdvanceLinkState, s16 *sendCmd, u16 (*recvCmds)[M
             {
                 default:
                     CheckMasterOrSlave();
-                    if (gUnknown_0202C5E0 == 0 && gLink.isMaster && gLink.playerCount == 2)
+                    if (sLinkMasterHandshakeState == 0 && gLink.isMaster && gLink.playerCount == 2)
                     {
                         gLink.handshakeAsMaster = TRUE;
-                        gUnknown_0202C5E0 = -1;
+                        sLinkMasterHandshakeState = -1;
                     }
                     break;
                 case 1:
                     if (gLink.isMaster != LINK_SLAVE && gLink.playerCount == 2)
                         gLink.handshakeAsMaster = TRUE;
-                    gUnknown_0202C5E0 = -1;
+                    sLinkMasterHandshakeState = -1;
                     break;
                 case 2:
                     gLink.state = LINK_STATE_START0;
@@ -260,7 +260,7 @@ extern s32 LinkMain1(u8 *shouldAdvanceLinkState, s16 *sendCmd, u16 (*recvCmds)[M
             gLink.state = LINK_STATE_CONN_ESTABLISHED;
             // fallthrough
         case LINK_STATE_CONN_ESTABLISHED:
-            if (gLink.unkE == 0)
+            if (gLink.sendPaused == 0)
             {
                 EnqueueSendCmd(sendCmd);
             }
@@ -277,11 +277,11 @@ extern s32 LinkMain1(u8 *shouldAdvanceLinkState, s16 *sendCmd, u16 (*recvCmds)[M
 
     {
         u32 receivedNothing = gLink.receivedNothing << 8;
-        u32 unk11 = gLink.unk11 << 9;
+        u32 checksumError = gLink.checksumError << 9;
         u32 hardwareError = gLink.hardwareError << 0x10;
-        u32 unk13 = gLink.unk13 << 0x11;
+        u32 invalidIdError = gLink.invalidIdError << 0x11;
         u32 queueFull = gLink.queueFull << 0x12;
-        u32 unk15 = gLink.unk15 << 0x14;
+        u32 lagError = gLink.lagError << 0x14;
         u32 val;
 
         if (gLink.state == LINK_STATE_CONN_ESTABLISHED)
@@ -289,21 +289,21 @@ extern s32 LinkMain1(u8 *shouldAdvanceLinkState, s16 *sendCmd, u16 (*recvCmds)[M
             val = LINK_STAT_CONN_ESTABLISHED;
             val |= receivedNothing;
             val |= retVal;
-            val |= unk11;
+            val |= checksumError;
             val |= hardwareError;
-            val |= unk13;
+            val |= invalidIdError;
             val |= queueFull;
-            val |= unk15;
+            val |= lagError;
         }
         else
         {
             val = retVal;
             val |= receivedNothing;
-            val |= unk11;
+            val |= checksumError;
             val |= hardwareError;
-            val |= unk13;
+            val |= invalidIdError;
             val |= queueFull;
-            val |= unk15;
+            val |= lagError;
         }
 
         retVal = val;
@@ -423,13 +423,13 @@ static void DequeueRecvCmds(u16 (*recvCmds)[MAX_LINK_PLAYERS])
 
 static void LinkVSync(void)
 {
-    if (gLink.unkE)
+    if (gLink.sendPaused)
     {
-        if (--gUnknown_02002826 != 0)
+        if (--sLinkFlowControlDelay != 0)
         {
             return;
         }
-        gLink.unkE = 0;
+        gLink.sendPaused = 0;
     }
 
     if (gLink.isMaster)
@@ -441,14 +441,14 @@ static void LinkVSync(void)
                 {
                     if (!gLink.hardwareError)
                     {
-                        gLink.unk15 = LAG_MASTER;
+                        gLink.lagError = LAG_MASTER;
                     }
                     else
                     {
                         StartTransfer();
                     }
                 }
-                else if (gLink.unk15 == LAG_NONE)
+                else if (gLink.lagError == LAG_NONE)
                 {
                     gLink.serialIntrCounter = 0;
                     StartTransfer();
@@ -465,13 +465,13 @@ static void LinkVSync(void)
         {
             if (gLink.state == LINK_STATE_CONN_ESTABLISHED)
             {
-                gLink.unk15 = LAG_SLAVE;
+                gLink.lagError = LAG_SLAVE;
             }
             if (gLink.state == LINK_STATE_HANDSHAKE)
             {
                 gLink.localId = 0;
                 gLink.playerCount = 0;
-                gLink.unk11 = FALSE;
+                gLink.checksumError = FALSE;
             }
         }
     }
@@ -518,7 +518,7 @@ extern void SerialCB(void)
     sNumVBlanksWithoutSerialIntr = 0;
     if (gLink.serialIntrCounter == 8)
     {
-        gUnknown_0202A554 = gLink.recvQueue.count;
+        sRecvQueueSnapshot = gLink.recvQueue.count;
     }
 }
 
@@ -569,19 +569,19 @@ static bool8 DoHandshake(void)
         }
     }
     gLink.playerCount = playerCount;
-    if (gLink.playerCount == 2 && gLink.playerCount == gUnknown_02002827 && gLink.handshakeBuffer[0] == MASTER_HANDSHAKE)
+    if (gLink.playerCount == 2 && gLink.playerCount == sHandshakePlayerCount && gLink.handshakeBuffer[0] == MASTER_HANDSHAKE)
     {
         return TRUE;
     }
     if (gLink.playerCount == 2) // ???
     {
-        gLink.unk11 = (minRecv & 3) + 1;
+        gLink.checksumError = (minRecv & 3) + 1;
     }
     else
     {
-        gLink.unk11 = 0;
+        gLink.checksumError = 0;
     }
-    gUnknown_02002827 = gLink.playerCount;
+    sHandshakePlayerCount = gLink.playerCount;
     return FALSE;
 }
 
@@ -598,7 +598,7 @@ static void DoRecv(void)
         {
             if (gLink.checksum != recv[i] && sChecksumAvailable)
             {
-                gLink.unk13 = TRUE;
+                gLink.invalidIdError = TRUE;
             }
         }
         gLink.checksum = 0;
@@ -616,12 +616,12 @@ static void DoRecv(void)
             for (i = 0; i < gLink.playerCount; i++)
             {
                 gLink.checksum += recv[i];
-                gUnknown_0200282A |= recv[i];
+                sRecvNonzeroCheck |= recv[i];
                 gLink.recvQueue.data[i][gLink.recvCmdIndex][index] = recv[i];
-                if ((gLink.sendCmdIndex == 1) && (gLink.unkE == 0) && ((recv[i] & 0xF) == 1))
+                if ((gLink.sendCmdIndex == 1) && (gLink.sendPaused == 0) && ((recv[i] & 0xF) == 1))
                 {
-                    gLink.unkE = 1;
-                    gUnknown_02002826 = 5;
+                    gLink.sendPaused = 1;
+                    sLinkFlowControlDelay = 5;
                 }
             }
         }
@@ -630,10 +630,10 @@ static void DoRecv(void)
             gLink.queueFull |= QUEUE_FULL_RECV;
         }
         gLink.recvCmdIndex++;
-        if (gLink.recvCmdIndex == CMD_LENGTH && gUnknown_0200282A)
+        if (gLink.recvCmdIndex == CMD_LENGTH && sRecvNonzeroCheck)
         {
             gLink.recvQueue.count++;
-            gUnknown_0200282A = 0;
+            sRecvNonzeroCheck = 0;
         }
     }
 }
@@ -671,7 +671,7 @@ static void DoSend(void)
         {
             REG_SIOMLT_SEND = gLink.sendQueue.data[gLink.sendCmdIndex][gLink.sendQueue.pos];
         }
-        if ((gLink.unkE == 0) && (gLink.sendCmdIndex == 0) && (3 < gLink.recvQueue.count)) {
+        if ((gLink.sendPaused == 0) && (gLink.sendCmdIndex == 0) && (3 < gLink.recvQueue.count)) {
             REG_SIOMLT_SEND |= 1; // TODO
         }
         gLink.sendCmdIndex++;

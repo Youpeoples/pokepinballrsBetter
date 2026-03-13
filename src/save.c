@@ -9,14 +9,14 @@ static bool16 LoadSaveDataFromSram(void);
 void SaveFile_LoadGameData(void)
 {
     SetSramFastFunc();
-    gMain.unkC = 0;
+    gMain.sramError = 0;
     if (LoadSaveDataFromSram() == FALSE)
     {
         ResetSaveFile();
         SaveFile_WriteToSram();
         if (LoadSaveDataFromSram() == FALSE)
         {
-            gMain.unkC = 1;
+            gMain.sramError = 1;
             ResetSaveFile();
         }
     }
@@ -77,7 +77,7 @@ void SaveFile_WriteToSram(void)
     u16 *saveData = (u16 *)&gMain_saveData;
     size_t size = sizeof(gMain_saveData);
 
-    gMain_saveData.unk2E4++;
+    gMain_saveData.saveChangeCounter++;
     gMain_saveData.checksum = 0;
 
     checksum = 0;
@@ -103,7 +103,7 @@ void SaveFile_SetPokedexFlags(s16 species, u8 flag)
 
     if (gMain_saveData.pokedexFlags[species] < flag)
     {
-        gMain_saveData.unk2E4++;
+        gMain_saveData.saveChangeCounter++;
         gMain_saveData.pokedexFlags[species] = flag;
         gMain_saveData.checksum = 0;
 
@@ -135,7 +135,7 @@ void ResetSaveFile(void)
     for (i = 0; i < 10; i++)
         gMain_saveData.signature[i] = gSaveFileSignature[i];
 
-    gMain_saveData.unk2E4 = 0;
+    gMain_saveData.saveChangeCounter = 0;
     gMain_saveData.rumbleEnabled = FALSE;
     gMain_saveData.ballSpeed = 0;
     SetButtonConfigInputs(BUTTON_CONFIG_RESET);

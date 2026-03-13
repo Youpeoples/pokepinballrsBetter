@@ -5,8 +5,8 @@
 #include "m4a.h"
 #include "titlescreen.h"
 
-static void sub_8F94(void);
-static void sub_8C38(void);
+static void RenderFieldSelectSprites(void);
+static void InitFieldSelectData(void);
 
 enum FieldSelectStates
 {
@@ -18,17 +18,17 @@ enum FieldSelectStates
 
 struct FieldSelectData
 {
-    u16 unk0;
-    u16 unk2;
-    u16 unk4;
-    u16 unk6;
+    u16 rubyFieldSpriteId;
+    u16 sapphireFieldSpriteId;
+    u16 rubyHighlightVisible;
+    u16 sapphireHighlightVisible;
     u16 selectedField;
     u16 state;
-    s16 unkC;
-    s16 unkE;
+    s16 transitionFrame;
+    s16 speedBlinkTimer;
     u8 ballSpeed;
-    s16 unk12;
-    s8 unk14;
+    s16 speedBlinkToggle;
+    s8 ballSpeedVisible;
     u16 nextMainState;
 };
 
@@ -59,50 +59,50 @@ void LoadFieldSelectGraphics(void)
     DmaCopy16(3, gFieldSelectBGPals,             (void *)(PLTT),           0x200);
     DmaCopy16(3, gFieldSelectWindow_Gfx,         (void *)(VRAM + 0x4000),  0x1400);
     DmaCopy16(3, gFieldSelectMiniFields_Gfx,     (void *)(VRAM + 0x8000),  0x3800);
-    DmaCopy16(3, gUnknown_080A2400,              (void *)(VRAM),           0x800);
+    DmaCopy16(3, gFieldSelectBG0Tilemap,              (void *)(VRAM),           0x800);
     DmaCopy16(3, gFieldSelectFrameShadowTilemap, (void *)(VRAM + 0x800),   0x800);
     DmaCopy16(3, gFieldSelectWindowTilemap,      (void *)(VRAM + 0x1000),  0x800);
     DmaCopy16(3, gFieldSelectSpritePals,         (void *)(PLTT + 0x200),   0x200);
     DmaCopy16(3, gFieldSelectSpriteGfx,          (void *)(VRAM + 0x10000), 0x4020);
 
-    sub_0CBC();
-    sub_8C38();
-    sub_FD5C(sub_8F94);
+    EnableVBlankInterrupts();
+    InitFieldSelectData();
+    FadeInFromWhite(RenderFieldSelectSprites);
     gMain.subState++;
     m4aSongNumStart(MUS_TABLE_SELECT);
 }
 
-static void sub_8C38(void)
+static void InitFieldSelectData(void)
 {
-    gFieldSelectData.unk0 = 2;
-    gFieldSelectData.unk2 = 3;
-    gFieldSelectData.unk4 = 0;
-    gFieldSelectData.unk6 = 1;
+    gFieldSelectData.rubyFieldSpriteId = 2;
+    gFieldSelectData.sapphireFieldSpriteId = 3;
+    gFieldSelectData.rubyHighlightVisible = 0;
+    gFieldSelectData.sapphireHighlightVisible = 1;
     gFieldSelectData.selectedField = FIELD_RUBY;
     gFieldSelectData.state = FIELD_SELECT_STATE_CHOOSE_FIELD;
-    gFieldSelectData.unkC = 0;
-    gFieldSelectData.unkE = 0;
+    gFieldSelectData.transitionFrame = 0;
+    gFieldSelectData.speedBlinkTimer = 0;
     gFieldSelectData.nextMainState = STATE_INTRO;
-    gFieldSelectData.unk12 = 0;
-    gFieldSelectData.unk14 = 0;
+    gFieldSelectData.speedBlinkToggle = 0;
+    gFieldSelectData.ballSpeedVisible = 0;
 
     gFieldSelectData.ballSpeed = gMain_saveData.ballSpeed;
     gMain.selectedField = FIELD_RUBY;
-    gUnknown_02002850 = 0;
+    gFieldSelectSoftReset = 0;
 }
 
 #define RESTART_GAME_BUTTONS (A_BUTTON | B_BUTTON | SELECT_BUTTON | START_BUTTON)
 
 void FieldSelect_State1_8C7C(void)
 {
-    sub_8F94();
+    RenderFieldSelectSprites();
     if (JOY_HELD(RESTART_GAME_BUTTONS) == RESTART_GAME_BUTTONS)
     {
-        gUnknown_02002850 = 1;
+        gFieldSelectSoftReset = 1;
         gFieldSelectData.nextMainState = STATE_INTRO;
         gMain.subState++;
     }
-    if (gUnknown_02002850 == 0)
+    if (gFieldSelectSoftReset == 0)
     {
         switch (gFieldSelectData.state)
         {
@@ -113,8 +113,8 @@ void FieldSelect_State1_8C7C(void)
                 {
                     m4aSongNumStart(SE_UNKNOWN_0x6D);
                     gFieldSelectData.selectedField = FIELD_RUBY;
-                    gFieldSelectData.unk4 = 0;
-                    gFieldSelectData.unk6 = 1;
+                    gFieldSelectData.rubyHighlightVisible = 0;
+                    gFieldSelectData.sapphireHighlightVisible = 1;
                     gFieldSelectData.state = FIELD_SELECT_STATE_1;
                 }
             }
@@ -124,8 +124,8 @@ void FieldSelect_State1_8C7C(void)
                 {
                     m4aSongNumStart(SE_UNKNOWN_0x6D);
                     gFieldSelectData.selectedField = FIELD_SAPPHIRE;
-                    gFieldSelectData.unk4 = 1;
-                    gFieldSelectData.unk6 = 0;
+                    gFieldSelectData.rubyHighlightVisible = 1;
+                    gFieldSelectData.sapphireHighlightVisible = 0;
                     gFieldSelectData.state = FIELD_SELECT_STATE_1;
                 }
             }
@@ -133,23 +133,23 @@ void FieldSelect_State1_8C7C(void)
             {
                 m4aSongNumStart(SE_MENU_SELECT);
                 gFieldSelectData.state = FIELD_SELECT_STATE_BALL_SPEED;
-                gFieldSelectData.unk14 = 1;
-                gFieldSelectData.unkE = 0;
+                gFieldSelectData.ballSpeedVisible = 1;
+                gFieldSelectData.speedBlinkTimer = 0;
                 if (gFieldSelectData.selectedField == FIELD_RUBY)
                 {
-                    gFieldSelectData.unk4 = 0;
-                    gFieldSelectData.unk6 = 1;
-                    gFieldSelectData.unk0 = 2;
-                    gFieldSelectData.unk2 = 3;
-                    gFieldSelectData.unkC = 0;
+                    gFieldSelectData.rubyHighlightVisible = 0;
+                    gFieldSelectData.sapphireHighlightVisible = 1;
+                    gFieldSelectData.rubyFieldSpriteId = 2;
+                    gFieldSelectData.sapphireFieldSpriteId = 3;
+                    gFieldSelectData.transitionFrame = 0;
                 }
                 else
                 {
-                    gFieldSelectData.unk4 = 1;
-                    gFieldSelectData.unk6 = 0;
-                    gFieldSelectData.unk0 = 7;
-                    gFieldSelectData.unk2 = 11;
-                    gFieldSelectData.unkC = 0;
+                    gFieldSelectData.rubyHighlightVisible = 1;
+                    gFieldSelectData.sapphireHighlightVisible = 0;
+                    gFieldSelectData.rubyFieldSpriteId = 7;
+                    gFieldSelectData.sapphireFieldSpriteId = 11;
+                    gFieldSelectData.transitionFrame = 0;
                 }
             }
             if (JOY_NEW(B_BUTTON))
@@ -159,25 +159,25 @@ void FieldSelect_State1_8C7C(void)
                 gFieldSelectData.nextMainState = STATE_TITLE;
                 if (gFieldSelectData.selectedField == FIELD_RUBY)
                 {
-                    gFieldSelectData.unk4 = 0;
-                    gFieldSelectData.unk6 = 1;
-                    gFieldSelectData.unk0 = 2;
-                    gFieldSelectData.unk2 = 3;
-                    gFieldSelectData.unkC = 0;
+                    gFieldSelectData.rubyHighlightVisible = 0;
+                    gFieldSelectData.sapphireHighlightVisible = 1;
+                    gFieldSelectData.rubyFieldSpriteId = 2;
+                    gFieldSelectData.sapphireFieldSpriteId = 3;
+                    gFieldSelectData.transitionFrame = 0;
                 }
                 else
                 {
-                    gFieldSelectData.unk4 = 1;
-                    gFieldSelectData.unk6 = 0;
-                    gFieldSelectData.unk0 = 7;
-                    gFieldSelectData.unk2 = 11;
-                    gFieldSelectData.unkC = 0;
+                    gFieldSelectData.rubyHighlightVisible = 1;
+                    gFieldSelectData.sapphireHighlightVisible = 0;
+                    gFieldSelectData.rubyFieldSpriteId = 7;
+                    gFieldSelectData.sapphireFieldSpriteId = 11;
+                    gFieldSelectData.transitionFrame = 0;
                 }
             }
             if (gMain.selectedField < MAIN_FIELD_COUNT)
-                gMain.unk6 = 0;
+                gMain.isBonusField = 0;
             else
-                gMain.unk6 = 1;
+                gMain.isBonusField = 1;
             break;
         case FIELD_SELECT_STATE_BALL_SPEED:
             if (JOY_NEW(DPAD_LEFT | DPAD_RIGHT))
@@ -188,8 +188,8 @@ void FieldSelect_State1_8C7C(void)
             if (JOY_NEW(A_BUTTON))
             {
                 m4aSongNumStart(SE_MENU_SELECT);
-                gFieldSelectData.unkE = 0;
-                gFieldSelectData.unkC = 0;
+                gFieldSelectData.speedBlinkTimer = 0;
+                gFieldSelectData.transitionFrame = 0;
                 gMain_saveData.ballSpeed = gFieldSelectData.ballSpeed;
                 SaveFile_WriteToSram();
                 gFieldSelectData.state = FIELD_SELECT_STATE_3;
@@ -197,36 +197,36 @@ void FieldSelect_State1_8C7C(void)
             if (JOY_NEW(B_BUTTON))
             {
                 m4aSongNumStart(SE_MENU_CANCEL);
-                gFieldSelectData.unk14 = 0;
+                gFieldSelectData.ballSpeedVisible = 0;
                 gFieldSelectData.state = FIELD_SELECT_STATE_CHOOSE_FIELD;
             }
-            gFieldSelectData.unkE++;
-            if (gFieldSelectData.unkE > 4)
+            gFieldSelectData.speedBlinkTimer++;
+            if (gFieldSelectData.speedBlinkTimer > 4)
             {
-                gFieldSelectData.unkE = 0;
-                gFieldSelectData.unk12 = 1 - gFieldSelectData.unk12;
+                gFieldSelectData.speedBlinkTimer = 0;
+                gFieldSelectData.speedBlinkToggle = 1 - gFieldSelectData.speedBlinkToggle;
             }
             break;
         case FIELD_SELECT_STATE_1:
             if (gFieldSelectData.selectedField == FIELD_RUBY)
             {
-                gFieldSelectData.unk0 = gUnknown_086A6B14.unk0[4 - gFieldSelectData.unkC];
-                gFieldSelectData.unk2 = gUnknown_086A6B14.unkA[4 - gFieldSelectData.unkC];
+                gFieldSelectData.rubyFieldSpriteId = gFieldTransitionAnimData.rubyTransitionFrames[4 - gFieldSelectData.transitionFrame];
+                gFieldSelectData.sapphireFieldSpriteId = gFieldTransitionAnimData.sapphireTransitionFrames[4 - gFieldSelectData.transitionFrame];
             }
             else
             {
-                gFieldSelectData.unk0 = gUnknown_086A6B14.unk0[gFieldSelectData.unkC];
-                gFieldSelectData.unk2 = gUnknown_086A6B14.unkA[gFieldSelectData.unkC];
+                gFieldSelectData.rubyFieldSpriteId = gFieldTransitionAnimData.rubyTransitionFrames[gFieldSelectData.transitionFrame];
+                gFieldSelectData.sapphireFieldSpriteId = gFieldTransitionAnimData.sapphireTransitionFrames[gFieldSelectData.transitionFrame];
             }
             if (!(gMain.systemFrameCount & 1))
             {
-                if (gFieldSelectData.unkC < 4)
+                if (gFieldSelectData.transitionFrame < 4)
                 {
-                    gFieldSelectData.unkC++;
+                    gFieldSelectData.transitionFrame++;
                 }
                 else
                 {
-                    gFieldSelectData.unkC = 0;
+                    gFieldSelectData.transitionFrame = 0;
                     gFieldSelectData.state = FIELD_SELECT_STATE_CHOOSE_FIELD;
                 }
             }
@@ -236,11 +236,11 @@ void FieldSelect_State1_8C7C(void)
                 {
                     m4aSongNumStart(SE_UNKNOWN_0x6D);
                     gFieldSelectData.selectedField = FIELD_RUBY;
-                    gFieldSelectData.unk4 = 0;
-                    gFieldSelectData.unk6 = 1;
-                    gFieldSelectData.unk0 = 2;
-                    gFieldSelectData.unk2 = 3;
-                    gFieldSelectData.unkC = 0;
+                    gFieldSelectData.rubyHighlightVisible = 0;
+                    gFieldSelectData.sapphireHighlightVisible = 1;
+                    gFieldSelectData.rubyFieldSpriteId = 2;
+                    gFieldSelectData.sapphireFieldSpriteId = 3;
+                    gFieldSelectData.transitionFrame = 0;
                     gFieldSelectData.state = FIELD_SELECT_STATE_CHOOSE_FIELD;
                 }
             }
@@ -250,26 +250,26 @@ void FieldSelect_State1_8C7C(void)
                 {
                     m4aSongNumStart(SE_UNKNOWN_0x6D);
                     gFieldSelectData.selectedField = FIELD_SAPPHIRE;
-                    gFieldSelectData.unk4 = 1;
-                    gFieldSelectData.unk6 = 0;
-                    gFieldSelectData.unk0 = 7;
-                    gFieldSelectData.unk2 = 11;
-                    gFieldSelectData.unkC = 0;
+                    gFieldSelectData.rubyHighlightVisible = 1;
+                    gFieldSelectData.sapphireHighlightVisible = 0;
+                    gFieldSelectData.rubyFieldSpriteId = 7;
+                    gFieldSelectData.sapphireFieldSpriteId = 11;
+                    gFieldSelectData.transitionFrame = 0;
                     gFieldSelectData.state = FIELD_SELECT_STATE_CHOOSE_FIELD;
                 }
             }
             break;
         case FIELD_SELECT_STATE_3:
-            gFieldSelectData.unkE++;
-            if (gFieldSelectData.unkE > 3)
+            gFieldSelectData.speedBlinkTimer++;
+            if (gFieldSelectData.speedBlinkTimer > 3)
             {
-                gFieldSelectData.unkE = 0;
+                gFieldSelectData.speedBlinkTimer = 0;
                 if (gFieldSelectData.selectedField == FIELD_RUBY)
-                    gFieldSelectData.unk4 = 1 - gFieldSelectData.unk4;
+                    gFieldSelectData.rubyHighlightVisible = 1 - gFieldSelectData.rubyHighlightVisible;
                 else
-                    gFieldSelectData.unk6 = 1 - gFieldSelectData.unk6;
-                gFieldSelectData.unkC++;
-                if (gFieldSelectData.unkC > 5)
+                    gFieldSelectData.sapphireHighlightVisible = 1 - gFieldSelectData.sapphireHighlightVisible;
+                gFieldSelectData.transitionFrame++;
+                if (gFieldSelectData.transitionFrame > 5)
                 {
                     gFieldSelectData.nextMainState = STATE_GAME_MAIN;
                     gMain.subState++;
@@ -278,20 +278,20 @@ void FieldSelect_State1_8C7C(void)
             break;
         }
         gMain.selectedField = gFieldSelectData.selectedField;
-        gMain.unk5 = gFieldSelectData.selectedField;
+        gMain.tempField = gFieldSelectData.selectedField;
     }
 }
 
 void FieldSelect_State2_8F64(void)
 {
-    sub_FE04(sub_8F94);
+    FadeOutToWhite(RenderFieldSelectSprites);
     m4aMPlayAllStop();
-    sub_0D10();
+    DisableVBlankInterrupts();
     gAutoDisplayTitlescreenMenu = TRUE;
     SetMainGameState(gFieldSelectData.nextMainState);
 }
 
-static void sub_8F94(void)
+static void RenderFieldSelectSprites(void)
 {
     struct SpriteGroup *r6;
     struct SpriteGroup *r9;
@@ -308,19 +308,19 @@ static void sub_8F94(void)
 
     r6 = &gMain.spriteGroups[0];
     r9 = &gMain.spriteGroups[1];
-    sp0 = &gMain.spriteGroups[gFieldSelectData.unk0];
-    r10 = &gMain.spriteGroups[gFieldSelectData.unk2];
-    r8 = &gMain.spriteGroups[12 + gFieldSelectData.ballSpeed * 2 + gFieldSelectData.unk12];
+    sp0 = &gMain.spriteGroups[gFieldSelectData.rubyFieldSpriteId];
+    r10 = &gMain.spriteGroups[gFieldSelectData.sapphireFieldSpriteId];
+    r8 = &gMain.spriteGroups[12 + gFieldSelectData.ballSpeed * 2 + gFieldSelectData.speedBlinkToggle];
 
-    r6->available = gFieldSelectData.unk4;
-    r9->available = gFieldSelectData.unk6;
+    r6->available = gFieldSelectData.rubyHighlightVisible;
+    r9->available = gFieldSelectData.sapphireHighlightVisible;
     sp0->available = TRUE;
     r10->available = TRUE;
-    r8->available = gFieldSelectData.unk14;
+    r8->available = gFieldSelectData.ballSpeedVisible;
 
-    LoadSpriteSets(gUnknown_086A6AD4, 16, r6);
+    LoadSpriteSets(gFieldSelectSpriteSets, 16, r6);
 
-    if (gFieldSelectData.unk4 == 1)
+    if (gFieldSelectData.rubyHighlightVisible == 1)
     {
         r6->baseX = 0x25;
         r6->baseY = 0x18;
@@ -331,7 +331,7 @@ static void sub_8F94(void)
         }
     }
 
-    if (gFieldSelectData.unk6 == 1)
+    if (gFieldSelectData.sapphireHighlightVisible == 1)
     {
         r9->baseX = 0x8D;
         r9->baseY = 0x18;
@@ -344,7 +344,7 @@ static void sub_8F94(void)
 
     sp0->baseX = 32;
     sp0->baseY = 32;
-    spriteSet = gUnknown_086A6AD4[gFieldSelectData.unk0];
+    spriteSet = gFieldSelectSpriteSets[gFieldSelectData.rubyFieldSpriteId];
     for (i = 0; i < spriteSet->count; i++)
     {
         gOamBuffer[sp0->oam[i].oamId].objMode = 1;
@@ -354,7 +354,7 @@ static void sub_8F94(void)
 
     r10->baseX = 0x88;
     r10->baseY = 32;
-    spriteSet = gUnknown_086A6AD4[gFieldSelectData.unk2];
+    spriteSet = gFieldSelectSpriteSets[gFieldSelectData.sapphireFieldSpriteId];
     for (i = 0; i < spriteSet->count; i++)
     {
         gOamBuffer[r10->oam[i].oamId].objMode = 1;
@@ -364,8 +364,8 @@ static void sub_8F94(void)
 
     if (r8->available == 1)
     {
-        r8->baseX = gUnknown_086A6B28[gFieldSelectData.selectedField].x;
-        r8->baseY = gUnknown_086A6B28[gFieldSelectData.selectedField].y;
+        r8->baseX = gFieldSelectBallSpeedPositions[gFieldSelectData.selectedField].x;
+        r8->baseY = gFieldSelectBallSpeedPositions[gFieldSelectData.selectedField].y;
         for (i = 0; i < 5; i++)
         {
             gOamBuffer[r8->oam[i].oamId].objMode = 0;

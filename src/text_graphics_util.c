@@ -7,7 +7,7 @@ void PrintString(u16 glyph, u16 palette, int x, int y, int width, int height)
 
     for (j = 0; j < height; j++)
         for (i = 0; i < width; i++)
-            gUnknown_03005C00[y * 0x20 + x + j * 0x20 + i] = (glyph + j * 0x20 + i) | (palette << 12);
+            gBG0TilemapBuffer[y * 0x20 + x + j * 0x20 + i] = (glyph + j * 0x20 + i) | (palette << 12);
 }
 
 void CopyString(int srcX, int srcY, int destX, int destY, int width, int height)
@@ -16,7 +16,7 @@ void CopyString(int srcX, int srcY, int destX, int destY, int width, int height)
 
     for (j = 0; j < height; j++)
         for (i = 0; i < width; i++)
-            gUnknown_03005C00[destY * 0x20 + destX + j * 0x20 + i] = gUnknown_03005C00[srcY * 0x20 + srcX + j * 0x20 + i];
+            gBG0TilemapBuffer[destY * 0x20 + destX + j * 0x20 + i] = gBG0TilemapBuffer[srcY * 0x20 + srcX + j * 0x20 + i];
 }
 
 void SetStringPalette(int x, int y, int width, int height, u16 palette)
@@ -29,7 +29,7 @@ void SetStringPalette(int x, int y, int width, int height, u16 palette)
         for (i = 0; i < width; i++)
         {
             index = y * 0x20 + x + j * 0x20 + i;
-            gUnknown_03005C00[index] = (gUnknown_03005C00[index] & 0xFFF) | (palette << 12);
+            gBG0TilemapBuffer[index] = (gBG0TilemapBuffer[index] & 0xFFF) | (palette << 12);
         }
     }
 }
@@ -47,7 +47,7 @@ void CopyBgTilesRect(void *volatile src, void *volatile dest, s16 width, s16 hei
 
 // This function is unused. It appears to operates on a pixel canvas where each "tile" is represented by
 // 2 bytes.
-void sub_10750(void *volatile src, void *volatile dest, s16 width, s16 height)
+void CopyPixelCanvasRect(void *volatile src, void *volatile dest, s16 width, s16 height)
 {
     int j;
 
@@ -58,15 +58,15 @@ void sub_10750(void *volatile src, void *volatile dest, s16 width, s16 height)
 }
 
 // This function is unused.
-void sub_10798(void *src1, void *src2, void (*func)(void))
+void Unused_FadeInWithCustomPalettes(void *src1, void *src2, void (*func)(void))
 {
     u16 i;
 
-    DmaCopy16(3, src1, gUnknown_0201A520[1], BG_PLTT_SIZE);
-    DmaCopy16(3, src2, gUnknown_0201A520[2], BG_PLTT_SIZE);
-    DmaFill16(3, RGB_WHITE, gUnknown_0201A520, PLTT_SIZE);
-    DmaCopy16(3, gUnknown_0201A520[0], gUnknown_0201A520[2], PLTT_SIZE);
-    DmaCopy16(3, gUnknown_0201A520[2], (void *)PLTT, PLTT_SIZE);
+    DmaCopy16(3, src1, gPaletteFadeBuffers[1], BG_PLTT_SIZE);
+    DmaCopy16(3, src2, gPaletteFadeBuffers[2], BG_PLTT_SIZE);
+    DmaFill16(3, RGB_WHITE, gPaletteFadeBuffers, PLTT_SIZE);
+    DmaCopy16(3, gPaletteFadeBuffers[0], gPaletteFadeBuffers[2], PLTT_SIZE);
+    DmaCopy16(3, gPaletteFadeBuffers[2], (void *)PLTT, PLTT_SIZE);
 
     UnblankLCD();
     gMain.dispcntBackup = REG_DISPCNT;
@@ -76,41 +76,41 @@ void sub_10798(void *src1, void *src2, void (*func)(void))
         if (func != NULL)
             func();
 
-        sub_1001C(i);
+        InterpolatePaletteStep(i);
         MainLoopIter();
         if (i == 0x20)
         {
-            DmaCopy16(3, gUnknown_0201A520[1], (void *)PLTT, PLTT_SIZE);
+            DmaCopy16(3, gPaletteFadeBuffers[1], (void *)PLTT, PLTT_SIZE);
         }
         else
         {
-            DmaCopy16(3, gUnknown_0201A520[2], (void *)PLTT, PLTT_SIZE);
+            DmaCopy16(3, gPaletteFadeBuffers[2], (void *)PLTT, PLTT_SIZE);
         }
     }
 }
 
 // This function is unused.
-void sub_10860(void (*func)(void))
+void Unused_FadeOutToWhite(void (*func)(void))
 {
     u16 i;
 
-    DmaCopy16(3, (void *)PLTT, gUnknown_0201A520[0], PLTT_SIZE);
-    DmaFill16(3, RGB_WHITE, gUnknown_0201A520[1], PLTT_SIZE);
-    DmaCopy16(3, gUnknown_0201A520[0], gUnknown_0201A520[2], PLTT_SIZE);
+    DmaCopy16(3, (void *)PLTT, gPaletteFadeBuffers[0], PLTT_SIZE);
+    DmaFill16(3, RGB_WHITE, gPaletteFadeBuffers[1], PLTT_SIZE);
+    DmaCopy16(3, gPaletteFadeBuffers[0], gPaletteFadeBuffers[2], PLTT_SIZE);
 
     for (i = 0; i <= 0x20; i += 0x10)
     {
         if (func != NULL)
             func();
-        sub_1001C(i);
+        InterpolatePaletteStep(i);
         MainLoopIter();
         if (i == 0x20)
         {
-            DmaCopy16(3, gUnknown_0201A520[1], (void *)PLTT, PLTT_SIZE);
+            DmaCopy16(3, gPaletteFadeBuffers[1], (void *)PLTT, PLTT_SIZE);
         }
         else
         {
-            DmaCopy16(3, gUnknown_0201A520[2], (void *)PLTT, PLTT_SIZE);
+            DmaCopy16(3, gPaletteFadeBuffers[2], (void *)PLTT, PLTT_SIZE);
         }
     }
     MainLoopIter();

@@ -1841,7 +1841,7 @@ gUnknown_08532808:: @ 0x08532808
 	voice_square_1 60, 0, 0, 2, 0, 0, 15, 0
 	voice_directsound_no_resample 60, 0, gDirectSound_0853854C, 255, 89, 0, 89
 
-gUnknown_08532D6C:: @ 0x08532D6C
+gPokemonCryToneBank0:: @ 0x08532D6C
 	voice_square_1 60, 0, 0, 2, 0, 0, 15, 0
 	voice_square_1 60, 0, 0, 2, 0, 0, 15, 0
 	voice_square_1 60, 0, 0, 2, 0, 0, 15, 0
@@ -1970,7 +1970,7 @@ gUnknown_08532D6C:: @ 0x08532D6C
 	voice_square_1 60, 0, 0, 2, 0, 0, 15, 0
 	voice_directsound_compressed gDirectSound_085DDBE4
 
-gUnknown_08533360:: @ 0x08533360
+gPokemonCryToneBank1:: @ 0x08533360
 	voice_directsound_compressed gDirectSound_085DE840
 	voice_directsound_compressed gDirectSound_085DFB48
 	voice_square_1 60, 0, 0, 2, 0, 0, 15, 0
@@ -2100,7 +2100,7 @@ gUnknown_08533360:: @ 0x08533360
 	voice_directsound_compressed gDirectSound_0860173C
 	voice_directsound_compressed gDirectSound_08602398
 
-gUnknown_08533960:: @ 0x08533960
+gPokemonCryToneBank2:: @ 0x08533960
 	voice_directsound_compressed gDirectSound_086038A0
 	voice_directsound_compressed gDirectSound_08604338
 	voice_directsound_compressed gDirectSound_08604F68
@@ -2230,7 +2230,7 @@ gUnknown_08533960:: @ 0x08533960
 	voice_directsound_compressed gDirectSound_08683470
 	voice_directsound_compressed gDirectSound_08683C94
 
-gUnknown_08533F60:: @ 0x08533F60
+gPokemonCryToneBank3:: @ 0x08533F60
 	voice_directsound_compressed gDirectSound_08684D9C
 	voice_directsound_compressed gDirectSound_08686394
 	voice_directsound_compressed gDirectSound_08687118

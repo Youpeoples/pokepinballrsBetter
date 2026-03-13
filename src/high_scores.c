@@ -9,49 +9,49 @@
 
 extern StateFunc gHighScoresStateFuncs[15];
 extern StateFunc gIdleHighScoresStateFuncs[15];
-extern u8 gUnknown_0809DBE0[];
-extern u8 gUnknown_08099FC0[];
+extern u8 gHighScoreBG_Pals[];
+extern u8 gHighScoreBallWatermark_Tilemap[];
 extern u8 gHighScoreText_Gfx[];
-extern s16 gUnknown_0202C588;
-extern s8 gUnknown_0202BEB0;
-extern s8 gUnknown_0201C18C;
-extern s16 gUnknown_0201A4B8;
-extern s8 gUnknown_0202BED4;
-extern s8 gUnknown_0202C580;
-extern s8 gUnknown_0201B178;
-extern u8 gUnknown_0202BEBC;
-extern u16 gUnknown_0201C1B0;
-extern u16 gUnknown_0202C59C;
-extern s8 gUnknown_0201A4BC;
-extern s8 gUnknown_0202C598;
-extern s8 gUnknown_0202C54C;
+extern s16 gHighScoreEntrySource;
+extern s8 gCompletionBannerDone;
+extern s8 gCompletionBannerVisible;
+extern s16 gCompletionBannerY;
+extern s8 gCompletionBannerPhase;
+extern s8 gCompletionBannerFrame;
+extern s8 gShowDialogFlag;
+extern u8 gDialogType;
+extern u16 gLinkExchangeCommand;
+extern u16 gLinkPacketCounter;
+extern s8 gLinkExchangeSendPhase;
+extern s8 gLinkExchangeRecvPhase;
+extern s8 gLinkExchangeTimeout;
 
-extern s16 gUnknown_02002880;
-extern s16 gUnknown_02002882;
-extern s8 gUnknown_02002884;
-extern s8 gUnknown_02002885;
+extern s16 gScrollDirection;
+extern s16 gScrollXOffset;
+extern s8 gResetComboTimer;
+extern s8 gResetComboCount;
 
-struct unkStruct_2002858
+struct HighScoreScreenState
 {
     u32 newScoreHi;
     u32 newScoreLo;
-    s16 unk8;
-    u8 unkA;
+    s16 displayTimer;
+    u8 nextSubState;
     u8 mainField;
     s32 highScoreIndex;
     s16 currentNameCharIndex;
-    s16 unk12;
-    s16 unk14;
+    s16 nameFlashToggle;
+    s16 flashFrameCounter;
     s16 currentNameChar;
-    s16 unk18;
-    s16 unk1A;
-    s16 unk1C;
-    s16 unk1E;
-    s16 unk20;
-    s16 unk22;
-    s8 unk24;
-    u8 unk25;
-    s8 unk26;
+    s16 flashDuration;
+    s16 flashElapsedFrames;
+    s16 paletteAnimPhase;
+    s16 paletteAnimTimer;
+    s16 inputRepeatDelay;
+    s16 linkWaitTimer;
+    s8 nextIdleState;
+    u8 arrowBlinkToggle;
+    s8 displayModeVisible;
 };
 
 enum HighScoreStates{
@@ -72,15 +72,15 @@ enum HighScoreStates{
     HIGH_SCORE_STATE_14 = 14
 };
 
-struct unkStruct_2002858 gUnknown_02002858;
+struct HighScoreScreenState gHighScoreScreenState;
 
-extern struct HighScoreEntry gUnknown_0202C610[MAIN_FIELD_COUNT][NUM_HIGH_SCORES];
-extern struct HighScoreEntry gUnknown_0202C550[2];
+extern struct HighScoreEntry gWorkingHighScores[MAIN_FIELD_COUNT][NUM_HIGH_SCORES];
+extern struct HighScoreEntry gRemoteTopScores[2];
 extern u8 gHighScoreBallWatermark_Gfx[];
-extern u8 gUnknown_080947A0[];
-extern u8 gUnknown_0809DDE0[];
+extern u8 gHighScoreScoreTable_Tilemap[];
+extern u8 gHighScoreSprite_Pals[];
 extern u8 gHighScoreDialogs_Gfx[];
-extern u32 gUnknown_08079870[8];
+extern u32 gHighScoreNameRowTilemapOffsets[8];
 extern const struct HighScoreEntry gDefaultHighScores[2][8];
 
 void HighScoresMain(void)
@@ -103,26 +103,26 @@ void LoadHighScoreGraphics(void)
   REG_DISPCNT |= DISPCNT_BG3_ON;
   gMain.dispcntBackup = REG_DISPCNT;
 
-  DmaCopy16(3, gUnknown_0809DBE0, (void*) PLTT, 0x200);
+  DmaCopy16(3, gHighScoreBG_Pals, (void*) PLTT, 0x200);
   DmaCopy16(3, gHighScoreText_Gfx, (void*) BG_VRAM + 0x4000, 0x4800);
   DmaCopy16(3, gHighScoreBallWatermark_Gfx, (void *)BG_VRAM + 0xC000, 0x2C00);
-  DmaCopy16(3, gUnknown_080947A0, gUnknown_03005C00, 0x1000);
-  DmaCopy16(3, gUnknown_08099FC0, (void *)BG_SCREEN_ADDR(2), 0x1000);
-  DmaCopy16(3, gUnknown_0809DDE0, (void *)OBJ_PLTT, 0x100);
+  DmaCopy16(3, gHighScoreScoreTable_Tilemap, gBG0TilemapBuffer, 0x1000);
+  DmaCopy16(3, gHighScoreBallWatermark_Tilemap, (void *)BG_SCREEN_ADDR(2), 0x1000);
+  DmaCopy16(3, gHighScoreSprite_Pals, (void *)OBJ_PLTT, 0x100);
   DmaCopy16(3, gHighScoreDialogs_Gfx, (void *)OBJ_VRAM0, 0x4420);
-  sub_CFD4();
-  sub_EE64();
-  DmaCopy16(3, gUnknown_03005C00,0x6000000, 0x1000);
-  if(gUnknown_0202C588 == 0)
+  InitHighScoreData();
+  DrawAllHighScoreText();
+  DmaCopy16(3, gBG0TilemapBuffer,0x6000000, 0x1000);
+  if(gHighScoreEntrySource == 0)
       m4aSongNumStart(MUS_HIGH_SCORE);
 
-  gUnknown_0202C588 = 0;
-  sub_0CBC();
-  sub_024C();
-  gMain.subState = gUnknown_02002858.unkA;
+  gHighScoreEntrySource = 0;
+  EnableVBlankInterrupts();
+  FadeInScreen();
+  gMain.subState = gHighScoreScreenState.nextSubState;
 }
 
-void sub_CFD4(void)
+void InitHighScoreData(void)
 {
     int i, j, k;
     for(i = 0; i < MAIN_FIELD_COUNT; i++)
@@ -130,244 +130,244 @@ void sub_CFD4(void)
         for(j = 0; j < NUM_HIGH_SCORES; j++)
         {
             for(k = 0; k < HIGH_SCORE_NAME_LENGTH + 2; k++) // ? use an array count instead?
-                gUnknown_0202C610[i][j].data.raw[k] = gMain_saveData.highScores[i][j].data.raw[k];
+                gWorkingHighScores[i][j].data.raw[k] = gMain_saveData.highScores[i][j].data.raw[k];
         }
     }
     for(i = 0; i < MAIN_FIELD_COUNT; i++)
     {
         for(j = 0; j <  HIGH_SCORE_NAME_LENGTH + 2; j++)
         {
-            gUnknown_0202C550[i].data.raw[j] = gUnknown_0202C610[i][0].data.raw[j];
+            gRemoteTopScores[i].data.raw[j] = gWorkingHighScores[i][0].data.raw[j];
         }
     }
-    gUnknown_02002858.currentNameCharIndex = 0;
-    gUnknown_02002858.unk12 = 0;
-    gUnknown_02002858.unk14 = 0;
-    gUnknown_02002858.unk18 = 0;
-    gUnknown_02002858.unk1A = 0;
-    gUnknown_02002858.unk1E = 0;
-    gUnknown_02002858.unk1C = 0;
-    gUnknown_02002858.unk20 = 0;
-    gUnknown_02002858.unk22 = 0;
-    gUnknown_02002858.unk25 = 0;
-    gUnknown_02002858.unk26 = 1;
-    gUnknown_0201B178 = 0;
-    gUnknown_0202BEBC = 1;
-    gUnknown_0201C18C = 0;
-    gUnknown_02002884 = 0;
-    gUnknown_02002885 = 0;
-    if(gUnknown_0202C588 == 1)
+    gHighScoreScreenState.currentNameCharIndex = 0;
+    gHighScoreScreenState.nameFlashToggle = 0;
+    gHighScoreScreenState.flashFrameCounter = 0;
+    gHighScoreScreenState.flashDuration = 0;
+    gHighScoreScreenState.flashElapsedFrames = 0;
+    gHighScoreScreenState.paletteAnimTimer = 0;
+    gHighScoreScreenState.paletteAnimPhase = 0;
+    gHighScoreScreenState.inputRepeatDelay = 0;
+    gHighScoreScreenState.linkWaitTimer = 0;
+    gHighScoreScreenState.arrowBlinkToggle = 0;
+    gHighScoreScreenState.displayModeVisible = 1;
+    gShowDialogFlag = 0;
+    gDialogType = 1;
+    gCompletionBannerVisible = 0;
+    gResetComboTimer = 0;
+    gResetComboCount = 0;
+    if(gHighScoreEntrySource == 1)
     {
-        gUnknown_02002858.newScoreHi = gMain.finalScoreHi;
-        gUnknown_02002858.newScoreLo = gMain.finalScoreLo;
+        gHighScoreScreenState.newScoreHi = gMain.finalScoreHi;
+        gHighScoreScreenState.newScoreLo = gMain.finalScoreLo;
         if(gMain.selectedField == FIELD_SAPPHIRE)
         {
-            gUnknown_02002858.mainField = FIELD_SAPPHIRE;
-            gUnknown_02002882 = 0xF0;
-            gUnknown_02002880 = 1;
+            gHighScoreScreenState.mainField = FIELD_SAPPHIRE;
+            gScrollXOffset = 0xF0;
+            gScrollDirection = 1;
         }
         else
         {
-            gUnknown_02002858.mainField = FIELD_RUBY;
-            gUnknown_02002882 = 0;
-            gUnknown_02002880 = -1;
+            gHighScoreScreenState.mainField = FIELD_RUBY;
+            gScrollXOffset = 0;
+            gScrollDirection = -1;
         }
-        gUnknown_02002858.highScoreIndex = GetNewHighScoreIndex(gUnknown_02002858.newScoreHi, gUnknown_02002858.newScoreLo, gUnknown_02002858.mainField);
-        if(gUnknown_02002858.highScoreIndex != -1)
+        gHighScoreScreenState.highScoreIndex = GetNewHighScoreIndex(gHighScoreScreenState.newScoreHi, gHighScoreScreenState.newScoreLo, gHighScoreScreenState.mainField);
+        if(gHighScoreScreenState.highScoreIndex != -1)
         {
-            sub_F434(gUnknown_02002858.newScoreHi, gUnknown_02002858.newScoreLo, gUnknown_02002858.mainField, gUnknown_02002858.highScoreIndex);
+            InsertNewHighScore(gHighScoreScreenState.newScoreHi, gHighScoreScreenState.newScoreLo, gHighScoreScreenState.mainField, gHighScoreScreenState.highScoreIndex);
             for(i = 0; i < HIGH_SCORE_NAME_LENGTH; i++)
             {
-                gUnknown_0202C610[gUnknown_02002858.mainField][gUnknown_02002858.highScoreIndex].data.parts.name[i] = gHighScoreNameEntry[i];
+                gWorkingHighScores[gHighScoreScreenState.mainField][gHighScoreScreenState.highScoreIndex].data.parts.name[i] = gHighScoreNameEntry[i];
             }
-            gUnknown_02002858.currentNameChar = gHighScoreNameEntry[0];
+            gHighScoreScreenState.currentNameChar = gHighScoreNameEntry[0];
         }
-        if(sub_FD20() == 1)
+        if(CheckAllPokemonCaught() == 1)
         {
-            if(gUnknown_0202BEB0 == 0)
+            if(gCompletionBannerDone == 0)
             {
-                gUnknown_0201C18C = 1;
-                gUnknown_0201A4B8 = 0xB8;
-                gUnknown_0202C580 = 0;
-                gUnknown_0202BED4 = 0;
-                gUnknown_02002858.unkA = 1;
+                gCompletionBannerVisible = 1;
+                gCompletionBannerY = 0xB8;
+                gCompletionBannerFrame = 0;
+                gCompletionBannerPhase = 0;
+                gHighScoreScreenState.nextSubState = 1;
             }
             else
             {
-                gUnknown_0201C18C = 0;
-                gUnknown_02002858.unkA = 2;
+                gCompletionBannerVisible = 0;
+                gHighScoreScreenState.nextSubState = 2;
             }
         }
         else
         {
-            gUnknown_0202BEB0 = 0;
-            gUnknown_02002858.unkA = 2;
+            gCompletionBannerDone = 0;
+            gHighScoreScreenState.nextSubState = 2;
         }
     }
     else
     {
-        gUnknown_02002858.mainField = 0;
-        gUnknown_02002882 = 0;
-        gUnknown_02002880 = -1;
-        sub_E464();
-        gUnknown_02002858.unkA = 3;
+        gHighScoreScreenState.mainField = 0;
+        gScrollXOffset = 0;
+        gScrollDirection = -1;
+        RenderHighScoreSprites();
+        gHighScoreScreenState.nextSubState = 3;
     }
-    gMain.bgOffsets[3].xOffset = gUnknown_02002882;
-    gMain.bgOffsets[2].xOffset = gUnknown_02002882;
+    gMain.bgOffsets[3].xOffset = gScrollXOffset;
+    gMain.bgOffsets[2].xOffset = gScrollXOffset;
 }
 
-void HighScore_State1_D20C(void)
+void HighScore_ShowCompletionBanner(void)
 {
     u16 temp;
-    switch(gUnknown_0202BED4)
+    switch(gCompletionBannerPhase)
     {
         case 0:
-            if(gUnknown_02002858.unk18 == 3)
+            if(gHighScoreScreenState.flashDuration == 3)
             {
                 m4aSongNumStart(MUS_SUCCESS);
-                gUnknown_0202BED4++;
+                gCompletionBannerPhase++;
             }
             break;
         case 1:
-            gUnknown_0201A4B8--;
+            gCompletionBannerY--;
 
             // TODO: FAKEMATCH - Seth
-            temp = gUnknown_02002858.unk18;
-            if((gUnknown_02002858.unk18 & 3) == 0)
+            temp = gHighScoreScreenState.flashDuration;
+            if((gHighScoreScreenState.flashDuration & 3) == 0)
             {
-                gUnknown_0202C580++;
-                if(gUnknown_0202C580 > 4)
+                gCompletionBannerFrame++;
+                if(gCompletionBannerFrame > 4)
                 {
-                    gUnknown_0202C580 = 0;
+                    gCompletionBannerFrame = 0;
                 }
             }
-            if(gUnknown_0201A4B8 == 0x50)
+            if(gCompletionBannerY == 0x50)
             {
-                gUnknown_0202C580 = 0;
-                gUnknown_0202BED4++;
+                gCompletionBannerFrame = 0;
+                gCompletionBannerPhase++;
             }
             break;
         case 2:
             if(JOY_NEW(A_BUTTON | B_BUTTON))
             {
-                gUnknown_0202C580 = 0;
-                gUnknown_0202BED4++;
+                gCompletionBannerFrame = 0;
+                gCompletionBannerPhase++;
             }
             break;
         case 3:
-            gUnknown_0201A4B8 -= 4;
-            if(gUnknown_0201A4B8 < -0x18)
+            gCompletionBannerY -= 4;
+            if(gCompletionBannerY < -0x18)
             {
-                gUnknown_02002858.unk18 = 0;
-                gUnknown_0202BEB0 = 1;
-                gUnknown_0201C18C = 0;
+                gHighScoreScreenState.flashDuration = 0;
+                gCompletionBannerDone = 1;
+                gCompletionBannerVisible = 0;
                 gMain.subState = HIGH_SCORE_STATE_2;
             }
             break;
     }
 
-    gUnknown_02002858.unk18++;
-    sub_E860();
+    gHighScoreScreenState.flashDuration++;
+    RenderCompletionBanner();
 }
 
-void HighScore_State2_D308(void)
+void HighScore_FlashNewEntry(void)
 {
-    if(!gUnknown_02002858.unk1A)
+    if(!gHighScoreScreenState.flashElapsedFrames)
     {
-        if(gUnknown_02002858.highScoreIndex == 0)
+        if(gHighScoreScreenState.highScoreIndex == 0)
         {
             m4aSongNumStart(SE_HIGH_SCORE_EARNED);
-            gUnknown_02002858.unk18 = 0xA0;
+            gHighScoreScreenState.flashDuration = 0xA0;
         }
-        else if(gUnknown_02002858.highScoreIndex == -1)
+        else if(gHighScoreScreenState.highScoreIndex == -1)
         {
-            gUnknown_02002858.unk18 = 999;
-            gUnknown_02002858.unk1A = 0;
+            gHighScoreScreenState.flashDuration = 999;
+            gHighScoreScreenState.flashElapsedFrames = 0;
             m4aSongNumStart(MUS_HIGH_SCORE);
             gMain.subState = HIGH_SCORE_STATE_3;
         }
         else
         {
             m4aSongNumStart(SE_UNKNOWN_0x14B);
-            gUnknown_02002858.unk18 = 0x5A;
+            gHighScoreScreenState.flashDuration = 0x5A;
         }
     }
-    gUnknown_02002858.unk14++;
-    if(gUnknown_02002858.unk14 > 8)
+    gHighScoreScreenState.flashFrameCounter++;
+    if(gHighScoreScreenState.flashFrameCounter > 8)
     {
-        gUnknown_02002858.unk14 = 0;
-        if(!gUnknown_02002858.unk12)
+        gHighScoreScreenState.flashFrameCounter = 0;
+        if(!gHighScoreScreenState.nameFlashToggle)
         {
-            gUnknown_02002858.unk12 = 1;
-            CopyString(6 - (gUnknown_02002858.mainField << 1), gUnknown_08079870[gUnknown_02002858.highScoreIndex] + (gUnknown_02002858.mainField << 5), 0, 0x15, 4, 2);
-            CopyString(0, 0x17, 6 - (gUnknown_02002858.mainField << 1), gUnknown_08079870[gUnknown_02002858.highScoreIndex] + (gUnknown_02002858.mainField << 5), 4, 2);
+            gHighScoreScreenState.nameFlashToggle = 1;
+            CopyString(6 - (gHighScoreScreenState.mainField << 1), gHighScoreNameRowTilemapOffsets[gHighScoreScreenState.highScoreIndex] + (gHighScoreScreenState.mainField << 5), 0, 0x15, 4, 2);
+            CopyString(0, 0x17, 6 - (gHighScoreScreenState.mainField << 1), gHighScoreNameRowTilemapOffsets[gHighScoreScreenState.highScoreIndex] + (gHighScoreScreenState.mainField << 5), 4, 2);
         }
         else
         {
-            gUnknown_02002858.unk12 = 0;
-            CopyString(0, 0x15, 6 - (gUnknown_02002858.mainField << 1), gUnknown_08079870[gUnknown_02002858.highScoreIndex] + (gUnknown_02002858.mainField << 5), 4, 2);
+            gHighScoreScreenState.nameFlashToggle = 0;
+            CopyString(0, 0x15, 6 - (gHighScoreScreenState.mainField << 1), gHighScoreNameRowTilemapOffsets[gHighScoreScreenState.highScoreIndex] + (gHighScoreScreenState.mainField << 5), 4, 2);
         }
     }
-    gUnknown_02002858.unk1E++;
-    if(gUnknown_02002858.unk1E > 8)
+    gHighScoreScreenState.paletteAnimTimer++;
+    if(gHighScoreScreenState.paletteAnimTimer > 8)
     {
-        gUnknown_02002858.unk1E = 0;
-        sub_F8B0(gUnknown_02002858.mainField, gUnknown_02002858.highScoreIndex, gUnknown_02002858.unk1C);
-        gUnknown_02002858.unk1C++;
-        if( gUnknown_02002858.unk1C > 2)
+        gHighScoreScreenState.paletteAnimTimer = 0;
+        AnimateScoreTilemapPalette(gHighScoreScreenState.mainField, gHighScoreScreenState.highScoreIndex, gHighScoreScreenState.paletteAnimPhase);
+        gHighScoreScreenState.paletteAnimPhase++;
+        if( gHighScoreScreenState.paletteAnimPhase > 2)
         {
-            gUnknown_02002858.unk1C = 0;
+            gHighScoreScreenState.paletteAnimPhase = 0;
         }
     }
 
-    gUnknown_02002858.unk1A++;
-    if(gUnknown_02002858.unk1A > gUnknown_02002858.unk18)
+    gHighScoreScreenState.flashElapsedFrames++;
+    if(gHighScoreScreenState.flashElapsedFrames > gHighScoreScreenState.flashDuration)
     {
-        gUnknown_02002858.unk1A = 0;
-        if(gUnknown_02002858.unk12 == 1)
+        gHighScoreScreenState.flashElapsedFrames = 0;
+        if(gHighScoreScreenState.nameFlashToggle == 1)
         {
-            gUnknown_02002858.unk12 = 0;
-            gUnknown_02002858.unk14 = 0;
-            CopyString(0, 0x15, 6 - (gUnknown_02002858.mainField << 1), gUnknown_08079870[gUnknown_02002858.highScoreIndex] +(gUnknown_02002858.mainField << 5), 4, 2);
+            gHighScoreScreenState.nameFlashToggle = 0;
+            gHighScoreScreenState.flashFrameCounter = 0;
+            CopyString(0, 0x15, 6 - (gHighScoreScreenState.mainField << 1), gHighScoreNameRowTilemapOffsets[gHighScoreScreenState.highScoreIndex] +(gHighScoreScreenState.mainField << 5), 4, 2);
         }
         m4aSongNumStart(MUS_HIGH_SCORE);
         gMain.subState = HIGH_SCORE_STATE_4;
     }
 
-    DmaCopy16(3, gUnknown_03005C00, 0x6000000, 0x1000);
+    DmaCopy16(3, gBG0TilemapBuffer, 0x6000000, 0x1000);
 }
 
-void HighScore_State3_D4B8(void)
+void HighScore_BrowseScores(void)
 {
-    sub_E464();
+    RenderHighScoreSprites();
     if(!(gMain.systemFrameCount % 0xC))
     {
-        gUnknown_02002858.unk1A = 1 - gUnknown_02002858.unk1A;
-        gUnknown_02002858.unk25 = 1 - gUnknown_02002858.unk25;
+        gHighScoreScreenState.flashElapsedFrames = 1 - gHighScoreScreenState.flashElapsedFrames;
+        gHighScoreScreenState.arrowBlinkToggle = 1 - gHighScoreScreenState.arrowBlinkToggle;
     }
     if(JOY_NEW(DPAD_LEFT))
     {
-         if(gUnknown_02002880 != -1)
+         if(gScrollDirection != -1)
          {
-             gUnknown_02002880 = -1;
+             gScrollDirection = -1;
          }
     }
     else if(JOY_NEW(DPAD_RIGHT))
     {
-        if(gUnknown_02002880 != 1)
+        if(gScrollDirection != 1)
          {
-             gUnknown_02002880 = 1;
+             gScrollDirection = 1;
          }
     }
-    if(gUnknown_02002880 > 0)
+    if(gScrollDirection > 0)
     {
-        if(gUnknown_02002882 < 0xF0)
-            gUnknown_02002882 += 8;
+        if(gScrollXOffset < 0xF0)
+            gScrollXOffset += 8;
     }
-    else if(gUnknown_02002880 < 0)
+    else if(gScrollDirection < 0)
     {
-        if(gUnknown_02002882 > 0)
-            gUnknown_02002882 -= 8;
+        if(gScrollXOffset > 0)
+            gScrollXOffset -= 8;
     }
     if(JOY_NEW(A_BUTTON | B_BUTTON))
     {
@@ -376,11 +376,11 @@ void HighScore_State3_D4B8(void)
     }
     if(JOY_NEW(START_BUTTON))
     {
-        if(gUnknown_02002882 == 0 || (gUnknown_02002882 == 0xF0))
+        if(gScrollXOffset == 0 || (gScrollXOffset == 0xF0))
         {
             m4aSongNumStart(SE_MENU_POPUP_OPEN);
-            gUnknown_0201B178 = 1;
-            gUnknown_0202BEBC = 0;
+            gShowDialogFlag = 1;
+            gDialogType = 0;
             gMain.subState = HIGH_SCORE_STATE_5;
         }
     }
@@ -389,140 +389,140 @@ void HighScore_State3_D4B8(void)
     {
         if(JOY_NEW(R_BUTTON))
         {
-            if(gUnknown_02002882 == 0 || gUnknown_02002882 == 0xF0)
+            if(gScrollXOffset == 0 || gScrollXOffset == 0xF0)
             {
-                gUnknown_02002884 = 0x28;
-                gUnknown_02002885++;
-                if(gUnknown_02002885 == 3)
+                gResetComboTimer = 0x28;
+                gResetComboCount++;
+                if(gResetComboCount == 3)
                 {
-                    gUnknown_02002885 = 0;
-                    gUnknown_02002884 = 0;
+                    gResetComboCount = 0;
+                    gResetComboTimer = 0;
                     m4aSongNumStart(SE_MENU_POPUP_OPEN);
-                    gUnknown_0201B178 = 1;
-                    gUnknown_0202BEBC = 4;
+                    gShowDialogFlag = 1;
+                    gDialogType = 4;
                     gMain.subState = HIGH_SCORE_STATE_10;
                 }
             }
-            if(gUnknown_02002884 > 0)
+            if(gResetComboTimer > 0)
             {
-                gUnknown_02002884--;
-                if(gUnknown_02002884 <= 0)
+                gResetComboTimer--;
+                if(gResetComboTimer <= 0)
                 {
-                    gUnknown_02002884 = 0;
-                    gUnknown_02002885 = 0;
+                    gResetComboTimer = 0;
+                    gResetComboCount = 0;
                 }
             }
         }
     }
-    else if(gUnknown_02002884 > 0)
+    else if(gResetComboTimer > 0)
     {
-        gUnknown_02002884--;
-        if(gUnknown_02002884 <= 0)
+        gResetComboTimer--;
+        if(gResetComboTimer <= 0)
         {
-            gUnknown_02002884 = 0;
-            gUnknown_02002885 = 0;
+            gResetComboTimer = 0;
+            gResetComboCount = 0;
         }
     }
 
-    gMain.bgOffsets[3].xOffset = gUnknown_02002882;
-    gMain.bgOffsets[2].xOffset = gUnknown_02002882;
+    gMain.bgOffsets[3].xOffset = gScrollXOffset;
+    gMain.bgOffsets[2].xOffset = gScrollXOffset;
 }
 
-void HighScore_State4_D664(void)
+void HighScore_NameEntry(void)
 {
     int i, j, k;
 
-    sub_E3A8();
-    if (++gUnknown_02002858.unk14 > 12)
+    UpdateNameEntryCursor();
+    if (++gHighScoreScreenState.flashFrameCounter > 12)
     {
-        gUnknown_02002858.unk14 = 0;
-        gUnknown_02002858.unk12 = 1 - gUnknown_02002858.unk12;
+        gHighScoreScreenState.flashFrameCounter = 0;
+        gHighScoreScreenState.nameFlashToggle = 1 - gHighScoreScreenState.nameFlashToggle;
     }
 
-    if (++gUnknown_02002858.unk1E > 8)
+    if (++gHighScoreScreenState.paletteAnimTimer > 8)
     {
-        gUnknown_02002858.unk1E = 0;
-        sub_F8B0(gUnknown_02002858.mainField, gUnknown_02002858.highScoreIndex, gUnknown_02002858.unk1C);
-        if (++gUnknown_02002858.unk1C > 2)
-            gUnknown_02002858.unk1C = 0;
+        gHighScoreScreenState.paletteAnimTimer = 0;
+        AnimateScoreTilemapPalette(gHighScoreScreenState.mainField, gHighScoreScreenState.highScoreIndex, gHighScoreScreenState.paletteAnimPhase);
+        if (++gHighScoreScreenState.paletteAnimPhase > 2)
+            gHighScoreScreenState.paletteAnimPhase = 0;
     }
 
     if (JOY_HELD(DPAD_DOWN))
     {
-        if (gUnknown_02002858.unk20 == 0)
+        if (gHighScoreScreenState.inputRepeatDelay == 0)
         {
             m4aSongNumStart(SE_SCORE_ENTRY_LETTER_CHANGE);
-            if (--gUnknown_02002858.currentNameChar < 0)
-                gUnknown_02002858.currentNameChar = 41;
+            if (--gHighScoreScreenState.currentNameChar < 0)
+                gHighScoreScreenState.currentNameChar = 41;
 
-            sub_F670(gUnknown_02002858.currentNameChar, gUnknown_02002858.highScoreIndex, gUnknown_02002858.currentNameCharIndex, gUnknown_02002858.mainField);
-            gUnknown_02002858.unk20 = 9;
+            PrintHighScoreNameChar(gHighScoreScreenState.currentNameChar, gHighScoreScreenState.highScoreIndex, gHighScoreScreenState.currentNameCharIndex, gHighScoreScreenState.mainField);
+            gHighScoreScreenState.inputRepeatDelay = 9;
         }
     }
     else if (JOY_HELD(DPAD_UP))
     {
-        if (gUnknown_02002858.unk20 == 0)
+        if (gHighScoreScreenState.inputRepeatDelay == 0)
         {
             m4aSongNumStart(SE_SCORE_ENTRY_LETTER_CHANGE);
-            if (++gUnknown_02002858.currentNameChar > 41)
-                gUnknown_02002858.currentNameChar = 0;
+            if (++gHighScoreScreenState.currentNameChar > 41)
+                gHighScoreScreenState.currentNameChar = 0;
 
-            sub_F670(gUnknown_02002858.currentNameChar, gUnknown_02002858.highScoreIndex, gUnknown_02002858.currentNameCharIndex, gUnknown_02002858.mainField);
-            gUnknown_02002858.unk20 = 9;
+            PrintHighScoreNameChar(gHighScoreScreenState.currentNameChar, gHighScoreScreenState.highScoreIndex, gHighScoreScreenState.currentNameCharIndex, gHighScoreScreenState.mainField);
+            gHighScoreScreenState.inputRepeatDelay = 9;
         }
     }
 
     if (JOY_NEW(DPAD_RIGHT))
     {
-        if (gUnknown_02002858.currentNameCharIndex == HIGH_SCORE_NAME_LENGTH - 1)
+        if (gHighScoreScreenState.currentNameCharIndex == HIGH_SCORE_NAME_LENGTH - 1)
         {
             m4aSongNumStart(SE_FAILURE);
         }
         else
         {
             m4aSongNumStart(SE_MENU_MOVE);
-            gUnknown_02002858.unk12 = 1;
-            sub_F670(gUnknown_02002858.currentNameChar, gUnknown_02002858.highScoreIndex, gUnknown_02002858.currentNameCharIndex, gUnknown_02002858.mainField);
-            gUnknown_0202C610[gUnknown_02002858.mainField][gUnknown_02002858.highScoreIndex].data.parts.name[gUnknown_02002858.currentNameCharIndex] = gUnknown_02002858.currentNameChar;
-            gUnknown_02002858.currentNameCharIndex++;
-            gUnknown_02002858.currentNameChar = gUnknown_0202C610[gUnknown_02002858.mainField][gUnknown_02002858.highScoreIndex].data.parts.name[gUnknown_02002858.currentNameCharIndex];
+            gHighScoreScreenState.nameFlashToggle = 1;
+            PrintHighScoreNameChar(gHighScoreScreenState.currentNameChar, gHighScoreScreenState.highScoreIndex, gHighScoreScreenState.currentNameCharIndex, gHighScoreScreenState.mainField);
+            gWorkingHighScores[gHighScoreScreenState.mainField][gHighScoreScreenState.highScoreIndex].data.parts.name[gHighScoreScreenState.currentNameCharIndex] = gHighScoreScreenState.currentNameChar;
+            gHighScoreScreenState.currentNameCharIndex++;
+            gHighScoreScreenState.currentNameChar = gWorkingHighScores[gHighScoreScreenState.mainField][gHighScoreScreenState.highScoreIndex].data.parts.name[gHighScoreScreenState.currentNameCharIndex];
         }
     }
     else if (JOY_NEW(DPAD_LEFT))
     {
-        if (gUnknown_02002858.currentNameCharIndex == 0)
+        if (gHighScoreScreenState.currentNameCharIndex == 0)
         {
             m4aSongNumStart(SE_FAILURE);
         }
         else
         {
             m4aSongNumStart(SE_MENU_MOVE);
-            gUnknown_02002858.unk12 = 1;
-            sub_F670(gUnknown_02002858.currentNameChar, gUnknown_02002858.highScoreIndex, gUnknown_02002858.currentNameCharIndex, gUnknown_02002858.mainField);
-            gUnknown_0202C610[gUnknown_02002858.mainField][gUnknown_02002858.highScoreIndex].data.parts.name[gUnknown_02002858.currentNameCharIndex] = gUnknown_02002858.currentNameChar;
-            gUnknown_02002858.currentNameCharIndex--;
-            gUnknown_02002858.currentNameChar = gUnknown_0202C610[gUnknown_02002858.mainField][gUnknown_02002858.highScoreIndex].data.parts.name[gUnknown_02002858.currentNameCharIndex];
+            gHighScoreScreenState.nameFlashToggle = 1;
+            PrintHighScoreNameChar(gHighScoreScreenState.currentNameChar, gHighScoreScreenState.highScoreIndex, gHighScoreScreenState.currentNameCharIndex, gHighScoreScreenState.mainField);
+            gWorkingHighScores[gHighScoreScreenState.mainField][gHighScoreScreenState.highScoreIndex].data.parts.name[gHighScoreScreenState.currentNameCharIndex] = gHighScoreScreenState.currentNameChar;
+            gHighScoreScreenState.currentNameCharIndex--;
+            gHighScoreScreenState.currentNameChar = gWorkingHighScores[gHighScoreScreenState.mainField][gHighScoreScreenState.highScoreIndex].data.parts.name[gHighScoreScreenState.currentNameCharIndex];
         }
     }
 
     if (JOY_NEW(A_BUTTON))
     {
-        gUnknown_02002858.unk12 = 1;
-        sub_F670(gUnknown_02002858.currentNameChar, gUnknown_02002858.highScoreIndex, gUnknown_02002858.currentNameCharIndex, gUnknown_02002858.mainField);
-        gUnknown_0202C610[gUnknown_02002858.mainField][gUnknown_02002858.highScoreIndex].data.parts.name[gUnknown_02002858.currentNameCharIndex] = gUnknown_02002858.currentNameChar;
-        if (gUnknown_02002858.currentNameCharIndex == HIGH_SCORE_NAME_LENGTH - 1)
+        gHighScoreScreenState.nameFlashToggle = 1;
+        PrintHighScoreNameChar(gHighScoreScreenState.currentNameChar, gHighScoreScreenState.highScoreIndex, gHighScoreScreenState.currentNameCharIndex, gHighScoreScreenState.mainField);
+        gWorkingHighScores[gHighScoreScreenState.mainField][gHighScoreScreenState.highScoreIndex].data.parts.name[gHighScoreScreenState.currentNameCharIndex] = gHighScoreScreenState.currentNameChar;
+        if (gHighScoreScreenState.currentNameCharIndex == HIGH_SCORE_NAME_LENGTH - 1)
         {
             m4aSongNumStart(SE_MENU_SELECT);
-            sub_FAE8(gUnknown_02002858.mainField, gUnknown_02002858.highScoreIndex, gUnknown_02002858.unk1C);
+            ResetScoreTilemapPalette(gHighScoreScreenState.mainField, gHighScoreScreenState.highScoreIndex, gHighScoreScreenState.paletteAnimPhase);
             for (i = 0; i < HIGH_SCORE_NAME_LENGTH; i++)
-                gHighScoreNameEntry[i] = gUnknown_0202C610[gUnknown_02002858.mainField][gUnknown_02002858.highScoreIndex].data.parts.name[i];
+                gHighScoreNameEntry[i] = gWorkingHighScores[gHighScoreScreenState.mainField][gHighScoreScreenState.highScoreIndex].data.parts.name[i];
 
             for (i = 0; i < MAIN_FIELD_COUNT; i++)
             {
                 for (j = 0; j < NUM_HIGH_SCORES; j++)
                 {
                     for (k = 0; k < 6; k++)
-                        gMain_saveData.highScores[i][j].data.raw[k] = gUnknown_0202C610[i][j].data.raw[k];
+                        gMain_saveData.highScores[i][j].data.raw[k] = gWorkingHighScores[i][j].data.raw[k];
                 }
             }
 
@@ -532,80 +532,80 @@ void HighScore_State4_D664(void)
         else
         {
             m4aSongNumStart(SE_SCORE_ENTRY_A_B_MOVE);
-            gUnknown_02002858.currentNameCharIndex++;
-            gUnknown_02002858.currentNameChar = gUnknown_0202C610[gUnknown_02002858.mainField][gUnknown_02002858.highScoreIndex].data.parts.name[gUnknown_02002858.currentNameCharIndex];
+            gHighScoreScreenState.currentNameCharIndex++;
+            gHighScoreScreenState.currentNameChar = gWorkingHighScores[gHighScoreScreenState.mainField][gHighScoreScreenState.highScoreIndex].data.parts.name[gHighScoreScreenState.currentNameCharIndex];
         }
     }
     else if (JOY_NEW(B_BUTTON))
     {
-        if (gUnknown_02002858.currentNameCharIndex == 0)
+        if (gHighScoreScreenState.currentNameCharIndex == 0)
         {
             m4aSongNumStart(SE_FAILURE);
         }
         else
         {
             m4aSongNumStart(SE_SCORE_ENTRY_A_B_MOVE);
-            gUnknown_02002858.unk12 = 1;
-            sub_F670(gUnknown_02002858.currentNameChar, gUnknown_02002858.highScoreIndex, gUnknown_02002858.currentNameCharIndex, gUnknown_02002858.mainField);
-            gUnknown_0202C610[gUnknown_02002858.mainField][gUnknown_02002858.highScoreIndex].data.parts.name[gUnknown_02002858.currentNameCharIndex] = gUnknown_02002858.currentNameChar;
-            gUnknown_02002858.currentNameCharIndex--;
-            gUnknown_02002858.currentNameChar = gUnknown_0202C610[gUnknown_02002858.mainField][gUnknown_02002858.highScoreIndex].data.parts.name[gUnknown_02002858.currentNameCharIndex];
+            gHighScoreScreenState.nameFlashToggle = 1;
+            PrintHighScoreNameChar(gHighScoreScreenState.currentNameChar, gHighScoreScreenState.highScoreIndex, gHighScoreScreenState.currentNameCharIndex, gHighScoreScreenState.mainField);
+            gWorkingHighScores[gHighScoreScreenState.mainField][gHighScoreScreenState.highScoreIndex].data.parts.name[gHighScoreScreenState.currentNameCharIndex] = gHighScoreScreenState.currentNameChar;
+            gHighScoreScreenState.currentNameCharIndex--;
+            gHighScoreScreenState.currentNameChar = gWorkingHighScores[gHighScoreScreenState.mainField][gHighScoreScreenState.highScoreIndex].data.parts.name[gHighScoreScreenState.currentNameCharIndex];
         }
     }
 
-    DmaCopy16(3, gUnknown_03005C00, 0x6000000, 0x1000);
-    if (gUnknown_02002858.unk20 > 0)
-        gUnknown_02002858.unk20--;
+    DmaCopy16(3, gBG0TilemapBuffer, 0x6000000, 0x1000);
+    if (gHighScoreScreenState.inputRepeatDelay > 0)
+        gHighScoreScreenState.inputRepeatDelay--;
 }
 
-void HighScore_State5_D9F8(void)
+void HighScore_InitLinkExchange(void)
 {
-    sub_19B4();
-    sub_E908();
-    gUnknown_0201B124 = 0;
-    sub_E464();
+    InitLinkHardware();
+    InitLinkExchangeBuffers();
+    gLinkExchangeStep = 0;
+    RenderHighScoreSprites();
     gMain.subState = HIGH_SCORE_STATE_6;
 }
 
-void HighScore_State6_DA20(void)
+void HighScore_LinkExchangeLoop(void)
 {
-    sub_E464();
+    RenderHighScoreSprites();
     if (JOY_NEW(B_BUTTON))
     {
         m4aSongNumStart(SE_MENU_CANCEL);
-        gUnknown_0201B178 = 0;
-        gUnknown_0202BEBC = 0;
-        sub_2568();
+        gShowDialogFlag = 0;
+        gDialogType = 0;
+        ResetSerialAndInterrupts();
         gMain.subState = HIGH_SCORE_STATE_3;
     }
     else
     {
-        gUnknown_0202ADD0 = LinkMain1(&gUnknown_0202BEC8, gUnknown_0202C5F0, gUnknown_0201A4D0);
-        gUnknown_0202BDF0 = gUnknown_0202ADD0 & 3;
-        gUnknown_0201C1AC = (gUnknown_0202ADD0 & 0x1c) >> 2;
-        gUnknown_0202ADDC = (gUnknown_0202ADD0 & 0xe00) >> 9;
-        if (((gUnknown_0202ADD0 & 0x40) != 0) && gUnknown_0202BDF0 < 2)
+        gLinkStatusResult = LinkMain1(&gLinkAdvanceState, gLinkSendBuffer, gLinkRecvBuffer);
+        gLinkConnectionState = gLinkStatusResult & 3;
+        gLinkPlayerCount = (gLinkStatusResult & 0x1c) >> 2;
+        gLinkNegotiationFlags = (gLinkStatusResult & 0xe00) >> 9;
+        if (((gLinkStatusResult & 0x40) != 0) && gLinkConnectionState < 2)
         {
-            sub_E970();
-            if ((gUnknown_0202ADD0 & 0x100) == 0)
+            ProcessLinkSendData();
+            if ((gLinkStatusResult & 0x100) == 0)
             {
-                s16 var0 = sub_E94C();
+                s16 var0 = HighScore_ProcessLinkExchange();
                 if (var0 == -1)
                 {
                     gMain.subState = HIGH_SCORE_STATE_8;
                 }
                 else if (var0 == 1)
                 {
-                    gUnknown_0202BEBC = 2;
+                    gDialogType = 2;
                     gMain.subState = HIGH_SCORE_STATE_7;
                     m4aSongNumStart(SE_FAILURE);
                 }
             }
 
-            gUnknown_0201A510++;
-            if ((gUnknown_0202ADD0 & 0x7f0000) != 0 && gUnknown_0202ADE4 == -1 && ++gUnknown_0201A444 > 180)
+            gLinkExchangeFrameCounter++;
+            if ((gLinkStatusResult & 0x7f0000) != 0 && gLinkExchangeResult == -1 && ++gLinkTimeoutCounter > 180)
             {
-                gUnknown_0202BEBC = 2;
+                gDialogType = 2;
                 gMain.subState = HIGH_SCORE_STATE_7;
                 m4aSongNumStart(SE_FAILURE);
             }
@@ -613,115 +613,115 @@ void HighScore_State6_DA20(void)
     }
 }
 
-void HighScore_State9_DB4C(void)
+void HighScore_LinkRetryWait(void)
 {
-    if (++gUnknown_0201A444 > 2)
+    if (++gLinkTimeoutCounter > 2)
     {
-        gUnknown_0201A444 = 0;
+        gLinkTimeoutCounter = 0;
         gMain.subState = HIGH_SCORE_STATE_5;
     }
 }
 
-void HighScore_State7_DB70(void)
+void HighScore_LinkError(void)
 {
     int i, j;
 
-    sub_E464();
-    if (++gUnknown_02002858.unk22 > 90)
+    RenderHighScoreSprites();
+    if (++gHighScoreScreenState.linkWaitTimer > 90)
     {
-        gUnknown_02002858.unk22 = 0;
-        gUnknown_0201B178 = 0;
-        gUnknown_0202BEBC = 0;
-        sub_2568();
+        gHighScoreScreenState.linkWaitTimer = 0;
+        gShowDialogFlag = 0;
+        gDialogType = 0;
+        ResetSerialAndInterrupts();
         DisableSerial();
         for (i = 0; i < MAIN_FIELD_COUNT; i++)
         {
             for (j = 0; j < 6; j++)
             {
-                gUnknown_0202C550[i].data.raw[j] = gUnknown_0202C610[i][0].data.raw[j];
+                gRemoteTopScores[i].data.raw[j] = gWorkingHighScores[i][0].data.raw[j];
             }
         }
-        sub_02B4();
+        FadeOutScreen();
         m4aMPlayAllStop();
-        sub_0D10();
+        DisableVBlankInterrupts();
         gMain.subState = HIGH_SCORE_STATE_0;
     }
 }
 
-void HighScore_State8_DBF4(void)
+void HighScore_LinkSuccess(void)
 {
     int i, j, k;
 
-    sub_E464();
-    switch (gUnknown_02002858.unk22)
+    RenderHighScoreSprites();
+    switch (gHighScoreScreenState.linkWaitTimer)
     {
     case 4:
-        sub_2568();
+        ResetSerialAndInterrupts();
         DisableSerial();
         break;
     case 130:
-        gUnknown_0202BEBC = 3;
+        gDialogType = 3;
         m4aSongNumStart(SE_MENU_SELECT);
         break;
     case 250:
-        gUnknown_02002858.unk22 = 0;
-        gUnknown_0201B178 = 0;
-        gUnknown_0202BEBC = 0;
-        gUnknown_0202BED8 = sub_F4FC(0);
-        gUnknown_0201B170 = sub_F4FC(1);
+        gHighScoreScreenState.linkWaitTimer = 0;
+        gShowDialogFlag = 0;
+        gDialogType = 0;
+        gMergedRubyScoreIndex = MergeReceivedTopScore(0);
+        gMergedSapphireScoreIndex = MergeReceivedTopScore(1);
         for (i = 0; i < MAIN_FIELD_COUNT; i++)
         {
             for (j = 0; j < NUM_HIGH_SCORES; j++)
             {
                 for (k = 0; k < 6; k++)
                 {
-                    gMain_saveData.highScores[i][j].data.raw[k] = gUnknown_0202C610[i][j].data.raw[k];
+                    gMain_saveData.highScores[i][j].data.raw[k] = gWorkingHighScores[i][j].data.raw[k];
                 }
             }
         }
         SaveFile_WriteToSram();
-        sub_02B4();
+        FadeOutScreen();
         m4aMPlayAllStop();
-        sub_0D10();
+        DisableVBlankInterrupts();
         gMain.subState = HIGH_SCORE_STATE_12;
         break;
     }
 
-    gUnknown_02002858.unk22++;
+    gHighScoreScreenState.linkWaitTimer++;
 }
 
-void HighScore_State10_DCF0(void)
+void HighScore_ResetConfirmation(void)
 {
-    sub_E464();
+    RenderHighScoreSprites();
     if (JOY_NEW(A_BUTTON))
     {
         m4aSongNumStart(SE_MENU_SELECT);
         SetDefaultHighScores();
         SaveFile_WriteToSram();
-        sub_02B4();
+        FadeOutScreen();
         m4aMPlayAllStop();
-        sub_0D10();
+        DisableVBlankInterrupts();
         gMain.subState = HIGH_SCORE_STATE_0;
     }
     else if (JOY_NEW(B_BUTTON))
     {
         m4aSongNumStart(SE_MENU_CANCEL);
-        gUnknown_0201B178 = 0;
-        gUnknown_0202BEBC = 0;
+        gShowDialogFlag = 0;
+        gDialogType = 0;
         gMain.subState = HIGH_SCORE_STATE_3;
     }
 }
 
-void HighScore_State11_DD4C(void)
+void HighScore_ExitToTitle(void)
 {
-    sub_02B4();
+    FadeOutScreen();
     m4aMPlayAllStop();
-    sub_0D10();
+    DisableVBlankInterrupts();
     gAutoDisplayTitlescreenMenu = TRUE;
     SetMainGameState(STATE_TITLE);
 }
 
-void IdleHighScore_State0_DD70(void)
+void IdleHighScore_LoadGraphics(void)
 {
     ResetSomeGraphicsRelatedStuff();
     REG_DISPCNT = DISPCNT_OBJ_ON | DISPCNT_FORCED_BLANK;
@@ -730,23 +730,23 @@ void IdleHighScore_State0_DD70(void)
     REG_BG3CNT = 0x420F;
     REG_DISPCNT |= DISPCNT_BG3_ON;
     gMain.dispcntBackup = REG_DISPCNT;
-    DmaCopy16(3, gUnknown_0809DBE0, (void*) PLTT, 0x200);
+    DmaCopy16(3, gHighScoreBG_Pals, (void*) PLTT, 0x200);
     DmaCopy16(3, gHighScoreText_Gfx, (void*) BG_VRAM + 0x4000, 0x4800);
     DmaCopy16(3, gHighScoreBallWatermark_Gfx, (void *)BG_VRAM + 0xC000, 0x2C00);
-    DmaCopy16(3, gUnknown_080947A0, gUnknown_03005C00, 0x1000);
-    DmaCopy16(3, gUnknown_08099FC0, (void *)BG_SCREEN_ADDR(2), 0x1000);
-    DmaCopy16(3, gUnknown_0809DDE0, (void *)OBJ_PLTT, 0x20);
+    DmaCopy16(3, gHighScoreScoreTable_Tilemap, gBG0TilemapBuffer, 0x1000);
+    DmaCopy16(3, gHighScoreBallWatermark_Tilemap, (void *)BG_SCREEN_ADDR(2), 0x1000);
+    DmaCopy16(3, gHighScoreSprite_Pals, (void *)OBJ_PLTT, 0x20);
     DmaCopy16(3, gHighScoreDialogs_Gfx, (void *)OBJ_VRAM0, 0x4420);
-    sub_DEB4();
-    sub_EE64();
-    DmaCopy16(3, gUnknown_03005C00,0x6000000, 0x1000);
+    InitIdleHighScoreData();
+    DrawAllHighScoreText();
+    DmaCopy16(3, gBG0TilemapBuffer,0x6000000, 0x1000);
     m4aSongNumStart(MUS_HIGH_SCORE);
-    sub_0CBC();
-    sub_024C();
+    EnableVBlankInterrupts();
+    FadeInScreen();
     gMain.subState++;
 }
 
-void sub_DEB4(void)
+void InitIdleHighScoreData(void)
 {
     int i, j, k;
 
@@ -756,90 +756,90 @@ void sub_DEB4(void)
         {
             for (k = 0; k < 6; k++)
             {
-                gUnknown_0202C610[i][j].data.raw[k] = gMain_saveData.highScores[i][j].data.raw[k];
+                gWorkingHighScores[i][j].data.raw[k] = gMain_saveData.highScores[i][j].data.raw[k];
             }
         }
     }
 
-    gUnknown_02002858.unk8 = 0;
-    gUnknown_02002858.unk1E = 0;
-    gUnknown_02002858.unk1C = 0;
-    gUnknown_02002858.mainField = 0;
-    gUnknown_02002882 = 0;
-    gUnknown_02002880 = -1;
-    gUnknown_02002858.unk24 = STATE_INTRO;
-    gUnknown_02002858.unkA = 0;
-    gMain.bgOffsets[3].xOffset = gUnknown_02002882;
-    gMain.bgOffsets[2].xOffset = gUnknown_02002882;
+    gHighScoreScreenState.displayTimer = 0;
+    gHighScoreScreenState.paletteAnimTimer = 0;
+    gHighScoreScreenState.paletteAnimPhase = 0;
+    gHighScoreScreenState.mainField = 0;
+    gScrollXOffset = 0;
+    gScrollDirection = -1;
+    gHighScoreScreenState.nextIdleState = STATE_INTRO;
+    gHighScoreScreenState.nextSubState = 0;
+    gMain.bgOffsets[3].xOffset = gScrollXOffset;
+    gMain.bgOffsets[2].xOffset = gScrollXOffset;
 }
 
-void IdleHighScore_State1_DF68(void)
+void IdleHighScore_AutoScroll(void)
 {
-    switch (gUnknown_02002858.unkA)
+    switch (gHighScoreScreenState.nextSubState)
     {
     case 0:
-        if (++gUnknown_02002858.unk1E > 8)
+        if (++gHighScoreScreenState.paletteAnimTimer > 8)
         {
-            gUnknown_02002858.unk1E = 0;
-            sub_F8B0(0, 0, gUnknown_02002858.unk1C);
-            if (++gUnknown_02002858.unk1C > 2)
-                gUnknown_02002858.unk1C = 0;
+            gHighScoreScreenState.paletteAnimTimer = 0;
+            AnimateScoreTilemapPalette(0, 0, gHighScoreScreenState.paletteAnimPhase);
+            if (++gHighScoreScreenState.paletteAnimPhase > 2)
+                gHighScoreScreenState.paletteAnimPhase = 0;
         }
-        if (gUnknown_02002858.unk8 > 600)
+        if (gHighScoreScreenState.displayTimer > 600)
         {
-            gUnknown_02002858.unk8 = 0;
-            gUnknown_02002858.unk1E = 0;
-            gUnknown_02002858.unk1C = 0;
-            gUnknown_02002858.unkA = 1;
+            gHighScoreScreenState.displayTimer = 0;
+            gHighScoreScreenState.paletteAnimTimer = 0;
+            gHighScoreScreenState.paletteAnimPhase = 0;
+            gHighScoreScreenState.nextSubState = 1;
         }
         break;
     case 1:
-        gUnknown_02002882 += 8;
-        if (gUnknown_02002882 >= 240)
+        gScrollXOffset += 8;
+        if (gScrollXOffset >= 240)
         {
-            gUnknown_02002858.unk8 = 0;
-            gUnknown_02002858.unkA = 2;
+            gHighScoreScreenState.displayTimer = 0;
+            gHighScoreScreenState.nextSubState = 2;
         }
-        gMain.bgOffsets[3].xOffset = gUnknown_02002882;
-        gMain.bgOffsets[2].xOffset = gUnknown_02002882;
+        gMain.bgOffsets[3].xOffset = gScrollXOffset;
+        gMain.bgOffsets[2].xOffset = gScrollXOffset;
         break;
     case 2:
-        if (++gUnknown_02002858.unk1E > 8)
+        if (++gHighScoreScreenState.paletteAnimTimer > 8)
         {
-            gUnknown_02002858.unk1E = 0;
-            sub_F8B0(1, 0, gUnknown_02002858.unk1C);
-            if (++gUnknown_02002858.unk1C > 2)
-                gUnknown_02002858.unk1C = 0;
+            gHighScoreScreenState.paletteAnimTimer = 0;
+            AnimateScoreTilemapPalette(1, 0, gHighScoreScreenState.paletteAnimPhase);
+            if (++gHighScoreScreenState.paletteAnimPhase > 2)
+                gHighScoreScreenState.paletteAnimPhase = 0;
         }
-        if (gUnknown_02002858.unk8 > 600)
+        if (gHighScoreScreenState.displayTimer > 600)
         {
-            gUnknown_02002858.unk8 = 0;
-            gUnknown_02002858.unk24 = STATE_INTRO;
+            gHighScoreScreenState.displayTimer = 0;
+            gHighScoreScreenState.nextIdleState = STATE_INTRO;
             gMain.subState++;
         }
         break;
     }
 
-    gUnknown_02002858.unk8++;
-    DmaCopy16(3, gUnknown_03005C00, 0x6000000, 0x1000);
+    gHighScoreScreenState.displayTimer++;
+    DmaCopy16(3, gBG0TilemapBuffer, 0x6000000, 0x1000);
 
     if (JOY_NEW(START_BUTTON | A_BUTTON | B_BUTTON))
     {
         m4aSongNumStart(SE_MENU_CANCEL);
-        gUnknown_02002858.unk24 = STATE_TITLE;
+        gHighScoreScreenState.nextIdleState = STATE_TITLE;
         gMain.subState++;
     }
 }
 
-void IdleHighScore_State2_E0C4(void)
+void IdleHighScore_Exit(void)
 {
-    sub_02B4();
+    FadeOutScreen();
     m4aMPlayAllStop();
-    sub_0D10();
-    SetMainGameState(gUnknown_02002858.unk24);
+    DisableVBlankInterrupts();
+    SetMainGameState(gHighScoreScreenState.nextIdleState);
 }
 
-void HighScore_State12_E0EC(void)
+void HighScore_ReloadAfterLink(void)
 {
     ResetSomeGraphicsRelatedStuff();
     REG_DISPCNT = DISPCNT_OBJ_ON | DISPCNT_FORCED_BLANK;
@@ -848,76 +848,76 @@ void HighScore_State12_E0EC(void)
     REG_BG3CNT = 0x420f;
     REG_DISPCNT |= DISPCNT_BG3_ON;
     gMain.dispcntBackup = REG_DISPCNT;
-    DmaCopy16(3, gUnknown_0809DBE0, (void*) PLTT, 0x200);
+    DmaCopy16(3, gHighScoreBG_Pals, (void*) PLTT, 0x200);
     DmaCopy16(3, gHighScoreText_Gfx, (void*) BG_VRAM + 0x4000, 0x4800);
     DmaCopy16(3, gHighScoreBallWatermark_Gfx, (void *)BG_VRAM + 0xC000, 0x2C00);
-    DmaCopy16(3, gUnknown_080947A0, gUnknown_03005C00, 0x1000);
-    DmaCopy16(3, gUnknown_08099FC0, (void *)BG_SCREEN_ADDR(2), 0x1000);
-    DmaCopy16(3, gUnknown_0809DDE0, (void *)OBJ_PLTT, 0x20);
+    DmaCopy16(3, gHighScoreScoreTable_Tilemap, gBG0TilemapBuffer, 0x1000);
+    DmaCopy16(3, gHighScoreBallWatermark_Tilemap, (void *)BG_SCREEN_ADDR(2), 0x1000);
+    DmaCopy16(3, gHighScoreSprite_Pals, (void *)OBJ_PLTT, 0x20);
     DmaCopy16(3, gHighScoreDialogs_Gfx, (void *)OBJ_VRAM0, 0x4420);
-    sub_DEB4();
-    sub_EE64();
-    DmaCopy16(3, gUnknown_03005C00,0x6000000, 0x1000);
+    InitIdleHighScoreData();
+    DrawAllHighScoreText();
+    DmaCopy16(3, gBG0TilemapBuffer,0x6000000, 0x1000);
     m4aSongNumStart(MUS_HIGH_SCORE);
-    sub_0CBC();
-    sub_024C();
+    EnableVBlankInterrupts();
+    FadeInScreen();
     gMain.subState++;
 }
 
-void HighScore_State13_E230(void)
+void HighScore_ShowMergedScores(void)
 {
-    switch (gUnknown_02002858.unkA)
+    switch (gHighScoreScreenState.nextSubState)
     {
     case 0:
-        if (gUnknown_0202BED8 != -1)
+        if (gMergedRubyScoreIndex != -1)
         {
-            if (++gUnknown_02002858.unk1E > 8)
+            if (++gHighScoreScreenState.paletteAnimTimer > 8)
             {
-                gUnknown_02002858.unk1E = 0;
-                sub_F8B0(0, gUnknown_0202BED8, gUnknown_02002858.unk1C);
-                if (++gUnknown_02002858.unk1C > 2)
-                    gUnknown_02002858.unk1C = 0;
+                gHighScoreScreenState.paletteAnimTimer = 0;
+                AnimateScoreTilemapPalette(0, gMergedRubyScoreIndex, gHighScoreScreenState.paletteAnimPhase);
+                if (++gHighScoreScreenState.paletteAnimPhase > 2)
+                    gHighScoreScreenState.paletteAnimPhase = 0;
             }
         }
-        if (gUnknown_02002858.unk8 > 120)
+        if (gHighScoreScreenState.displayTimer > 120)
         {
-            gUnknown_02002858.unk8 = 0;
-            gUnknown_02002858.unk1E = 0;
-            gUnknown_02002858.unk1C = 0;
-            gUnknown_02002858.unkA = 1;
+            gHighScoreScreenState.displayTimer = 0;
+            gHighScoreScreenState.paletteAnimTimer = 0;
+            gHighScoreScreenState.paletteAnimPhase = 0;
+            gHighScoreScreenState.nextSubState = 1;
         }
         break;
     case 1:
-        gUnknown_02002882 += 8;
-        if (gUnknown_02002882 >= 240)
+        gScrollXOffset += 8;
+        if (gScrollXOffset >= 240)
         {
-            gUnknown_02002858.unk8 = 0;
-            gUnknown_02002858.unkA = 2;
+            gHighScoreScreenState.displayTimer = 0;
+            gHighScoreScreenState.nextSubState = 2;
         }
-        gMain.bgOffsets[3].xOffset = gUnknown_02002882;
-        gMain.bgOffsets[2].xOffset = gUnknown_02002882;
+        gMain.bgOffsets[3].xOffset = gScrollXOffset;
+        gMain.bgOffsets[2].xOffset = gScrollXOffset;
         break;
     case 2:
-        if (gUnknown_0201B170 != -1)
+        if (gMergedSapphireScoreIndex != -1)
         {
-            if (++gUnknown_02002858.unk1E > 8)
+            if (++gHighScoreScreenState.paletteAnimTimer > 8)
             {
-                gUnknown_02002858.unk1E = 0;
-                sub_F8B0(1, gUnknown_0201B170, gUnknown_02002858.unk1C);
-                if (++gUnknown_02002858.unk1C > 2)
-                    gUnknown_02002858.unk1C = 0;
+                gHighScoreScreenState.paletteAnimTimer = 0;
+                AnimateScoreTilemapPalette(1, gMergedSapphireScoreIndex, gHighScoreScreenState.paletteAnimPhase);
+                if (++gHighScoreScreenState.paletteAnimPhase > 2)
+                    gHighScoreScreenState.paletteAnimPhase = 0;
             }
         }
-        if (gUnknown_02002858.unk8 > 120)
+        if (gHighScoreScreenState.displayTimer > 120)
         {
-            gUnknown_02002858.unk8 = 0;
+            gHighScoreScreenState.displayTimer = 0;
             gMain.subState++;
         }
         break;
     }
 
-    gUnknown_02002858.unk8++;
-    DmaCopy16(3, gUnknown_03005C00, 0x6000000, 0x1000);
+    gHighScoreScreenState.displayTimer++;
+    DmaCopy16(3, gBG0TilemapBuffer, 0x6000000, 0x1000);
 
     if (JOY_NEW(START_BUTTON | A_BUTTON | B_BUTTON))
     {
@@ -926,25 +926,25 @@ void HighScore_State13_E230(void)
     }
 }
 
-void HighScore_State14_E390(void)
+void HighScore_ReturnToMain(void)
 {
-    sub_02B4();
+    FadeOutScreen();
     m4aMPlayAllStop();
-    sub_0D10();
+    DisableVBlankInterrupts();
     SetMainGameState(STATE_SCORES_MAIN);
 }
 
-void sub_E3A8(void)
+void UpdateNameEntryCursor(void)
 {
     int i;
     struct SpriteGroup *spriteGroup;
 
-    spriteGroup = &gMain_spriteGroups[gUnknown_02002858.unk12];
+    spriteGroup = &gMain_spriteGroups[gHighScoreScreenState.nameFlashToggle];
     spriteGroup->available = TRUE;
-    LoadSpriteSets(gUnknown_086A7DA8, 2, gMain_spriteGroups);
+    LoadSpriteSets(gNameEntryCursorSpriteSets, 2, gMain_spriteGroups);
 
-    spriteGroup->baseX = gUnknown_080797F0[gUnknown_02002858.mainField][gUnknown_02002858.highScoreIndex].x + gUnknown_02002858.currentNameCharIndex * 8;
-    spriteGroup->baseY = gUnknown_080797F0[gUnknown_02002858.mainField][gUnknown_02002858.highScoreIndex].y;
+    spriteGroup->baseX = gHighScoreNamePixelPositions[gHighScoreScreenState.mainField][gHighScoreScreenState.highScoreIndex].x + gHighScoreScreenState.currentNameCharIndex * 8;
+    spriteGroup->baseY = gHighScoreNamePixelPositions[gHighScoreScreenState.mainField][gHighScoreScreenState.highScoreIndex].y;
     for (i = 0; i < 2; i++)
     {
         gOamBuffer[spriteGroup->oam[i].oamId].x = spriteGroup->oam[i].xOffset + spriteGroup->baseX;
@@ -954,11 +954,11 @@ void sub_E3A8(void)
     spriteGroup->available = FALSE;
 }
 
-extern s8 gUnknown_0200287D;
+extern s8 gHighScoreDisplayMode;
 
 
 #ifdef NONMATCHING
-static inline void sub_E464_HELPER(int x, struct SpriteGroup *spriteGroup, struct SpriteGroup *spriteGroup4, struct SpriteGroup *spriteGroup3)
+static inline void RenderHighScoreSprites_HELPER(int x, struct SpriteGroup *spriteGroup, struct SpriteGroup *spriteGroup4, struct SpriteGroup *spriteGroup3)
 {
     int i;
     const struct SpriteSet *spriteSet;
@@ -966,14 +966,14 @@ static inline void sub_E464_HELPER(int x, struct SpriteGroup *spriteGroup, struc
     spriteGroup->baseX = x;
     spriteGroup->baseY = 144;
     oamData = &spriteGroup->oam[0];
-    gOamBuffer[oamData->oamId].tileNum = gUnknown_02002858.unk1A * 2 + 2;
+    gOamBuffer[oamData->oamId].tileNum = gHighScoreScreenState.flashElapsedFrames * 2 + 2;
     gOamBuffer[oamData->oamId].x = oamData->xOffset + spriteGroup->baseX;
     gOamBuffer[oamData->oamId].y = oamData->yOffset + spriteGroup->baseY;
 }
 
 // This one is tough. I think there might be an inline function used for the shared logic
 // of the two main if statements.
-void sub_E464(void)
+void RenderHighScoreSprites(void)
 {
     int i;
     int count;
@@ -983,30 +983,30 @@ void sub_E464(void)
     struct SpriteGroup *spriteGroup3;
     struct SpriteGroup *spriteGroup4;
     struct SpriteGroup *spriteGroup5;
-    register struct unkStruct_2002858 *var1_02002858 asm("r9");
+    register struct HighScoreScreenState *var1_02002858 asm("r9");
     const struct SpriteSet *spriteSet;
     struct OamDataSimple *oamData;
 
     spriteGroups = gMain_spriteGroups;
     spriteGroup1 = spriteGroups;
     spriteGroup2 = &spriteGroups[1];
-    spriteGroup3 = &spriteGroups[(s8)gUnknown_0202BEBC + 2];
-    var1_02002858 = &gUnknown_02002858;
-    spriteGroup4 = &spriteGroups[gUnknown_0200287D + 7];
+    spriteGroup3 = &spriteGroups[(s8)gDialogType + 2];
+    var1_02002858 = &gHighScoreScreenState;
+    spriteGroup4 = &spriteGroups[gHighScoreDisplayMode + 7];
 
-    if (gUnknown_02002882 == 0)
+    if (gScrollXOffset == 0)
     {
         spriteGroups->available = TRUE;
         spriteGroup2->available = FALSE;
-        spriteGroup3->available = gUnknown_0201B178;
-        spriteGroup4->available = var1_02002858->unk26;
-        LoadSpriteSets(gUnknown_086A7DB0, 9, spriteGroups);
-        sub_E464_HELPER(220, spriteGroup1, spriteGroup4, spriteGroup3);
+        spriteGroup3->available = gShowDialogFlag;
+        spriteGroup4->available = var1_02002858->collisionCooldownTimer;
+        LoadSpriteSets(gHighScoreScreenSpriteSets, 9, spriteGroups);
+        RenderHighScoreSprites_HELPER(220, spriteGroup1, spriteGroup4, spriteGroup3);
         if (spriteGroup4->available == 1)
         {
             spriteGroup4->baseX = 84;
             spriteGroup4->baseY = 150;
-            spriteSet = gUnknown_086A7DB0[gUnknown_0200287D + 7];
+            spriteSet = gHighScoreScreenSpriteSets[gHighScoreDisplayMode + 7];
             for (i = 0; i < spriteSet->count; i++)
             {
                 oamData = &spriteGroup4->oam[i];
@@ -1016,7 +1016,7 @@ void sub_E464(void)
         }
         if (spriteGroup3->available == 1)
         {
-            switch ((s8)gUnknown_0202BEBC)
+            switch ((s8)gDialogType)
             {
             case 0:
             case 4:
@@ -1028,7 +1028,7 @@ void sub_E464(void)
                 spriteGroup3->baseY = 80;
                 break;
             }
-            spriteSet = gUnknown_086A7DB0[(s8)gUnknown_0202BEBC + 2];
+            spriteSet = gHighScoreScreenSpriteSets[(s8)gDialogType + 2];
             for (i = 0; i < spriteSet->count; i++)
             {
                 oamData = &spriteGroup3->oam[i];
@@ -1037,19 +1037,19 @@ void sub_E464(void)
             }
         }
     }
-    else if (gUnknown_02002882 == 240)
+    else if (gScrollXOffset == 240)
     {
         spriteGroup1->available = FALSE;
         spriteGroup2->available = TRUE;
-        spriteGroup3->available = gUnknown_0201B178;
-        spriteGroup4->available = var1_02002858->unk26;
-        LoadSpriteSets(gUnknown_086A7DB0, 2, gMain_spriteGroups);
-        sub_E464_HELPER(4, spriteGroup2, spriteGroup4, spriteGroup3);
+        spriteGroup3->available = gShowDialogFlag;
+        spriteGroup4->available = var1_02002858->collisionCooldownTimer;
+        LoadSpriteSets(gHighScoreScreenSpriteSets, 2, gMain_spriteGroups);
+        RenderHighScoreSprites_HELPER(4, spriteGroup2, spriteGroup4, spriteGroup3);
         if (spriteGroup4->available == 1)
     {
         spriteGroup4->baseX = 84;
         spriteGroup4->baseY = 150;
-        spriteSet = gUnknown_086A7DB0[gUnknown_0200287D + 7];
+        spriteSet = gHighScoreScreenSpriteSets[gHighScoreDisplayMode + 7];
         for (i = 0; i < spriteSet->count; i++)
         {
             oamData = &spriteGroup4->oam[i];
@@ -1059,7 +1059,7 @@ void sub_E464(void)
     }
     if (spriteGroup3->available == 1)
     {
-        switch ((s8)gUnknown_0202BEBC)
+        switch ((s8)gDialogType)
         {
         case 0:
         case 4:
@@ -1071,7 +1071,7 @@ void sub_E464(void)
             spriteGroup3->baseY = 80;
             break;
         }
-        spriteSet = gUnknown_086A7DB0[(s8)gUnknown_0202BEBC + 2];
+        spriteSet = gHighScoreScreenSpriteSets[(s8)gDialogType + 2];
         for (i = 0; i < spriteSet->count; i++)
         {
             oamData = &spriteGroup3->oam[i];
@@ -1084,7 +1084,7 @@ void sub_E464(void)
     {
         spriteGroup1->available = FALSE;
         spriteGroup2->available = FALSE;
-        LoadSpriteSets(gUnknown_086A7DB0, 9, gMain_spriteGroups);
+        LoadSpriteSets(gHighScoreScreenSpriteSets, 9, gMain_spriteGroups);
     }
 
     spriteGroup3->available = FALSE;
@@ -1092,7 +1092,7 @@ void sub_E464(void)
 }
 #else
 NAKED
-void sub_E464(void)
+void RenderHighScoreSprites(void)
 {
     asm_unified("\n\
 	push {r4, r5, r6, r7, lr}\n\
@@ -1106,7 +1106,7 @@ void sub_E464(void)
 	adds r0, r0, r6\n\
 	mov sl, r0\n\
 	mov r5, sl\n\
-	ldr r0, _0800E5D0 @ =gUnknown_0202BEBC\n\
+	ldr r0, _0800E5D0 @ =gDialogType\n\
 	ldrb r0, [r0]\n\
 	lsls r0, r0, #0x18\n\
 	asrs r0, r0, #0x18\n\
@@ -1117,9 +1117,9 @@ void sub_E464(void)
 	lsls r3, r3, #1\n\
 	adds r0, r6, r3\n\
 	adds r7, r1, r0\n\
-	ldr r0, _0800E5D4 @ =gUnknown_02002858\n\
+	ldr r0, _0800E5D4 @ =gHighScoreScreenState\n\
 	mov sb, r0\n\
-	ldr r1, _0800E5D8 @ =gUnknown_0200287D\n\
+	ldr r1, _0800E5D8 @ =gHighScoreDisplayMode\n\
 	movs r0, #0\n\
 	ldrsb r0, [r1, r0]\n\
 	adds r1, r0, #0\n\
@@ -1129,7 +1129,7 @@ void sub_E464(void)
 	adds r0, r6, r2\n\
 	adds r1, r1, r0\n\
 	mov r8, r1\n\
-	ldr r0, _0800E5DC @ =gUnknown_02002882\n\
+	ldr r0, _0800E5DC @ =gScrollXOffset\n\
 	movs r3, #0\n\
 	ldrsh r1, [r0, r3]\n\
 	cmp r1, #0\n\
@@ -1139,7 +1139,7 @@ _0800E4B4:\n\
 	movs r0, #1\n\
 	strh r0, [r6]\n\
 	strh r1, [r5]\n\
-	ldr r0, _0800E5E0 @ =gUnknown_0201B178\n\
+	ldr r0, _0800E5E0 @ =gShowDialogFlag\n\
 	ldrb r0, [r0]\n\
 	lsls r0, r0, #0x18\n\
 	asrs r0, r0, #0x18\n\
@@ -1151,7 +1151,7 @@ _0800E4B4:\n\
 	asrs r0, r0, #0x18\n\
 	mov r1, r8\n\
 	strh r0, [r1]\n\
-	ldr r0, _0800E5E4 @ =gUnknown_086A7DB0\n\
+	ldr r0, _0800E5E4 @ =gHighScoreScreenSpriteSets\n\
 	movs r1, #9\n\
 	adds r2, r6, #0\n\
 	bl LoadSpriteSets\n\
@@ -1210,12 +1210,12 @@ _0800E4B4:\n\
 	strh r0, [r1, #2]\n\
 	movs r0, #0x96\n\
 	strh r0, [r1, #4]\n\
-	ldr r2, _0800E5D8 @ =gUnknown_0200287D\n\
+	ldr r2, _0800E5D8 @ =gHighScoreDisplayMode\n\
 	movs r0, #0\n\
 	ldrsb r0, [r2, r0]\n\
 	adds r0, #7\n\
 	lsls r0, r0, #2\n\
-	ldr r3, _0800E5E4 @ =gUnknown_086A7DB0\n\
+	ldr r3, _0800E5E4 @ =gHighScoreScreenSpriteSets\n\
 	adds r0, r0, r3\n\
 	ldr r6, [r0]\n\
 	movs r5, #0\n\
@@ -1265,7 +1265,7 @@ _0800E5AA:\n\
 	beq _0800E5B2\n\
 	b _0800E846\n\
 _0800E5B2:\n\
-	ldr r0, _0800E5D0 @ =gUnknown_0202BEBC\n\
+	ldr r0, _0800E5D0 @ =gDialogType\n\
 	movs r1, #0\n\
 	ldrsb r1, [r0, r1]\n\
 	adds r2, r0, #0\n\
@@ -1280,12 +1280,12 @@ _0800E5C2:\n\
 	b _0800E602\n\
 	.align 2, 0\n\
 _0800E5CC: .4byte gMain_spriteGroups\n\
-_0800E5D0: .4byte gUnknown_0202BEBC\n\
-_0800E5D4: .4byte gUnknown_02002858\n\
-_0800E5D8: .4byte gUnknown_0200287D\n\
-_0800E5DC: .4byte gUnknown_02002882\n\
-_0800E5E0: .4byte gUnknown_0201B178\n\
-_0800E5E4: .4byte gUnknown_086A7DB0\n\
+_0800E5D0: .4byte gDialogType\n\
+_0800E5D4: .4byte gHighScoreScreenState\n\
+_0800E5D8: .4byte gHighScoreDisplayMode\n\
+_0800E5DC: .4byte gScrollXOffset\n\
+_0800E5E0: .4byte gShowDialogFlag\n\
+_0800E5E4: .4byte gHighScoreScreenSpriteSets\n\
 _0800E5E8: .4byte gOamBuffer\n\
 _0800E5EC: .4byte 0x000003FF\n\
 _0800E5F0: .4byte 0xFFFFFC00\n\
@@ -1297,7 +1297,7 @@ _0800E5FC:\n\
 	movs r0, #0x50\n\
 _0800E602:\n\
 	strh r0, [r7, #4]\n\
-	ldr r1, _0800E664 @ =gUnknown_086A7DB0\n\
+	ldr r1, _0800E664 @ =gHighScoreScreenSpriteSets\n\
 	movs r0, #0\n\
 	ldrsb r0, [r2, r0]\n\
 	adds r0, #2\n\
@@ -1347,7 +1347,7 @@ _0800E628:\n\
 	blt _0800E628\n\
 	b _0800E846\n\
 	.align 2, 0\n\
-_0800E664: .4byte gUnknown_086A7DB0\n\
+_0800E664: .4byte gHighScoreScreenSpriteSets\n\
 _0800E668: .4byte gOamBuffer\n\
 _0800E66C: .4byte 0xFFFFFE00\n\
 _0800E670: .4byte 0x000001FF\n\
@@ -1361,7 +1361,7 @@ _0800E67A:\n\
 	movs r0, #1\n\
 	mov r1, sl\n\
 	strh r0, [r1]\n\
-	ldr r0, _0800E79C @ =gUnknown_0201B178\n\
+	ldr r0, _0800E79C @ =gShowDialogFlag\n\
 	ldrb r0, [r0]\n\
 	lsls r0, r0, #0x18\n\
 	asrs r0, r0, #0x18\n\
@@ -1373,7 +1373,7 @@ _0800E67A:\n\
 	asrs r0, r0, #0x18\n\
 	mov r2, r8\n\
 	strh r0, [r2]\n\
-	ldr r0, _0800E7A0 @ =gUnknown_086A7DB0\n\
+	ldr r0, _0800E7A0 @ =gHighScoreScreenSpriteSets\n\
 	movs r1, #9\n\
 	adds r2, r6, #0\n\
 	bl LoadSpriteSets\n\
@@ -1435,12 +1435,12 @@ _0800E67A:\n\
 	strh r0, [r1, #2]\n\
 	movs r0, #0x96\n\
 	strh r0, [r1, #4]\n\
-	ldr r2, _0800E7B8 @ =gUnknown_0200287D\n\
+	ldr r2, _0800E7B8 @ =gHighScoreDisplayMode\n\
 	movs r0, #0\n\
 	ldrsb r0, [r2, r0]\n\
 	adds r0, #7\n\
 	lsls r0, r0, #2\n\
-	ldr r3, _0800E7A0 @ =gUnknown_086A7DB0\n\
+	ldr r3, _0800E7A0 @ =gHighScoreScreenSpriteSets\n\
 	adds r0, r0, r3\n\
 	ldr r6, [r0]\n\
 	movs r5, #0\n\
@@ -1489,7 +1489,7 @@ _0800E77C:\n\
 	ldrh r0, [r7]\n\
 	cmp r0, #1\n\
 	bne _0800E846\n\
-	ldr r0, _0800E7BC @ =gUnknown_0202BEBC\n\
+	ldr r0, _0800E7BC @ =gDialogType\n\
 	movs r1, #0\n\
 	ldrsb r1, [r0, r1]\n\
 	adds r2, r0, #0\n\
@@ -1503,22 +1503,22 @@ _0800E792:\n\
 	movs r0, #0x64\n\
 	b _0800E7C6\n\
 	.align 2, 0\n\
-_0800E79C: .4byte gUnknown_0201B178\n\
-_0800E7A0: .4byte gUnknown_086A7DB0\n\
+_0800E79C: .4byte gShowDialogFlag\n\
+_0800E7A0: .4byte gHighScoreScreenSpriteSets\n\
 _0800E7A4: .4byte gOamBuffer\n\
 _0800E7A8: .4byte 0x000003FF\n\
 _0800E7AC: .4byte 0xFFFFFC00\n\
 _0800E7B0: .4byte 0x000001FF\n\
 _0800E7B4: .4byte 0xFFFFFE00\n\
-_0800E7B8: .4byte gUnknown_0200287D\n\
-_0800E7BC: .4byte gUnknown_0202BEBC\n\
+_0800E7B8: .4byte gHighScoreDisplayMode\n\
+_0800E7BC: .4byte gDialogType\n\
 _0800E7C0:\n\
 	movs r0, #0x78\n\
 	strh r0, [r7, #2]\n\
 	movs r0, #0x50\n\
 _0800E7C6:\n\
 	strh r0, [r7, #4]\n\
-	ldr r1, _0800E824 @ =gUnknown_086A7DB0\n\
+	ldr r1, _0800E824 @ =gHighScoreScreenSpriteSets\n\
 	movs r0, #0\n\
 	ldrsb r0, [r2, r0]\n\
 	adds r0, #2\n\
@@ -1566,7 +1566,7 @@ _0800E7EA:\n\
 	blt _0800E7EA\n\
 	b _0800E846\n\
 	.align 2, 0\n\
-_0800E824: .4byte gUnknown_086A7DB0\n\
+_0800E824: .4byte gHighScoreScreenSpriteSets\n\
 _0800E828: .4byte gOamBuffer\n\
 _0800E82C: .4byte 0xFFFFFE00\n\
 _0800E830: .4byte 0x000001FF\n\
@@ -1575,7 +1575,7 @@ _0800E834:\n\
 	strh r0, [r6]\n\
 	mov r1, sl\n\
 	strh r0, [r1]\n\
-	ldr r0, _0800E85C @ =gUnknown_086A7DB0\n\
+	ldr r0, _0800E85C @ =gHighScoreScreenSpriteSets\n\
 	movs r1, #9\n\
 	adds r2, r6, #0\n\
 	bl LoadSpriteSets\n\
@@ -1592,23 +1592,23 @@ _0800E846:\n\
 	pop {r0}\n\
 	bx r0\n\
 	.align 2, 0\n\
-_0800E85C: .4byte gUnknown_086A7DB0\n\
+_0800E85C: .4byte gHighScoreScreenSpriteSets\n\
     ");
 }
 #endif
 
-void sub_E860(void)
+void RenderCompletionBanner(void)
 {
     int i;
     struct SpriteGroup *spriteGroup;
 
-    spriteGroup = &gMain_spriteGroups[gUnknown_0202C580];
-    spriteGroup->available = gUnknown_0201C18C;
-    LoadSpriteSets(gUnknown_086A7DD4, 5, gMain_spriteGroups);
+    spriteGroup = &gMain_spriteGroups[gCompletionBannerFrame];
+    spriteGroup->available = gCompletionBannerVisible;
+    LoadSpriteSets(gCompletionBannerSpriteSets, 5, gMain_spriteGroups);
     if (spriteGroup->available == 1)
     {
         spriteGroup->baseX = 120;
-        spriteGroup->baseY = gUnknown_0201A4B8;
+        spriteGroup->baseY = gCompletionBannerY;
         for (i = 0; i < 4; i++)
         {
             gOamBuffer[spriteGroup->oam[i].oamId].x = spriteGroup->oam[i].xOffset + spriteGroup->baseX;
@@ -1619,179 +1619,179 @@ void sub_E860(void)
     spriteGroup->available = FALSE;
 }
 
-void sub_E908(void)
+void InitLinkExchangeBuffers(void)
 {
-    gUnknown_0202C5F0[0] = 0xCFCF;
-    gUnknown_0201C1B0 = 1;
-    gUnknown_0202C59C = 1;
-    gUnknown_0202ADE4 = 0;
-    gUnknown_0201A4BC = 0;
-    gUnknown_0202C598 = 0;
-    gUnknown_0202C54C = 0;
+    gLinkSendBuffer[0] = 0xCFCF;
+    gLinkExchangeCommand = 1;
+    gLinkPacketCounter = 1;
+    gLinkExchangeResult = 0;
+    gLinkExchangeSendPhase = 0;
+    gLinkExchangeRecvPhase = 0;
+    gLinkExchangeTimeout = 0;
 }
 
-s16 sub_E94C(void)
+s16 HighScore_ProcessLinkExchange(void)
 {
     s16 result;
     if (gLink.isMaster)
-        result = sub_EBEC();
+        result = MasterReceiveHighScores();
     else
-        result = sub_ED28();
+        result = SlaveReceiveHighScores();
 
     return result;
 }
 
-s16 sub_E970(void)
+s16 ProcessLinkSendData(void)
 {
     s16 result;
     if (gLink.isMaster)
-        result = sub_E994();
+        result = MasterSendHighScores();
     else
-        result = sub_EAC0();
+        result = SlaveSendHighScores();
 
     return result;
 }
 
-s16 sub_E994(void)
+s16 MasterSendHighScores(void)
 {
     int i;
     struct HighScoreEntry *topScore;
 
-    if (gUnknown_0202ADE4 == 0)
+    if (gLinkExchangeResult == 0)
     {
-        switch (gUnknown_0201A4BC)
+        switch (gLinkExchangeSendPhase)
         {
         case 0:
             if (JOY_NEW(A_BUTTON))
             {
-                gUnknown_0202C5F0[0] = 0xDEDE;
+                gLinkSendBuffer[0] = 0xDEDE;
             }
             else
             {
                 for (i = 0; i < 8; i++)
-                    gUnknown_0202C5F0[i] = 0;
+                    gLinkSendBuffer[i] = 0;
             }
             break;
         case 1:
-            gUnknown_0202C5F0[0] = 0xEDED;
+            gLinkSendBuffer[0] = 0xEDED;
             break;
         }
     }
     else
     {
-        if (gUnknown_0202C59C < 8)
+        if (gLinkPacketCounter < 8)
         {
             for (i = 0; i < 8; i++)
-                gUnknown_0202C5F0[i] = 0xCFCF;
+                gLinkSendBuffer[i] = 0xCFCF;
         }
-        else if (gUnknown_0202C59C < 10)
+        else if (gLinkPacketCounter < 10)
         {
-            u16 field = gUnknown_0202C59C - 8;
-            gUnknown_0202C5F0[0] = gUnknown_0202C59C;
-            gUnknown_0202C5F0[1] = (gUnknown_0202C610[field][0].data.parts.name[0] << 8) |
-                                    gUnknown_0202C610[field][0].data.parts.name[1];
-            gUnknown_0202C5F0[2] = (gUnknown_0202C610[field][0].data.parts.name[2] << 8) |
-                                    gUnknown_0202C610[field][0].data.parts.name[3];
-            gUnknown_0202C5F0[3] = gUnknown_0202C610[field][0].data.parts.scoreHi >> 16;
-            gUnknown_0202C5F0[4] = gUnknown_0202C610[field][0].data.parts.scoreHi;
-            gUnknown_0202C5F0[5] = gUnknown_0202C610[field][0].data.parts.scoreLo >> 16;
-            gUnknown_0202C5F0[6] = gUnknown_0202C610[field][0].data.parts.scoreLo;
-            gUnknown_0202C5F0[7] = 0;
+            u16 field = gLinkPacketCounter - 8;
+            gLinkSendBuffer[0] = gLinkPacketCounter;
+            gLinkSendBuffer[1] = (gWorkingHighScores[field][0].data.parts.name[0] << 8) |
+                                    gWorkingHighScores[field][0].data.parts.name[1];
+            gLinkSendBuffer[2] = (gWorkingHighScores[field][0].data.parts.name[2] << 8) |
+                                    gWorkingHighScores[field][0].data.parts.name[3];
+            gLinkSendBuffer[3] = gWorkingHighScores[field][0].data.parts.scoreHi >> 16;
+            gLinkSendBuffer[4] = gWorkingHighScores[field][0].data.parts.scoreHi;
+            gLinkSendBuffer[5] = gWorkingHighScores[field][0].data.parts.scoreLo >> 16;
+            gLinkSendBuffer[6] = gWorkingHighScores[field][0].data.parts.scoreLo;
+            gLinkSendBuffer[7] = 0;
         }
         else
         {
             for (i = 0; i < 8; i++)
-                gUnknown_0202C5F0[i] = 0;
+                gLinkSendBuffer[i] = 0;
         }
 
-        gUnknown_0202C59C++;
+        gLinkPacketCounter++;
     }
 
     return 0;
 }
 
-s16 sub_EAC0(void)
+s16 SlaveSendHighScores(void)
 {
     int i;
     struct HighScoreEntry *topScore;
 
-    if (gUnknown_0202ADE4 == 0)
+    if (gLinkExchangeResult == 0)
     {
-        switch (gUnknown_0202C598)
+        switch (gLinkExchangeRecvPhase)
         {
         case 0:
             if (JOY_NEW(A_BUTTON))
             {
-                gUnknown_0202C5F0[0] = 0xDEDE;
+                gLinkSendBuffer[0] = 0xDEDE;
             }
             else
             {
                 for (i = 0; i < 8; i++)
-                    gUnknown_0202C5F0[i] = 0;
+                    gLinkSendBuffer[i] = 0;
             }
             break;
         case 1:
-            gUnknown_0202C5F0[0] = 0xEDED;
+            gLinkSendBuffer[0] = 0xEDED;
             break;
         }
     }
     else
     {
-        if (gUnknown_0202C59C < 8)
+        if (gLinkPacketCounter < 8)
         {
             for (i = 0; i < 8; i++)
-                gUnknown_0202C5F0[i] = 0xCFCF;
+                gLinkSendBuffer[i] = 0xCFCF;
         }
-        else if (gUnknown_0202C59C < 10)
+        else if (gLinkPacketCounter < 10)
         {
-            u16 field = gUnknown_0202C59C - 8;
-            gUnknown_0202C5F0[0] = gUnknown_0202C59C;
-            gUnknown_0202C5F0[1] = (gUnknown_0202C610[field][0].data.parts.name[0] << 8) |
-                                    gUnknown_0202C610[field][0].data.parts.name[1];
-            gUnknown_0202C5F0[2] = (gUnknown_0202C610[field][0].data.parts.name[2] << 8) |
-                                    gUnknown_0202C610[field][0].data.parts.name[3];
-            gUnknown_0202C5F0[3] = gUnknown_0202C610[field][0].data.parts.scoreHi >> 16;
-            gUnknown_0202C5F0[4] = gUnknown_0202C610[field][0].data.parts.scoreHi;
-            gUnknown_0202C5F0[5] = gUnknown_0202C610[field][0].data.parts.scoreLo >> 16;
-            gUnknown_0202C5F0[6] = gUnknown_0202C610[field][0].data.parts.scoreLo;
-            gUnknown_0202C5F0[7] = 0;
+            u16 field = gLinkPacketCounter - 8;
+            gLinkSendBuffer[0] = gLinkPacketCounter;
+            gLinkSendBuffer[1] = (gWorkingHighScores[field][0].data.parts.name[0] << 8) |
+                                    gWorkingHighScores[field][0].data.parts.name[1];
+            gLinkSendBuffer[2] = (gWorkingHighScores[field][0].data.parts.name[2] << 8) |
+                                    gWorkingHighScores[field][0].data.parts.name[3];
+            gLinkSendBuffer[3] = gWorkingHighScores[field][0].data.parts.scoreHi >> 16;
+            gLinkSendBuffer[4] = gWorkingHighScores[field][0].data.parts.scoreHi;
+            gLinkSendBuffer[5] = gWorkingHighScores[field][0].data.parts.scoreLo >> 16;
+            gLinkSendBuffer[6] = gWorkingHighScores[field][0].data.parts.scoreLo;
+            gLinkSendBuffer[7] = 0;
         }
         else
         {
             for (i = 0; i < 8; i++)
-                gUnknown_0202C5F0[i] = 0;
+                gLinkSendBuffer[i] = 0;
         }
 
-        gUnknown_0202C59C++;
+        gLinkPacketCounter++;
     }
 
     return 0;
 }
 
-s16 sub_EBEC(void)
+s16 MasterReceiveHighScores(void)
 {
     int i, j;
     struct HighScoreEntry *topScore;
     u16 field;
 
-    if (gUnknown_0202ADE4 == 0)
+    if (gLinkExchangeResult == 0)
     {
-        switch (gUnknown_0201A4BC)
+        switch (gLinkExchangeSendPhase)
         {
         case 0:
-            if (gUnknown_0201A4D0[0][0] == 0xDEDE || gUnknown_0201A4D0[0][1] == 0xDEDE)
-                gUnknown_0201A4BC = 1;
+            if (gLinkRecvBuffer[0][0] == 0xDEDE || gLinkRecvBuffer[0][1] == 0xDEDE)
+                gLinkExchangeSendPhase = 1;
             break;
         case 1:
-            if (gUnknown_0201A4D0[0][0] == 0xEDED && gUnknown_0201A4D0[0][1] == 0xEDED)
+            if (gLinkRecvBuffer[0][0] == 0xEDED && gLinkRecvBuffer[0][1] == 0xEDED)
             {
-                gUnknown_0202ADE4 = -1;
-                gUnknown_0202BEBC = 1;
-                gUnknown_0202C59C = 1;
+                gLinkExchangeResult = -1;
+                gDialogType = 1;
+                gLinkPacketCounter = 1;
             }
             else
             {
-                if (++gUnknown_0202C54C > 10)
+                if (++gLinkExchangeTimeout > 10)
                     return 1;
             }
             break;
@@ -1799,54 +1799,54 @@ s16 sub_EBEC(void)
     }
     else
     {
-        field = gUnknown_0201A4D0[0][1] - 8;
+        field = gLinkRecvBuffer[0][1] - 8;
         if (field > 1)
             return 0;
 
-        gUnknown_0201C1B0 = gUnknown_0201A4D0[0][1];
-        gUnknown_0202C550[field].data.parts.name[0] = (gUnknown_0201A4D0[1][1] >> 8) & 0xFF;
-        gUnknown_0202C550[field].data.parts.name[1] = gUnknown_0201A4D0[1][1] & 0xFF;
-        gUnknown_0202C550[field].data.parts.name[2] = (gUnknown_0201A4D0[2][1] >> 8) & 0xFF;
-        gUnknown_0202C550[field].data.parts.name[3] = gUnknown_0201A4D0[2][1] & 0xFF;
-        gUnknown_0202C550[field].data.parts.scoreHi = (gUnknown_0201A4D0[3][1] << 16) |
-                                                        gUnknown_0201A4D0[4][1];
-        gUnknown_0202C550[field].data.parts.scoreLo = (gUnknown_0201A4D0[5][1] << 16) |
-                                                                gUnknown_0201A4D0[6][1];
-        if (gUnknown_0201C1B0 == 9)
+        gLinkExchangeCommand = gLinkRecvBuffer[0][1];
+        gRemoteTopScores[field].data.parts.name[0] = (gLinkRecvBuffer[1][1] >> 8) & 0xFF;
+        gRemoteTopScores[field].data.parts.name[1] = gLinkRecvBuffer[1][1] & 0xFF;
+        gRemoteTopScores[field].data.parts.name[2] = (gLinkRecvBuffer[2][1] >> 8) & 0xFF;
+        gRemoteTopScores[field].data.parts.name[3] = gLinkRecvBuffer[2][1] & 0xFF;
+        gRemoteTopScores[field].data.parts.scoreHi = (gLinkRecvBuffer[3][1] << 16) |
+                                                        gLinkRecvBuffer[4][1];
+        gRemoteTopScores[field].data.parts.scoreLo = (gLinkRecvBuffer[5][1] << 16) |
+                                                                gLinkRecvBuffer[6][1];
+        if (gLinkExchangeCommand == 9)
             return -1;
     }
 
     for (i = 0; i < 8; i++)
         for (j = 0; j < 2; j++)
-            gUnknown_0201A4D0[i][j] = 0;
+            gLinkRecvBuffer[i][j] = 0;
 
     return 0;
 }
 
-s16 sub_ED28(void)
+s16 SlaveReceiveHighScores(void)
 {
     int i, j;
     struct HighScoreEntry *topScore;
     u16 field;
 
-    if (gUnknown_0202ADE4 == 0)
+    if (gLinkExchangeResult == 0)
     {
-        switch (gUnknown_0202C598)
+        switch (gLinkExchangeRecvPhase)
         {
         case 0:
-            if (gUnknown_0201A4D0[0][0] == 0xDEDE || gUnknown_0201A4D0[0][1] == 0xDEDE)
-                gUnknown_0202C598 = 1;
+            if (gLinkRecvBuffer[0][0] == 0xDEDE || gLinkRecvBuffer[0][1] == 0xDEDE)
+                gLinkExchangeRecvPhase = 1;
             break;
         case 1:
-            if (gUnknown_0201A4D0[0][0] == 0xEDED && gUnknown_0201A4D0[0][1] == 0xEDED)
+            if (gLinkRecvBuffer[0][0] == 0xEDED && gLinkRecvBuffer[0][1] == 0xEDED)
             {
-                gUnknown_0202ADE4 = -1;
-                gUnknown_0202BEBC = 1;
-                gUnknown_0202C59C = 1;
+                gLinkExchangeResult = -1;
+                gDialogType = 1;
+                gLinkPacketCounter = 1;
             }
             else
             {
-                if (++gUnknown_0202C54C > 10)
+                if (++gLinkExchangeTimeout > 10)
                     return 1;
             }
             break;
@@ -1854,38 +1854,38 @@ s16 sub_ED28(void)
     }
     else
     {
-        field = gUnknown_0201A4D0[0][0] - 8;
+        field = gLinkRecvBuffer[0][0] - 8;
         if (field > 1)
             return 0;
 
-        gUnknown_0201C1B0 = gUnknown_0201A4D0[0][0];
-        gUnknown_0202C550[field].data.parts.name[0] = (gUnknown_0201A4D0[1][0] >> 8) & 0xFF;
-        gUnknown_0202C550[field].data.parts.name[1] = gUnknown_0201A4D0[1][0] & 0xFF;
-        gUnknown_0202C550[field].data.parts.name[2] = (gUnknown_0201A4D0[2][0] >> 8) & 0xFF;
-        gUnknown_0202C550[field].data.parts.name[3] = gUnknown_0201A4D0[2][0] & 0xFF;
-        gUnknown_0202C550[field].data.parts.scoreHi = (gUnknown_0201A4D0[3][0] << 16) |
-                                                        gUnknown_0201A4D0[4][0];
-        gUnknown_0202C550[field].data.parts.scoreLo = (gUnknown_0201A4D0[5][0] << 16) |
-                                                                gUnknown_0201A4D0[6][0];
-        if (gUnknown_0201C1B0 == 9)
+        gLinkExchangeCommand = gLinkRecvBuffer[0][0];
+        gRemoteTopScores[field].data.parts.name[0] = (gLinkRecvBuffer[1][0] >> 8) & 0xFF;
+        gRemoteTopScores[field].data.parts.name[1] = gLinkRecvBuffer[1][0] & 0xFF;
+        gRemoteTopScores[field].data.parts.name[2] = (gLinkRecvBuffer[2][0] >> 8) & 0xFF;
+        gRemoteTopScores[field].data.parts.name[3] = gLinkRecvBuffer[2][0] & 0xFF;
+        gRemoteTopScores[field].data.parts.scoreHi = (gLinkRecvBuffer[3][0] << 16) |
+                                                        gLinkRecvBuffer[4][0];
+        gRemoteTopScores[field].data.parts.scoreLo = (gLinkRecvBuffer[5][0] << 16) |
+                                                                gLinkRecvBuffer[6][0];
+        if (gLinkExchangeCommand == 9)
             return -1;
     }
 
     for (i = 0; i < 8; i++)
         for (j = 0; j < 2; j++)
-            gUnknown_0201A4D0[i][j] = 0;
+            gLinkRecvBuffer[i][j] = 0;
 
     return 0;
 }
 
-void sub_EE64(void)
+void DrawAllHighScoreText(void)
 {
     int i, j;
 
     // Ruby Field Top name
     for (j = 0; j < HIGH_SCORE_NAME_LENGTH; j++)
     {
-        PrintString(gUnknown_086A7FAC[gUnknown_0202C610[FIELD_RUBY][0].data.parts.name[j]] + 0x80, 8, j + 6, 3, 1, 1);
+        PrintString(gHighScoreCharToTileMap[gWorkingHighScores[FIELD_RUBY][0].data.parts.name[j]] + 0x80, 8, j + 6, 3, 1, 1);
     }
 
     // Ruby Field 2nd-8th names
@@ -1893,39 +1893,39 @@ void sub_EE64(void)
     {
         for (j = 0; j < HIGH_SCORE_NAME_LENGTH; j++)
         {
-            PrintString(gUnknown_086A7FAC[gUnknown_0202C610[FIELD_RUBY][i].data.parts.name[j]] + 0xA0, 8, j + 6, i * 2 + 3, 1, 2);
+            PrintString(gHighScoreCharToTileMap[gWorkingHighScores[FIELD_RUBY][i].data.parts.name[j]] + 0xA0, 8, j + 6, i * 2 + 3, 1, 2);
         }
     }
 
     // Ruby Field Top score
-    sub_F21C(gUnknown_0202C610[FIELD_RUBY][0].data.parts.scoreHi, gUnknown_0202C610[FIELD_RUBY][0].data.parts.scoreLo);
+    FormatScoreDigits(gWorkingHighScores[FIELD_RUBY][0].data.parts.scoreHi, gWorkingHighScores[FIELD_RUBY][0].data.parts.scoreLo);
     for (j = 0; j < 14; j++)
     {
         if ((j + 1) % 3 == 0)
-            PrintString(gUnknown_0202C5C0[j] + 0x120, 9, j + 12, 2, 1, 2); // Thousands separator?
+            PrintString(gScoreDigitBuffer[j] + 0x120, 9, j + 12, 2, 1, 2); // Thousands separator?
         else
-            PrintString(gUnknown_0202C5C0[j] + 0xE0, 9, j + 12, 2, 1, 2);
+            PrintString(gScoreDigitBuffer[j] + 0xE0, 9, j + 12, 2, 1, 2);
     }
-    PrintString(gUnknown_0202C5C0[14] + 0xE0, 9, 26, 2, 1, 2);
+    PrintString(gScoreDigitBuffer[14] + 0xE0, 9, 26, 2, 1, 2);
     // Ruby Field 2nd-8th scores
     for (i = 1; i < NUM_HIGH_SCORES; i++)
     {
-        sub_F21C(gUnknown_0202C610[FIELD_RUBY][i].data.parts.scoreHi, gUnknown_0202C610[FIELD_RUBY][i].data.parts.scoreLo);
+        FormatScoreDigits(gWorkingHighScores[FIELD_RUBY][i].data.parts.scoreHi, gWorkingHighScores[FIELD_RUBY][i].data.parts.scoreLo);
         for (j = 0; j < 14; j++)
         {
             if ((j + 1) % 3 == 0)
-                PrintString(gUnknown_0202C5C0[j] + 0x1A0, 9, j + 12, i * 2 + 3, 1, 2); // Thousands separator?
+                PrintString(gScoreDigitBuffer[j] + 0x1A0, 9, j + 12, i * 2 + 3, 1, 2); // Thousands separator?
             else
-                PrintString(gUnknown_0202C5C0[j] + 0x160, 9, j + 12, i * 2 + 3, 1, 2);
+                PrintString(gScoreDigitBuffer[j] + 0x160, 9, j + 12, i * 2 + 3, 1, 2);
         }
 
-        PrintString(gUnknown_0202C5C0[14] + 0x160, 9, 26, 3 + i * 2, 1, 2);
+        PrintString(gScoreDigitBuffer[14] + 0x160, 9, 26, 3 + i * 2, 1, 2);
     }
 
     // Sapphire Field Top name
     for (j = 0; j < HIGH_SCORE_NAME_LENGTH; j++)
     {
-        PrintString(gUnknown_086A7FAC[gUnknown_0202C610[FIELD_SAPPHIRE][0].data.parts.name[j]] + 0x80, 8, j + 4, 35, 1, 1);
+        PrintString(gHighScoreCharToTileMap[gWorkingHighScores[FIELD_SAPPHIRE][0].data.parts.name[j]] + 0x80, 8, j + 4, 35, 1, 1);
     }
 
     // Sapphire Field 2nd-8th names
@@ -1933,37 +1933,37 @@ void sub_EE64(void)
     {
         for (j = 0; j < HIGH_SCORE_NAME_LENGTH; j++)
         {
-            PrintString(gUnknown_086A7FAC[gUnknown_0202C610[FIELD_SAPPHIRE][i].data.parts.name[j]] + 0xA0, 8, j + 4, i * 2 + 35, 1, 2);
+            PrintString(gHighScoreCharToTileMap[gWorkingHighScores[FIELD_SAPPHIRE][i].data.parts.name[j]] + 0xA0, 8, j + 4, i * 2 + 35, 1, 2);
         }
     }
-    sub_F21C(gUnknown_0202C610[FIELD_SAPPHIRE][0].data.parts.scoreHi, gUnknown_0202C610[FIELD_SAPPHIRE][0].data.parts.scoreLo);
+    FormatScoreDigits(gWorkingHighScores[FIELD_SAPPHIRE][0].data.parts.scoreHi, gWorkingHighScores[FIELD_SAPPHIRE][0].data.parts.scoreLo);
     // Sapphire Field Top score
     for (j = 0; j < 14; j++)
     {
         if ((j + 1) % 3 == 0)
-            PrintString(gUnknown_0202C5C0[j] + 0x120, 9, j + 10, 34, 1, 2); // Thousands separator?
+            PrintString(gScoreDigitBuffer[j] + 0x120, 9, j + 10, 34, 1, 2); // Thousands separator?
         else
-            PrintString(gUnknown_0202C5C0[j] + 0xE0, 9, j + 10, 34, 1, 2);
+            PrintString(gScoreDigitBuffer[j] + 0xE0, 9, j + 10, 34, 1, 2);
     }
 
-    PrintString(gUnknown_0202C5C0[j] + 0xE0, 9, 24, 34, 1, 2);
+    PrintString(gScoreDigitBuffer[j] + 0xE0, 9, 24, 34, 1, 2);
     // Sapphire Field 2nd-8th scores
     for (i = 1; i < NUM_HIGH_SCORES; i++)
     {
-        sub_F21C(gUnknown_0202C610[FIELD_SAPPHIRE][i].data.parts.scoreHi, gUnknown_0202C610[FIELD_SAPPHIRE][i].data.parts.scoreLo);
+        FormatScoreDigits(gWorkingHighScores[FIELD_SAPPHIRE][i].data.parts.scoreHi, gWorkingHighScores[FIELD_SAPPHIRE][i].data.parts.scoreLo);
         for (j = 0; j < 14; j++)
         {
             if ((j + 1) % 3 == 0)
-                PrintString(gUnknown_0202C5C0[j] + 0x1A0, 9, j + 10, i * 2 + 35, 1, 2); // Thousands separator?s
+                PrintString(gScoreDigitBuffer[j] + 0x1A0, 9, j + 10, i * 2 + 35, 1, 2); // Thousands separator?s
             else
-                PrintString(gUnknown_0202C5C0[j] + 0x160, 9, j + 10, i * 2 + 35, 1, 2);
+                PrintString(gScoreDigitBuffer[j] + 0x160, 9, j + 10, i * 2 + 35, 1, 2);
         }
 
-        PrintString(gUnknown_0202C5C0[j] + 0x160, 9, 24, i * 2 + 35, 1, 2);
+        PrintString(gScoreDigitBuffer[j] + 0x160, 9, 24, i * 2 + 35, 1, 2);
     }
 }
 
-void sub_F21C(u32 scoreHi, u32 scoreLo)
+void FormatScoreDigits(u32 scoreHi, u32 scoreLo)
 {
     int i;
     u32 var0;
@@ -1973,9 +1973,9 @@ void sub_F21C(u32 scoreHi, u32 scoreLo)
     if (scoreHi == 0 && scoreLo == 0)
     {
         for (i = 0; i < 14; i++)
-            gUnknown_0202C5C0[i] = 10;
+            gScoreDigitBuffer[i] = 10;
 
-        gUnknown_0202C5C0[14] = 0;
+        gScoreDigitBuffer[14] = 0;
     }
     else
     {
@@ -1989,7 +1989,7 @@ void sub_F21C(u32 scoreHi, u32 scoreLo)
             scoreLo = 99999999;
         }
 
-        arr = gUnknown_0202C5C0;
+        arr = gScoreDigitBuffer;
 
         var0 = scoreHi / 1000000;
         arr[0] = var0;
@@ -2022,8 +2022,8 @@ void sub_F21C(u32 scoreHi, u32 scoreLo)
 
         if ((s16)var0 == 0)
         {
-            for (i = 0; i < 15 && gUnknown_0202C5C0[i] == 0; i++)
-                gUnknown_0202C5C0[i] = 10;
+            for (i = 0; i < 15 && gScoreDigitBuffer[i] == 0; i++)
+                gScoreDigitBuffer[i] = 10;
         }
     }
 }
@@ -2051,8 +2051,8 @@ int GetNewHighScoreIndex(u32 scoreHi, u32 scoreLo, u32 field)
         int comparisonResult = CompareScores(
             scoreHi,
             scoreLo,
-            gUnknown_0202C610[field][i].data.parts.scoreHi,
-            gUnknown_0202C610[field][i].data.parts.scoreLo
+            gWorkingHighScores[field][i].data.parts.scoreHi,
+            gWorkingHighScores[field][i].data.parts.scoreLo
         );
         if (comparisonResult >= 0)
             return i;
@@ -2061,46 +2061,46 @@ int GetNewHighScoreIndex(u32 scoreHi, u32 scoreLo, u32 field)
     return -1;
 }
 
-void sub_F434(u32 scoreHi, u32 scoreLo, u32 field, int newHighScoreIndex)
+void InsertNewHighScore(u32 scoreHi, u32 scoreLo, u32 field, int newHighScoreIndex)
 {
     int i;
 
     for (i = 7; i > newHighScoreIndex; i--)
     {
-        gUnknown_0202C610[field][i].data.parts.name[0] = gUnknown_0202C610[field][i-1].data.parts.name[0];
-        gUnknown_0202C610[field][i].data.parts.name[1] = gUnknown_0202C610[field][i-1].data.parts.name[1];
-        gUnknown_0202C610[field][i].data.parts.name[2] = gUnknown_0202C610[field][i-1].data.parts.name[2];
-        gUnknown_0202C610[field][i].data.parts.name[3] = gUnknown_0202C610[field][i-1].data.parts.name[3];
-        gUnknown_0202C610[field][i].data.parts.scoreHi = gUnknown_0202C610[field][i-1].data.parts.scoreHi;
-        gUnknown_0202C610[field][i].data.parts.scoreLo = gUnknown_0202C610[field][i-1].data.parts.scoreLo;
+        gWorkingHighScores[field][i].data.parts.name[0] = gWorkingHighScores[field][i-1].data.parts.name[0];
+        gWorkingHighScores[field][i].data.parts.name[1] = gWorkingHighScores[field][i-1].data.parts.name[1];
+        gWorkingHighScores[field][i].data.parts.name[2] = gWorkingHighScores[field][i-1].data.parts.name[2];
+        gWorkingHighScores[field][i].data.parts.name[3] = gWorkingHighScores[field][i-1].data.parts.name[3];
+        gWorkingHighScores[field][i].data.parts.scoreHi = gWorkingHighScores[field][i-1].data.parts.scoreHi;
+        gWorkingHighScores[field][i].data.parts.scoreLo = gWorkingHighScores[field][i-1].data.parts.scoreLo;
     }
 
-    gUnknown_0202C610[field][i].data.parts.name[0] = 0;
-    gUnknown_0202C610[field][i].data.parts.name[1] = 0;
-    gUnknown_0202C610[field][i].data.parts.name[2] = 0;
-    gUnknown_0202C610[field][i].data.parts.name[3] = 0;
-    gUnknown_0202C610[field][i].data.parts.scoreHi = scoreHi;
-    gUnknown_0202C610[field][i].data.parts.scoreLo = scoreLo;
+    gWorkingHighScores[field][i].data.parts.name[0] = 0;
+    gWorkingHighScores[field][i].data.parts.name[1] = 0;
+    gWorkingHighScores[field][i].data.parts.name[2] = 0;
+    gWorkingHighScores[field][i].data.parts.name[3] = 0;
+    gWorkingHighScores[field][i].data.parts.scoreHi = scoreHi;
+    gWorkingHighScores[field][i].data.parts.scoreLo = scoreLo;
 }
 
-u32 sub_F4FC(u32 field)
+u32 MergeReceivedTopScore(u32 field)
 {
     int i, j;
     int newHighScoreIndex;
     int comparisonResult;
 
-    newHighScoreIndex = GetNewHighScoreIndex(gUnknown_0202C550[field].data.parts.scoreHi, gUnknown_0202C550[field].data.parts.scoreLo, field);
+    newHighScoreIndex = GetNewHighScoreIndex(gRemoteTopScores[field].data.parts.scoreHi, gRemoteTopScores[field].data.parts.scoreLo, field);
     comparisonResult = CompareScores(
-        gUnknown_0202C610[field][newHighScoreIndex].data.parts.scoreHi,
-        gUnknown_0202C610[field][newHighScoreIndex].data.parts.scoreLo,
-        gUnknown_0202C550[field].data.parts.scoreHi,
-        gUnknown_0202C550[field].data.parts.scoreLo
+        gWorkingHighScores[field][newHighScoreIndex].data.parts.scoreHi,
+        gWorkingHighScores[field][newHighScoreIndex].data.parts.scoreLo,
+        gRemoteTopScores[field].data.parts.scoreHi,
+        gRemoteTopScores[field].data.parts.scoreLo
     );
     if (comparisonResult == 0 &&
-        gUnknown_0202C610[field][newHighScoreIndex].data.parts.name[0] == gUnknown_0202C550[field].data.parts.name[0] &&
-        gUnknown_0202C610[field][newHighScoreIndex].data.parts.name[1] == gUnknown_0202C550[field].data.parts.name[1] &&
-        gUnknown_0202C610[field][newHighScoreIndex].data.parts.name[2] == gUnknown_0202C550[field].data.parts.name[2] &&
-        gUnknown_0202C610[field][newHighScoreIndex].data.parts.name[3] == gUnknown_0202C550[field].data.parts.name[3])
+        gWorkingHighScores[field][newHighScoreIndex].data.parts.name[0] == gRemoteTopScores[field].data.parts.name[0] &&
+        gWorkingHighScores[field][newHighScoreIndex].data.parts.name[1] == gRemoteTopScores[field].data.parts.name[1] &&
+        gWorkingHighScores[field][newHighScoreIndex].data.parts.name[2] == gRemoteTopScores[field].data.parts.name[2] &&
+        gWorkingHighScores[field][newHighScoreIndex].data.parts.name[3] == gRemoteTopScores[field].data.parts.name[3])
     {
         return newHighScoreIndex;
     }
@@ -2114,29 +2114,29 @@ u32 sub_F4FC(u32 field)
     {
         for (j = 0; j < 6; j++)
         {
-            gUnknown_0202C610[field][i].data.raw[j] = gUnknown_0202C610[field][i-1].data.raw[j];
+            gWorkingHighScores[field][i].data.raw[j] = gWorkingHighScores[field][i-1].data.raw[j];
         }
     }
 
-    gUnknown_0202C610[field][i].data.parts.name[0] = gUnknown_0202C550[field].data.parts.name[0];
-    gUnknown_0202C610[field][i].data.parts.name[1] = gUnknown_0202C550[field].data.parts.name[1];
-    gUnknown_0202C610[field][i].data.parts.name[2] = gUnknown_0202C550[field].data.parts.name[2];
-    gUnknown_0202C610[field][i].data.parts.name[3] = gUnknown_0202C550[field].data.parts.name[3];
-    gUnknown_0202C610[field][i].data.parts.scoreHi = gUnknown_0202C550[field].data.parts.scoreHi;
-    gUnknown_0202C610[field][i].data.parts.scoreLo = gUnknown_0202C550[field].data.parts.scoreLo;
+    gWorkingHighScores[field][i].data.parts.name[0] = gRemoteTopScores[field].data.parts.name[0];
+    gWorkingHighScores[field][i].data.parts.name[1] = gRemoteTopScores[field].data.parts.name[1];
+    gWorkingHighScores[field][i].data.parts.name[2] = gRemoteTopScores[field].data.parts.name[2];
+    gWorkingHighScores[field][i].data.parts.name[3] = gRemoteTopScores[field].data.parts.name[3];
+    gWorkingHighScores[field][i].data.parts.scoreHi = gRemoteTopScores[field].data.parts.scoreHi;
+    gWorkingHighScores[field][i].data.parts.scoreLo = gRemoteTopScores[field].data.parts.scoreLo;
     return newHighScoreIndex;
 }
 
-void sub_F670(u32 currNameChar, u32 hsIndex, s16 currNameCharIndex, u32 mainField)
+void PrintHighScoreNameChar(u32 currNameChar, u32 hsIndex, s16 currNameCharIndex, u32 mainField)
 {
-    currNameChar = gUnknown_086A7FAC[currNameChar];
+    currNameChar = gHighScoreCharToTileMap[currNameChar];
     PrintString(
-        gUnknown_08079730[mainField][hsIndex].unk8 * 32 + 0x80 + currNameChar,
+        gHighScoreNamePositions[mainField][hsIndex].fieldWidth * 32 + 0x80 + currNameChar,
         8,
-        gUnknown_08079730[mainField][hsIndex].unk0 + currNameCharIndex,
-        gUnknown_08079730[mainField][hsIndex].unk4,
+        gHighScoreNamePositions[mainField][hsIndex].yBaseOffset + currNameCharIndex,
+        gHighScoreNamePositions[mainField][hsIndex].yPixelPosition,
         1,
-        gUnknown_08079730[mainField][hsIndex].unk8 + 1
+        gHighScoreNamePositions[mainField][hsIndex].fieldWidth + 1
     );
 }
 
@@ -2144,14 +2144,14 @@ void SetDefaultHighScores(void)
 {
     int field, highScoreIndex, i;
 
-    gUnknown_0202BEB0 = 0;
+    gCompletionBannerDone = 0;
     for (field = 0; field < 2; field++)
         for (highScoreIndex = 0; highScoreIndex < 8; highScoreIndex++)
             for (i = 0; i < 6; i++)
                 gMain_saveData.highScores[field][highScoreIndex].data.raw[i] = gDefaultHighScores[field][highScoreIndex].data.raw[i];
 }
 
-void sub_F74C(void)
+void GenerateRandomHighScores(void)
 {
     int field, highScoreIndex, k;
     u8 letter;
@@ -2197,7 +2197,7 @@ void sub_F74C(void)
     }
 }
 
-void sub_F8B0(u32 arg0, u32 arg1, s16 arg2)
+void AnimateScoreTilemapPalette(u32 arg0, u32 arg1, s16 arg2)
 {
     int i;
     u32 r3;
@@ -2208,17 +2208,17 @@ void sub_F8B0(u32 arg0, u32 arg1, s16 arg2)
             r3 = (0 * 2 + 2) * 32 + 12;
             for(i = 0; i < 15; i++)
             {
-                if(gUnknown_03005C00[r3 + i] != 0x90EA && gUnknown_03005C00[r3 + i] != 0x912A)
+                if(gBG0TilemapBuffer[r3 + i] != 0x90EA && gBG0TilemapBuffer[r3 + i] != 0x912A)
                 {
-                    gUnknown_03005C00[r3 + i] += gUnknown_086A7FA4[arg2];
+                    gBG0TilemapBuffer[r3 + i] += gScorePaletteAnimOffsets[arg2];
                 }
             }
             r3 = (0 * 2 + 3) * 32 + 12;
             for(i = 0; i < 15; i++)
             {
-                if(gUnknown_03005C00[r3 + i] != 0x910A && gUnknown_03005C00[r3 + i] != 0x914A)
+                if(gBG0TilemapBuffer[r3 + i] != 0x910A && gBG0TilemapBuffer[r3 + i] != 0x914A)
                 {
-                    gUnknown_03005C00[r3 + i] += gUnknown_086A7FA4[arg2];
+                    gBG0TilemapBuffer[r3 + i] += gScorePaletteAnimOffsets[arg2];
                 }
             }
         }
@@ -2227,17 +2227,17 @@ void sub_F8B0(u32 arg0, u32 arg1, s16 arg2)
             r3 = (arg1 * 2 + 3) * 32 + 12;
             for(i = 0; i < 15; i++)
             {
-                if(gUnknown_03005C00[r3 + i] != 0x916A && gUnknown_03005C00[r3 + i] != 0x91AA)
+                if(gBG0TilemapBuffer[r3 + i] != 0x916A && gBG0TilemapBuffer[r3 + i] != 0x91AA)
                 {
-                    gUnknown_03005C00[r3 + i] += gUnknown_086A7FA4[arg2];
+                    gBG0TilemapBuffer[r3 + i] += gScorePaletteAnimOffsets[arg2];
                 }
             }
             r3 = (arg1 * 2 + 4) * 32 + 12;
             for(i = 0; i < 15; i++)
             {
-                if(gUnknown_03005C00[r3 + i] != 0x918A && gUnknown_03005C00[r3 + i] != 0x91CA)
+                if(gBG0TilemapBuffer[r3 + i] != 0x918A && gBG0TilemapBuffer[r3 + i] != 0x91CA)
                 {
-                    gUnknown_03005C00[r3 + i] += gUnknown_086A7FA4[arg2];
+                    gBG0TilemapBuffer[r3 + i] += gScorePaletteAnimOffsets[arg2];
                 }
             }
         }
@@ -2249,17 +2249,17 @@ void sub_F8B0(u32 arg0, u32 arg1, s16 arg2)
             r3 = (0 * 2 + 2) * 32 + 32 * 32 + 10;
             for(i = 0; i < 15; i++)
             {
-                if(gUnknown_03005C00[r3 + i] != 0x90EA && gUnknown_03005C00[r3 + i] != 0x912A)
+                if(gBG0TilemapBuffer[r3 + i] != 0x90EA && gBG0TilemapBuffer[r3 + i] != 0x912A)
                 {
-                    gUnknown_03005C00[r3 + i] += gUnknown_086A7FA4[arg2];
+                    gBG0TilemapBuffer[r3 + i] += gScorePaletteAnimOffsets[arg2];
                 }
             }
             r3 = (0 * 2 + 3) * 32 + 32 * 32 + 10;
             for(i = 0; i < 15; i++)
             {
-                if(gUnknown_03005C00[r3 + i] != 0x910A && gUnknown_03005C00[r3 + i] != 0x914A)
+                if(gBG0TilemapBuffer[r3 + i] != 0x910A && gBG0TilemapBuffer[r3 + i] != 0x914A)
                 {
-                    gUnknown_03005C00[r3 + i] += gUnknown_086A7FA4[arg2];
+                    gBG0TilemapBuffer[r3 + i] += gScorePaletteAnimOffsets[arg2];
                 }
             }
         }
@@ -2268,24 +2268,24 @@ void sub_F8B0(u32 arg0, u32 arg1, s16 arg2)
             r3 = (arg1 * 2 + 3) * 32 + 32 * 32 + 10;
             for(i = 0; i < 15; i++)
             {
-                if(gUnknown_03005C00[r3 + i] != 0x916A && gUnknown_03005C00[r3 + i] != 0x91AA)
+                if(gBG0TilemapBuffer[r3 + i] != 0x916A && gBG0TilemapBuffer[r3 + i] != 0x91AA)
                 {
-                    gUnknown_03005C00[r3 + i] += gUnknown_086A7FA4[arg2];
+                    gBG0TilemapBuffer[r3 + i] += gScorePaletteAnimOffsets[arg2];
                 }
             }
             r3 = (arg1 * 2 + 4) * 32 + 32 * 32 + 10;
             for(i = 0; i < 15; i++)
             {
-                if(gUnknown_03005C00[r3 + i] != 0x918A && gUnknown_03005C00[r3 + i] != 0x91CA)
+                if(gBG0TilemapBuffer[r3 + i] != 0x918A && gBG0TilemapBuffer[r3 + i] != 0x91CA)
                 {
-                    gUnknown_03005C00[r3 + i] += gUnknown_086A7FA4[arg2];
+                    gBG0TilemapBuffer[r3 + i] += gScorePaletteAnimOffsets[arg2];
                 }
             }
         }
     }
 }
 
-void sub_FAE8(u32 arg0, u32 arg1, s16 arg2)
+void ResetScoreTilemapPalette(u32 arg0, u32 arg1, s16 arg2)
 {
     int i;
     u32 r3;
@@ -2296,17 +2296,17 @@ void sub_FAE8(u32 arg0, u32 arg1, s16 arg2)
             r3 = (0 * 2 + 2) * 32 + 12;
             for(i = 0; i < 15; i++)
             {
-                if(gUnknown_03005C00[r3 + i] != 0x90EA && gUnknown_03005C00[r3 + i] != 0x912A)
+                if(gBG0TilemapBuffer[r3 + i] != 0x90EA && gBG0TilemapBuffer[r3 + i] != 0x912A)
                 {
-                    gUnknown_03005C00[r3 + i] += gUnknown_086A7FA8[arg2];
+                    gBG0TilemapBuffer[r3 + i] += gScorePaletteResetOffsets[arg2];
                 }
             }
             r3 = (0 * 2 + 3) * 32 + 12;
             for(i = 0; i < 15; i++)
             {
-                if(gUnknown_03005C00[r3 + i] != 0x910A && gUnknown_03005C00[r3 + i] != 0x914A)
+                if(gBG0TilemapBuffer[r3 + i] != 0x910A && gBG0TilemapBuffer[r3 + i] != 0x914A)
                 {
-                    gUnknown_03005C00[r3 + i] += gUnknown_086A7FA8[arg2];
+                    gBG0TilemapBuffer[r3 + i] += gScorePaletteResetOffsets[arg2];
                 }
             }
         }
@@ -2315,17 +2315,17 @@ void sub_FAE8(u32 arg0, u32 arg1, s16 arg2)
             r3 = (arg1 * 2 + 3) * 32 + 12;
             for(i = 0; i < 15; i++)
             {
-                if(gUnknown_03005C00[r3 + i] != 0x916A && gUnknown_03005C00[r3 + i] != 0x91AA)
+                if(gBG0TilemapBuffer[r3 + i] != 0x916A && gBG0TilemapBuffer[r3 + i] != 0x91AA)
                 {
-                    gUnknown_03005C00[r3 + i] += gUnknown_086A7FA8[arg2];
+                    gBG0TilemapBuffer[r3 + i] += gScorePaletteResetOffsets[arg2];
                 }
             }
             r3 = (arg1 * 2 + 4) * 32 + 12;
             for(i = 0; i < 15; i++)
             {
-                if(gUnknown_03005C00[r3 + i] != 0x918A && gUnknown_03005C00[r3 + i] != 0x91CA)
+                if(gBG0TilemapBuffer[r3 + i] != 0x918A && gBG0TilemapBuffer[r3 + i] != 0x91CA)
                 {
-                    gUnknown_03005C00[r3 + i] += gUnknown_086A7FA8[arg2];
+                    gBG0TilemapBuffer[r3 + i] += gScorePaletteResetOffsets[arg2];
                 }
             }
         }
@@ -2337,17 +2337,17 @@ void sub_FAE8(u32 arg0, u32 arg1, s16 arg2)
             r3 = (0 * 2 + 2) * 32 + 32 * 32 + 10;
             for(i = 0; i < 15; i++)
             {
-                if(gUnknown_03005C00[r3 + i] != 0x90EA && gUnknown_03005C00[r3 + i] != 0x912A)
+                if(gBG0TilemapBuffer[r3 + i] != 0x90EA && gBG0TilemapBuffer[r3 + i] != 0x912A)
                 {
-                    gUnknown_03005C00[r3 + i] += gUnknown_086A7FA8[arg2];
+                    gBG0TilemapBuffer[r3 + i] += gScorePaletteResetOffsets[arg2];
                 }
             }
             r3 = (0 * 2 + 3) * 32 + 32 * 32 + 10;
             for(i = 0; i < 15; i++)
             {
-                if(gUnknown_03005C00[r3 + i] != 0x910A && gUnknown_03005C00[r3 + i] != 0x914A)
+                if(gBG0TilemapBuffer[r3 + i] != 0x910A && gBG0TilemapBuffer[r3 + i] != 0x914A)
                 {
-                    gUnknown_03005C00[r3 + i] += gUnknown_086A7FA8[arg2];
+                    gBG0TilemapBuffer[r3 + i] += gScorePaletteResetOffsets[arg2];
                 }
             }
         }
@@ -2356,24 +2356,24 @@ void sub_FAE8(u32 arg0, u32 arg1, s16 arg2)
             r3 = (arg1 * 2 + 3) * 32 + 32 * 32 + 10;
             for(i = 0; i < 15; i++)
             {
-                if(gUnknown_03005C00[r3 + i] != 0x916A && gUnknown_03005C00[r3 + i] != 0x91AA)
+                if(gBG0TilemapBuffer[r3 + i] != 0x916A && gBG0TilemapBuffer[r3 + i] != 0x91AA)
                 {
-                    gUnknown_03005C00[r3 + i] += gUnknown_086A7FA8[arg2];
+                    gBG0TilemapBuffer[r3 + i] += gScorePaletteResetOffsets[arg2];
                 }
             }
             r3 = (arg1 * 2 + 4) * 32 + 32 * 32 + 10;
             for(i = 0; i < 15; i++)
             {
-                if(gUnknown_03005C00[r3 + i] != 0x918A && gUnknown_03005C00[r3 + i] != 0x91CA)
+                if(gBG0TilemapBuffer[r3 + i] != 0x918A && gBG0TilemapBuffer[r3 + i] != 0x91CA)
                 {
-                    gUnknown_03005C00[r3 + i] += gUnknown_086A7FA8[arg2];
+                    gBG0TilemapBuffer[r3 + i] += gScorePaletteResetOffsets[arg2];
                 }
             }
         }
     }
 }
 
-s8 sub_FD20(void)
+s8 CheckAllPokemonCaught(void)
 {
     int i;
     s16 sp0[NUM_SPECIES];
@@ -2389,14 +2389,14 @@ s8 sub_FD20(void)
     return 1;
 }
 
-void sub_FD5C(void (*func)(void))
+void FadeInFromWhite(void (*func)(void))
 {
     u16 i;
 
-    DmaCopy16(3, (void*)PLTT, gUnknown_0201A520[1], PLTT_SIZE);
-    DmaFill16(3, 0x7FFF, gUnknown_0201A520[0], PLTT_SIZE);
-    DmaCopy16(3, gUnknown_0201A520[0], gUnknown_0201A520[2], PLTT_SIZE);
-    DmaCopy16(3, gUnknown_0201A520[2], (void*)PLTT, PLTT_SIZE);
+    DmaCopy16(3, (void*)PLTT, gPaletteFadeBuffers[1], PLTT_SIZE);
+    DmaFill16(3, 0x7FFF, gPaletteFadeBuffers[0], PLTT_SIZE);
+    DmaCopy16(3, gPaletteFadeBuffers[0], gPaletteFadeBuffers[2], PLTT_SIZE);
+    DmaCopy16(3, gPaletteFadeBuffers[2], (void*)PLTT, PLTT_SIZE);
 
     UnblankLCD();
 
@@ -2404,40 +2404,40 @@ void sub_FD5C(void (*func)(void))
     {
         if (func != NULL)
             func();
-        sub_1001C(i);
+        InterpolatePaletteStep(i);
         MainLoopIter();
         if (i == 31)
         {
-            DmaCopy16(3, gUnknown_0201A520[1], (void *)PLTT, 0x400);
+            DmaCopy16(3, gPaletteFadeBuffers[1], (void *)PLTT, 0x400);
         }
         else
         {
-            DmaCopy16(3, gUnknown_0201A520[2], (void *)PLTT, 0x400);
+            DmaCopy16(3, gPaletteFadeBuffers[2], (void *)PLTT, 0x400);
         }
     }
 }
 
-void sub_FE04(void (*func)(void))
+void FadeOutToWhite(void (*func)(void))
 {
     u16 i;
 
-    DmaCopy16(3, (void*)PLTT, gUnknown_0201A520[0], PLTT_SIZE);
-    DmaFill16(3, 0x7FFF, gUnknown_0201A520[1], PLTT_SIZE);
-    DmaCopy16(3, gUnknown_0201A520[0], gUnknown_0201A520[2], PLTT_SIZE);
+    DmaCopy16(3, (void*)PLTT, gPaletteFadeBuffers[0], PLTT_SIZE);
+    DmaFill16(3, 0x7FFF, gPaletteFadeBuffers[1], PLTT_SIZE);
+    DmaCopy16(3, gPaletteFadeBuffers[0], gPaletteFadeBuffers[2], PLTT_SIZE);
 
     for (i = 0; i < 32; i++)
     {
         if (func != NULL)
             func();
-        sub_1001C(i);
+        InterpolatePaletteStep(i);
         MainLoopIter();
         if (i == 31)
         {
-            DmaCopy16(3, gUnknown_0201A520[1], (void *)PLTT, 0x400);
+            DmaCopy16(3, gPaletteFadeBuffers[1], (void *)PLTT, 0x400);
         }
         else
         {
-            DmaCopy16(3, gUnknown_0201A520[2], (void *)PLTT, 0x400);
+            DmaCopy16(3, gPaletteFadeBuffers[2], (void *)PLTT, 0x400);
         }
     }
     ForceBlankLDC();
@@ -2445,15 +2445,15 @@ void sub_FE04(void (*func)(void))
     ClearGraphicsMemory();
 }
 
-void sub_FEB8(u8 * arg0, u8 * arg1, void (*func)(void))
+void FadeInWithCustomPalettes(u8 * arg0, u8 * arg1, void (*func)(void))
 {
     u16 i;
 
-    DmaCopy16(3, arg0, gUnknown_0201A520[1], 0x200);
-    DmaCopy16(3, arg1, gUnknown_0201A520[2], 0x200);
-    DmaFill16(3, 0, gUnknown_0201A520[0], PLTT_SIZE);
-    DmaCopy16(3, gUnknown_0201A520[0], gUnknown_0201A520[2], PLTT_SIZE);
-    DmaCopy16(3, gUnknown_0201A520[2], (void*)PLTT, PLTT_SIZE);
+    DmaCopy16(3, arg0, gPaletteFadeBuffers[1], 0x200);
+    DmaCopy16(3, arg1, gPaletteFadeBuffers[2], 0x200);
+    DmaFill16(3, 0, gPaletteFadeBuffers[0], PLTT_SIZE);
+    DmaCopy16(3, gPaletteFadeBuffers[0], gPaletteFadeBuffers[2], PLTT_SIZE);
+    DmaCopy16(3, gPaletteFadeBuffers[2], (void*)PLTT, PLTT_SIZE);
 
     UnblankLCD();
     gMain.dispcntBackup = REG_DISPCNT;
@@ -2462,46 +2462,46 @@ void sub_FEB8(u8 * arg0, u8 * arg1, void (*func)(void))
     {
         if (func != NULL)
             func();
-        sub_1001C(i);
+        InterpolatePaletteStep(i);
         MainLoopIter();
         if (i == 31)
         {
-            DmaCopy16(3, gUnknown_0201A520[1], (void *)PLTT, 0x400);
+            DmaCopy16(3, gPaletteFadeBuffers[1], (void *)PLTT, 0x400);
         }
         else
         {
-            DmaCopy16(3, gUnknown_0201A520[2], (void *)PLTT, 0x400);
+            DmaCopy16(3, gPaletteFadeBuffers[2], (void *)PLTT, 0x400);
         }
     }
 }
 
-void sub_FF74(void (*func)(void))
+void FadeOutToBlack(void (*func)(void))
 {
     u16 i;
 
-    DmaCopy16(3, (void*)PLTT, gUnknown_0201A520[0], PLTT_SIZE);
-    DmaFill16(3, 0, gUnknown_0201A520[1], PLTT_SIZE);
-    DmaCopy16(3, gUnknown_0201A520[0], gUnknown_0201A520[2], PLTT_SIZE);
+    DmaCopy16(3, (void*)PLTT, gPaletteFadeBuffers[0], PLTT_SIZE);
+    DmaFill16(3, 0, gPaletteFadeBuffers[1], PLTT_SIZE);
+    DmaCopy16(3, gPaletteFadeBuffers[0], gPaletteFadeBuffers[2], PLTT_SIZE);
 
     for (i = 0; i < 32; i++)
     {
         if (func != NULL)
             func();
-        sub_1001C(i);
+        InterpolatePaletteStep(i);
         MainLoopIter();
         if (i == 31)
         {
-            DmaCopy16(3, gUnknown_0201A520[1], (void *)PLTT, 0x400);
+            DmaCopy16(3, gPaletteFadeBuffers[1], (void *)PLTT, 0x400);
         }
         else
         {
-            DmaCopy16(3, gUnknown_0201A520[2], (void *)PLTT, 0x400);
+            DmaCopy16(3, gPaletteFadeBuffers[2], (void *)PLTT, 0x400);
         }
     }
     MainLoopIter();
 }
 
-void sub_1001C(u16 arg0)
+void InterpolatePaletteStep(u16 arg0)
 {
     u16 var0;
     u16 var1;
@@ -2522,13 +2522,13 @@ void sub_1001C(u16 arg0)
 
     while(var0 < var1)
     {
-        r[0] = gUnknown_0201A520[0][var0] & 0x1F;
-        g[0] = (gUnknown_0201A520[0][var0] & 0x3E0) >> 5;
-        b[0] = (gUnknown_0201A520[0][var0] & 0x7C00) >> 10;
+        r[0] = gPaletteFadeBuffers[0][var0] & 0x1F;
+        g[0] = (gPaletteFadeBuffers[0][var0] & 0x3E0) >> 5;
+        b[0] = (gPaletteFadeBuffers[0][var0] & 0x7C00) >> 10;
 
-        r[1] = gUnknown_0201A520[1][var0] & 0x1F;
-        g[1] = (gUnknown_0201A520[1][var0] & 0x3E0) >> 5;
-        b[1] = (gUnknown_0201A520[1][var0] & 0x7C00) >> 10;
+        r[1] = gPaletteFadeBuffers[1][var0] & 0x1F;
+        g[1] = (gPaletteFadeBuffers[1][var0] & 0x3E0) >> 5;
+        b[1] = (gPaletteFadeBuffers[1][var0] & 0x7C00) >> 10;
 
         if(b[0] < b[1])
             b[0] += ((b[1] - b[0]) * arg0) >> 5;
@@ -2545,29 +2545,29 @@ void sub_1001C(u16 arg0)
         else
             r[0] -= ((r[0] - r[1]) * arg0) >> 5;
 
-        gUnknown_0201A520[2][var0] = (b[0] << 10) | (g[0] << 5) | r[0];
+        gPaletteFadeBuffers[2][var0] = (b[0] << 10) | (g[0] << 5) | r[0];
         var0++;
     }
 }
 
-void sub_10170(u8 * pal, u8 * dest, u16 arg2, u16 arg3)
+void DarkenPalette(u8 * pal, u8 * dest, u16 arg2, u16 arg3)
 {
     u16 i;
     u16 b[2];
     u16 g[2];
     u16 r[2];
-    DmaCopy16(3, pal, gUnknown_0201A520[0], arg2);
-    DmaFill16(3, 0, gUnknown_0201A520[1], arg2);
+    DmaCopy16(3, pal, gPaletteFadeBuffers[0], arg2);
+    DmaFill16(3, 0, gPaletteFadeBuffers[1], arg2);
 
     for(i = 0; i < arg2; i++)
     {
-        r[0] = gUnknown_0201A520[0][i] & 0x1F;
-        g[0] = (gUnknown_0201A520[0][i] & 0x3E0) >> 5;
-        b[0] = (gUnknown_0201A520[0][i] & 0x7C00) >> 10;
+        r[0] = gPaletteFadeBuffers[0][i] & 0x1F;
+        g[0] = (gPaletteFadeBuffers[0][i] & 0x3E0) >> 5;
+        b[0] = (gPaletteFadeBuffers[0][i] & 0x7C00) >> 10;
 
-        r[1] = gUnknown_0201A520[1][i] & 0x1F;
-        g[1] = (gUnknown_0201A520[1][i] & 0x3E0) >> 5;
-        b[1] = (gUnknown_0201A520[1][i] & 0x7C00) >> 10;
+        r[1] = gPaletteFadeBuffers[1][i] & 0x1F;
+        g[1] = (gPaletteFadeBuffers[1][i] & 0x3E0) >> 5;
+        b[1] = (gPaletteFadeBuffers[1][i] & 0x7C00) >> 10;
 
         if(b[0] > b[1])
             b[0] -= (b[0] * arg3) >> 5;
@@ -2584,29 +2584,29 @@ void sub_10170(u8 * pal, u8 * dest, u16 arg2, u16 arg3)
         else
             r[0] = r[1];
 
-        gUnknown_0201A520[2][i] = (b[0] << 10) | (g[0] << 5) | r[0];
+        gPaletteFadeBuffers[2][i] = (b[0] << 10) | (g[0] << 5) | r[0];
     }
-    DmaCopy16(3, gUnknown_0201A520[2], dest, arg2);
+    DmaCopy16(3, gPaletteFadeBuffers[2], dest, arg2);
 }
 
-void sub_102A8(u8 * pal, u8 * dest, u16 arg2, u16 arg3)
+void BrightenPalette(u8 * pal, u8 * dest, u16 arg2, u16 arg3)
 {
     u16 i;
     u16 b[2];
     u16 g[2];
     u16 r[2];
-    DmaCopy16(3, pal, gUnknown_0201A520[0], arg2);
-    DmaFill16(3, 0x7FFF, gUnknown_0201A520[1], arg2);
+    DmaCopy16(3, pal, gPaletteFadeBuffers[0], arg2);
+    DmaFill16(3, 0x7FFF, gPaletteFadeBuffers[1], arg2);
 
     for(i = 0; i < arg2; i++)
     {
-        r[0] = gUnknown_0201A520[0][i] & 0x1F;
-        g[0] = (gUnknown_0201A520[0][i] & 0x3E0) >> 5;
-        b[0] = (gUnknown_0201A520[0][i] & 0x7C00) >> 10;
+        r[0] = gPaletteFadeBuffers[0][i] & 0x1F;
+        g[0] = (gPaletteFadeBuffers[0][i] & 0x3E0) >> 5;
+        b[0] = (gPaletteFadeBuffers[0][i] & 0x7C00) >> 10;
 
-        r[1] = gUnknown_0201A520[1][i] & 0x1F;
-        g[1] = (gUnknown_0201A520[1][i] & 0x3E0) >> 5;
-        b[1] = (gUnknown_0201A520[1][i] & 0x7C00) >> 10;
+        r[1] = gPaletteFadeBuffers[1][i] & 0x1F;
+        g[1] = (gPaletteFadeBuffers[1][i] & 0x3E0) >> 5;
+        b[1] = (gPaletteFadeBuffers[1][i] & 0x7C00) >> 10;
 
         if(b[0] < b[1])
             b[0] += ((b[1] - b[0]) * arg3) >> 5;
@@ -2623,12 +2623,12 @@ void sub_102A8(u8 * pal, u8 * dest, u16 arg2, u16 arg3)
         else
             r[0] -= ((r[0] - r[1]) * arg3) >> 5;
 
-        gUnknown_0201A520[2][i] = (b[0] << 10) | (g[0] << 5) | r[0];
+        gPaletteFadeBuffers[2][i] = (b[0] << 10) | (g[0] << 5) | r[0];
     }
-    DmaCopy16(3, gUnknown_0201A520[2], dest, arg2);
+    DmaCopy16(3, gPaletteFadeBuffers[2], dest, arg2);
 }
 
-void sub_10424(void)
+void FlashWhiteTransitionIn(void)
 {
     REG_BLDY = 0x10;
     REG_BLDCNT = ((REG_DISPCNT & (DISPCNT_BG_ALL_ON | DISPCNT_OBJ_ON)) >> 8) | BLDCNT_EFFECT_LIGHTEN | BLDCNT_TGT1_BD;
@@ -2643,7 +2643,7 @@ void sub_10424(void)
     REG_BLDCNT = 0;
 }
 
-void sub_10480(void)
+void FlashWhiteTransitionOut(void)
 {
     REG_BLDY = 0;
     REG_BLDCNT = ((REG_DISPCNT & (DISPCNT_BG_ALL_ON | DISPCNT_OBJ_ON)) >> 8) | BLDCNT_EFFECT_LIGHTEN | BLDCNT_TGT1_BD;
@@ -2677,7 +2677,7 @@ void ForceBlankLDC(void)
     REG_DISPCNT |= DISPCNT_FORCED_BLANK;
 }
 
-void sub_10544(void)
+void DisableDisplayInterrupts(void)
 {
     REG_DISPSTAT &= ~DISPSTAT_VBLANK_INTR;
     REG_DISPSTAT &= ~DISPSTAT_VCOUNT_INTR;
