@@ -1,4 +1,4 @@
-gUnknown_02000000: @ 0x02000000
+gPinballGameState: @ 0x02000000
 	.space 0x2000
 sGbPlayerCurKeys: @ 0x2002000
 	.space 0x2
@@ -6,13 +6,13 @@ sGbPlayerPrevKeys: @ 0x2002002
 	.space 0x6
 gGbPlayerTilemapBuffer: @ 0x2002008
 	.space 0x800
-gUnknown_02002808: @ 0x2002808
+gSio32Id: @ 0x2002808
 	.space 0xC
-gUnknown_02002814: @ 0x02002814
+gSio32SendData: @ 0x02002814
 	.space 0x4
-gUnknown_02002818: @ 0x02002818
+gSio32ReceivedData: @ 0x02002818
 	.space 0x4
-gUnknown_0200281C: @ 0x0200281C
+gSio32RemoteDeviceId: @ 0x0200281C
 	.space 0x4
 sChecksumAvailable: @ 0x02002820
 	.space 0x2
@@ -22,17 +22,17 @@ sNumVBlanksWithoutSerialIntr: @ 0x02002824
 	.space 0x1
 sSendBufferEmpty: @ 0x02002825
 	.space 0x1
-gUnknown_02002826: @ 0x02002826
+sLinkFlowControlDelay: @ 0x02002826
 	.space 0x1
-gUnknown_02002827: @ 0x02002827
+sHandshakePlayerCount: @ 0x02002827
 	.space 0x1
 sSendNonzeroCheck: @ 0x02002828
 	.space 0x2
-gUnknown_0200282A: @ 0x0200282A
+sRecvNonzeroCheck: @ 0x0200282A
 	.space 0x2
-gUnknown_0200282C: @ 0x0200282C
+gEReaderUnused1: @ 0x0200282C
 	.space 0x1
-gUnknown_0200282D: @ 0x0200282D
+gEReaderUnused2: @ 0x0200282D
 	.space 0x3
 gPokedex_EraseSaveDataAccessCounter: @ 0x02002830
 	.space 0x1
@@ -40,19 +40,19 @@ gPokedex_EraseSaveDataAccessStep: @ 0x02002831
 	.space 0x7
 gFieldSelectData: @ 0x02002838
 	.space 0x18
-gUnknown_02002850: @ 0x02002850
+gFieldSelectSoftReset: @ 0x02002850
 	.space 0x8
-gUnknown_02002858: @ 0x02002858
+gHighScoreScreenState: @ 0x02002858
 	.space 0x25
-gUnknown_0200287D: @ 0x0200287D
+gHighScoreDisplayMode: @ 0x0200287D
 	.space 0x3
-gUnknown_02002880: @ 0x02002880
+gScrollDirection: @ 0x02002880
 	.space 0x2
-gUnknown_02002882: @ 0x02002882
+gScrollXOffset: @ 0x02002882
 	.space 0x2
-gUnknown_02002884: @ 0x02002884
+gResetComboTimer: @ 0x02002884
 	.space 0x1
-gUnknown_02002885: @ 0x02002885
+gResetComboCount: @ 0x02002885
 	.space 0x3
 gTitlescreen: @ 0x2002888
 	.space 0x18
@@ -64,23 +64,23 @@ gEReaderAccessStep: @ 0x20028A2
 	.space 0x1
 gEReaderAccessCounter: @ 0x20028A3
 	.space 0x1
-gUnknown_020028A4: @ 0x20028A4
+gTitleTransitionActive: @ 0x20028A4
 	.space 0x1
-gUnknown_020028A5: @ 0x20028A5
+gTitleRestartDebounce: @ 0x20028A5
 	.space 0x3
-gUnknown_020028A8: @ 0x020028A8
+gPaletteFadeRGBCache: @ 0x020028A8
 	.space 0x30
 CurrentBoardProcPairs_020028D8: @ 0x020028D8
 	.space 0x48
 gOptionsData: @ 0x02002920
 	.space 0x12
-gUnknown_02002932: @ 0x02002932
+gOptionsBGMDigitTileIds: @ 0x02002932
 	.space 0x3
-gUnknown_02002935: @ 0x02002935
+gOptionsSEDigitTileIds: @ 0x02002935
 	.space 0x5
-gUnknown_0200293A: @ 0x0200293A
+gOptionsButtonConfigEditFlags: @ 0x0200293A
 	.space 0x1E
-gUnknown_02002958: @ 0x2002958
+gDpcmSampleBuffer: @ 0x2002958
 	.space 0x40
 gMPlayTrack_BGM: @ 0x2002998
 	.space 0x320
@@ -96,7 +96,7 @@ readSramFast_Work: @ 0x02002FD8
 	.space 0x88
 gIntrTable: @ 0x2003060
 	.space 0x40
-gUnknown_020030A0: @ 0x020030A0
+gBoardBGTileBufferAlt: @ 0x020030A0
 	.space 0x8020
 gMain: @ 0x200B0C0
 	.space 0x40
@@ -241,297 +241,297 @@ gVBlankIntrFuncPtr: @ 0x200FB98
 	.space 0x4
 gMainCallback: @ 0x200FB9C
 	.space 0x4
-gUnknown_0200FBA0: @ 0x200FBA0
+gVCountIntrFuncShadow: @ 0x200FBA0
 	.space 0x10
-gUnknown_0200FBB0: @ 0x0200FBB0
+gBoardGfxBuffer: @ 0x0200FBB0
 	.space 0x8020
-gUnknown_02017BD0: @ 0x2017BD0
+gVBlankIntrFuncShadow: @ 0x2017BD0
 	.space 0x4
-gUnknown_02017BD4: @ 0x2017BD4
+gMainCallbackShadow: @ 0x2017BD4
 	.space 0xC
 gUnknown_02017BE0: @ 0x2017BE0
 	.space 0x2000
 gVCountIntrFuncPtr: @ 0x2019BE0
 	.space 0x4
-gUnknown_02019BE4: @ 0x2019BE4
+gRumbleLoopCounter: @ 0x2019BE4
 	.space 0x4
-gUnknown_02019BE8: @ 0x2019BE8
+gRumbleFrameCounter: @ 0x2019BE8
 	.space 0x4
-gUnknown_02019BEC: @ 0x02019BEC
+gRumbleMotorMode: @ 0x02019BEC
 	.space 0x4
-gUnknown_02019BF0: @ 0x02019BF0
+gSio32ReconnectTimer: @ 0x02019BF0
 	.space 0x4
-gUnknown_02019BF4: @ 0x02019BF4
+gSio32SerialEnabled: @ 0x02019BF4
 	.space 0x4
-gUnknown_02019BF8: @ 0x2019BF8
+gRumblePatternIndex: @ 0x2019BF8
 	.space 0x4
-gUnknown_02019BFC: @ 0x2019BFC
+gRumblePatternPosition: @ 0x2019BFC
 	.space 0x4
-gUnknown_02019C00: @ 0x02019C00
+gRumbleCommand: @ 0x02019C00
 	.space 0x4
-gUnknown_02019C04: @ 0x2019C04
+gRumblePaused: @ 0x2019C04
 	.space 0x4
-gUnknown_02019C08: @ 0x2019C08
+gRumbleSpeedMode: @ 0x2019C08
 	.space 0x4
 gGameBoyPlayerEnabled: @ 0x2019C0C
 	.space 0x4
-gUnknown_02019C10: @ 0x02019C10
+gSio32CommState: @ 0x02019C10
 	.space 0x10
-gUnknown_02019C20: @ 0x02019C20
+gEReaderLinkDataReceived: @ 0x02019C20
 	.space 0x4
-gUnknown_02019C24: @ 0x02019C24
+gPokedexScrollActive: @ 0x02019C24
 	.space 0x4
-gUnknown_02019C28: @ 0x02019C28
+gPokedexSpriteIndexBase: @ 0x02019C28
 	.space 0x4
 gLastSendQueueCount: @ 0x02019C2C
 	.space 0x4
-gUnknown_02019C30: @ 0x02019C30
+gIntroScaleX: @ 0x02019C30
 	.space 0x10
-gUnknown_02019C40: @ 0x02019C40
+gPokedexVramBuffer: @ 0x02019C40
 	.space 0x800
-gUnknown_0201A440: @ 0x0201A440
+gPokedexSpriteAnimTimer: @ 0x0201A440
 	.space 0x4
-gUnknown_0201A444: @ 0x0201A444
+gLinkTimeoutCounter: @ 0x0201A444
 	.space 0x4
-gUnknown_0201A448: @ 0x0201A448
+gPokedexAnimatedIconFrame: @ 0x0201A448
 	.space 0x4
-gUnknown_0201A44C: @ 0x0201A44C
+gEReaderGeneralTimer: @ 0x0201A44C
 	.space 0x4
-gUnknown_0201A450: @ 0x0201A450
+gIntroSpriteEntities: @ 0x0201A450
 	.space 0x60
-gUnknown_0201A4B0: @ 0x0201A4B0
+gBallSpeedSubmenuVisible: @ 0x0201A4B0
 	.space 0x4
 gAutoDisplayTitlescreenMenu: @ 0x201A4B4
 	.space 0x4
-gUnknown_0201A4B8: @ 0x0201A4B8
+gCompletionBannerY: @ 0x0201A4B8
 	.space 0x4
-gUnknown_0201A4BC: @ 0x0201A4BC
+gLinkExchangeSendPhase: @ 0x0201A4BC
 	.space 0x4
-gUnknown_0201A4C0: @ 0x0201A4C0
+gSelectedBallSpeed: @ 0x0201A4C0
 	.space 0x10
-gUnknown_0201A4D0: @ 0x0201A4D0
+gLinkRecvBuffer: @ 0x0201A4D0
 	.space 0x20
-gUnknown_0201A4F0: @ 0x0201A4F0
+gPokedexCursorBlinkOffset: @ 0x0201A4F0
 	.space 0x4
-gUnknown_0201A4F4: @ 0x0201A4F4
+gBallSpeedDisplayToggle: @ 0x0201A4F4
 	.space 0x4
 gSelectedBonusField: @ 0x0201A4F8
 	.space 0x8
 gHighScoreNameEntry: @ 0x0201A500
 	.space 0x10
-gUnknown_0201A510: @ 0x0201A510
+gLinkExchangeFrameCounter: @ 0x0201A510
 	.space 0x4
 gPokedexNumOwned: @ 0x0201A514
 	.space 0x4
 gUnknown_0201A518: @ 0x0201A518
 	.space 0x8
-gUnknown_0201A520: @ 0x0201A520
+gPaletteFadeBuffers: @ 0x0201A520
 	.space 0xC00
-gUnknown_0201B120: @ 0x0201B120
+gPokedexLinkStateTimer: @ 0x0201B120
 	.space 0x4
-gUnknown_0201B124: @ 0x0201B124
+gLinkExchangeStep: @ 0x0201B124
 	.space 0x4
-gUnknown_0201B128: @ 0x0201B128
+gPokedexLinkTransferPhase: @ 0x0201B128
 	.space 0x8
-gUnknown_0201B130: @ 0x0201B130
+gGlyphLowerRowBuffer: @ 0x0201B130
 	.space 0x40
-gUnknown_0201B170: @ 0x0201B170
+gMergedSapphireScoreIndex: @ 0x0201B170
 	.space 0x4
-gUnknown_0201B174: @ 0x0201B174
+gEReaderTransitionStep: @ 0x0201B174
 	.space 0x4
-gUnknown_0201B178: @ 0x0201B178
+gShowDialogFlag: @ 0x0201B178
 	.space 0x8
-gUnknown_0201B180: @ 0x0201B180
+gIntroScene3_AltBG1TilemapBuffer: @ 0x0201B180
 	.space 0x1000
-gUnknown_0201C180: @ 0x0201C180
+gPokedexLinkSendCounter: @ 0x0201C180
 	.space 0x4
 gEReaderCardIndex: @ 0x0201C184
 	.space 0x4
-gUnknown_0201C188: @ 0x0201C188
+gIntroScaleY: @ 0x0201C188
 	.space 0x4
-gUnknown_0201C18C: @ 0x0201C18C
+gCompletionBannerVisible: @ 0x0201C18C
 	.space 0x4
-gUnknown_0201C190: @ 0x0201C190
+gTitleNoSaveMenuSpriteSets: @ 0x0201C190
 	.space 0x1C
-gUnknown_0201C1AC: @ 0x0201C1AC
+gLinkPlayerCount: @ 0x0201C1AC
 	.space 0x4
-gUnknown_0201C1B0: @ 0x0201C1B0
+gLinkExchangeCommand: @ 0x0201C1B0
 	.space 0x4
-gUnknown_0201C1B4: @ 0x0201C1B4
+gPokedexShowPageIndicator: @ 0x0201C1B4
 	.space 0x4
-gUnknown_0201C1B8: @ 0x0201C1B8
+gIntroBlendSrc: @ 0x0201C1B8
 	.space 0x4
-gUnknown_0201C1BC: @ 0x0201C1BC
+gPokedexMasterHandshakeState: @ 0x0201C1BC
 	.space 0x4
-gUnknown_0201C1C0: @ 0x0201C1C0
+gIntroTileBuffer: @ 0x0201C1C0
 	.space 0xE000
 gPokedexFlags: @ 0x0202A1C0
 	.space 0x1D0
 gPokedexFlagExchangeBuffer: @ 0x0202A390
 	.space 0x1C4
-gUnknown_0202A554: @ 0x0202A554
+sRecvQueueSnapshot: @ 0x0202A554
 	.space 0x4
-gUnknown_0202A558: @ 0x0202A558
+gPokedexInfoWindowSlideStep: @ 0x0202A558
 	.space 0x4
-gUnknown_0202A55C: @ 0x0202A55C
+gPokedexShowPortrait: @ 0x0202A55C
 	.space 0x4
 gBonusFieldSelectTimer: @ 0x0202A560
 	.space 0x4
-gUnknown_0202A564: @ 0x0202A564
+gEReaderLinkHandshakeStarted: @ 0x0202A564
 	.space 0x4
-gUnknown_0202A568: @ 0x0202A568
+gPokedexShowCatchHatch: @ 0x0202A568
 	.space 0x4
-gUnknown_0202A56C: @ 0x0202A56C
+gIntroBGWhiteFlash: @ 0x0202A56C
 	.space 0x8
 gPokedexListEntryCount: @ 0x0202A574
 	.space 0x4
-gUnknown_0202A578: @ 0x0202A578
+gIntroAnimStep: @ 0x0202A578
 	.space 0x4
-gUnknown_0202A57C: @ 0x0202A57C
+gPokedexCursorOffset: @ 0x0202A57C
 	.space 0x4
-gUnknown_0202A580: @ 0x0202A580
+gEReaderTextAnimDelay: @ 0x0202A580
 	.space 0x8
-gUnknown_0202A588: @ 0x0202A588
+gPokedexShowAnimSprite: @ 0x0202A588
 	.space 0x4
-gUnknown_0202A58C: @ 0x0202A58C
+gEReaderStatusSpriteIndex: @ 0x0202A58C
 	.space 0x4
-gUnknown_0202A590: @ 0x0202A590
+gPokedexInfoWindowBackupTiles: @ 0x0202A590
 	.space 0x800
-gUnknown_0202AD90: @ 0x0202AD90
+gEReaderTextPageIndex: @ 0x0202AD90
 	.space 0x10
-gUnknown_0202ADA0: @ 0x0202ADA0
+gIntroBGParams: @ 0x0202ADA0
 	.space 0x30
-gUnknown_0202ADD0: @ 0x0202ADD0
+gLinkStatusResult: @ 0x0202ADD0
 	.space 0x4
-gUnknown_0202ADD4: @ 0x0202ADD4
+gIntroBlendDst: @ 0x0202ADD4
 	.space 0x4
-gUnknown_0202ADD8: @ 0x0202ADD8
+gIntroWailmerScaleY: @ 0x0202ADD8
 	.space 0x4
-gUnknown_0202ADDC: @ 0x0202ADDC
+gLinkNegotiationFlags: @ 0x0202ADDC
 	.space 0x4
 gPokedexSelectedMon: @ 0x0202ADE0
 	.space 0x4
-gUnknown_0202ADE4: @ 0x0202ADE4
+gLinkExchangeResult: @ 0x0202ADE4
 	.space 0x4
-gUnknown_0202ADE8: @ 0x0202ADE8
+gEReaderLinkAckSent: @ 0x0202ADE8
 	.space 0x1008
-gUnknown_0202BDF0: @ 0x0202BDF0
+gLinkConnectionState: @ 0x0202BDF0
 	.space 0x10
-gUnknown_0202BE00: @ 0x0202BE00
+gTitleSavedMenuSpriteSets: @ 0x0202BE00
 	.space 0x1C
-gUnknown_0202BE1C: @ 0x0202BE1C
+gBonusFieldLoadingCounter: @ 0x0202BE1C
 	.space 0x4
-gUnknown_0202BE20: @ 0x0202BE20
+gPokedexBlinkTimer: @ 0x0202BE20
 	.space 0x4
-gUnknown_202BE24: @ 0x202BE24
+gTitleReturnedFromMenu: @ 0x202BE24
 	.space 0xC
-gUnknown_0202BE30: @ 0x0202BE30
+gGlyphUpperRowBuffer: @ 0x0202BE30
 	.space 0x40
-gUnknown_0202BE70: @ 0x0202BE70
+gIntroPalSwapBuffer: @ 0x0202BE70
 	.space 0x40
-gUnknown_0202BEB0: @ 0x0202BEB0
+gCompletionBannerDone: @ 0x0202BEB0
 	.space 0x4
-gUnknown_0202BEB4: @ 0x0202BEB4
+gIntroScene6EntitySpawnIndex: @ 0x0202BEB4
 	.space 0x4
 gPokedexNumSeen: @ 0x0202BEB8
 	.space 0x4
-gUnknown_0202BEBC: @ 0x0202BEBC
+gDialogType: @ 0x0202BEBC
 	.space 0x4
-gUnknown_0202BEC0: @ 0x0202BEC0
+gEReaderHeaderSpriteIndex: @ 0x0202BEC0
 	.space 0x4
-gUnknown_0202BEC4: @ 0x0202BEC4
+gPokedexShowPopupWindow: @ 0x0202BEC4
 	.space 0x4
-gUnknown_0202BEC8: @ 0x0202BEC8
+gLinkAdvanceState: @ 0x0202BEC8
 	.space 0x4
-gUnknown_0202BECC: @ 0x0202BECC
+gPokedexHandshakeRetryCount: @ 0x0202BECC
 	.space 0x4
 gBonusFieldSelectState: @ 0x0202BED0
 	.space 0x4
-gUnknown_0202BED4: @ 0x0202BED4
+gCompletionBannerPhase: @ 0x0202BED4
 	.space 0x4
-gUnknown_0202BED8: @ 0x0202BED8
+gMergedRubyScoreIndex: @ 0x0202BED8
 	.space 0x4
-gUnknown_0202BEDC: @ 0x0202BEDC
+gIntroObjWhiteFlash: @ 0x0202BEDC
 	.space 0x4
-gUnknown_0202BEE0: @ 0x0202BEE0
+gPokedexButtonPromptFrame: @ 0x0202BEE0
 	.space 0x4
 gBonusFieldSelectNextMainState: @ 0x0202BEE4
 	.space 0x4
-gUnknown_0202BEE8: @ 0x0202BEE8
+gBonusFieldHighlightPalette: @ 0x0202BEE8
 	.space 0x4
-gUnknown_0202BEEC: @ 0x0202BEEC
+gEReaderReceivedCardId: @ 0x0202BEEC
 	.space 0x4
-gUnknown_0202BEF0: @ 0x0202BEF0
+gIntroPalFadeLevel: @ 0x0202BEF0
 	.space 0x4
-gUnknown_0202BEF4: @ 0x0202BEF4
+gPokedexPageIndicatorTimer: @ 0x0202BEF4
 	.space 0x4
-gUnknown_0202BEF8: @ 0x0202BEF8
+gEReaderExitTargetState: @ 0x0202BEF8
 	.space 0x4
 Pokedex_PopupTypeIx: @ 0x0202BEFC
 	.space 0x4
-gUnknown_0202BF00: @ 0x0202BF00
+gPokedexAnimatedIconTimer: @ 0x0202BF00
 	.space 0x4
-gUnknown_0202BF04: @ 0x0202BF04
+gPokedexShowButtonPrompt: @ 0x0202BF04
 	.space 0x4
-gUnknown_0202BF08: @ 0x0202BF08
+gPokedexScrollbarY: @ 0x0202BF08
 	.space 0x4
-gUnknown_0202BF0C: @ 0x0202BF0C
+gPokedexSpriteAnimFrame: @ 0x0202BF0C
 	.space 0x4
-gUnknown_0202BF10: @ 0x0202BF10
+gIntroFrameCounter: @ 0x0202BF10
 	.space 0x4
-gUnknown_0202BF14: @ 0x0202BF14
+gPokedexSpriteCategory: @ 0x0202BF14
 	.space 0xC
 gLink: @ 0x0202BF20
 	.space 0x624
-gUnknown_0202C544: @ 0x0202C544
+gPokedexClientHandshakeState: @ 0x0202C544
 	.space 0x4
-gUnknown_0202C548: @ 0x0202C548
+gIntroScene6VelocityIndex: @ 0x0202C548
 	.space 0x4
-gUnknown_0202C54C: @ 0x0202C54C
+gLinkExchangeTimeout: @ 0x0202C54C
 	.space 0x4
-gUnknown_0202C550: @ 0x0202C550
+gRemoteTopScores: @ 0x0202C550
 	.space 0x30
-gUnknown_0202C580: @ 0x0202C580
+gCompletionBannerFrame: @ 0x0202C580
 	.space 0x4
-gUnknown_0202C584: @ 0x0202C584
+gEReaderStatusSpriteVisible: @ 0x0202C584
 	.space 0x4
-gUnknown_0202C588: @ 0x202C588
+gHighScoreEntrySource: @ 0x202C588
 	.space 0x4
 gPokedexScrollWaitFrames: @ 0x0202C58C
 	.space 0x4
-gUnknown_0202C590: @ 0x0202C590
+gPokedexShowLinkCableIcon: @ 0x0202C590
 	.space 0x4
-gUnknown_0202C594: @ 0x0202C594
+gIntroOverlayFadeStep: @ 0x0202C594
 	.space 0x4
-gUnknown_0202C598: @ 0x0202C598
+gLinkExchangeRecvPhase: @ 0x0202C598
 	.space 0x4
-gUnknown_0202C59C: @ 0x0202C59C
+gLinkPacketCounter: @ 0x0202C59C
 	.space 0x4
-gUnknown_0202C5A0: @ 0x0202C5A0
+gEReaderTransitionTimer: @ 0x0202C5A0
 	.space 0x4
-gUnknown_0202C5A4: @ 0x0202C5A4
+gEReaderTextBlinkToggle: @ 0x0202C5A4
 	.space 0x4
-gUnknown_0202C5A8: @ 0x0202C5A8
+gIntroJingleVariant: @ 0x0202C5A8
 	.space 0x4
-gUnknown_0202C5AC: @ 0x0202C5AC
+gPokedexPageIndicatorBlink: @ 0x0202C5AC
 	.space 0x4
 gPokedexListPosition: @ 0x0202C5B0
 	.space 0x4
-gUnknown_0202C5B4: @ 0x0202C5B4
+gPokedexLinkChunkIndex: @ 0x0202C5B4
 	.space 0xC
-gUnknown_0202C5C0: @ 0x0202C5C0
+gScoreDigitBuffer: @ 0x0202C5C0
 	.space 0x20
-gUnknown_0202C5E0: @ 0x0202C5E0
+sLinkMasterHandshakeState: @ 0x0202C5E0
 	.space 0x4
-gUnknown_0202C5E4: @ 0x0202C5E4
+gIntroWailmerScaleX: @ 0x0202C5E4
 	.space 0x4
-gUnknown_0202C5E8: @ 0x0202C5E8
+gPokedexDetailFrameCount: @ 0x0202C5E8
 	.space 0x8
-gUnknown_0202C5F0: @ 0x0202C5F0
+gLinkSendBuffer: @ 0x0202C5F0
 	.space 0x14
-gUnknown_0202C604: @ 0x0202C604
+gEReaderTextCharIndex: @ 0x0202C604
 	.space 0xC
-gUnknown_0202C610: @ 0x0202C610
+gWorkingHighScores: @ 0x0202C610
 	.space 0x14
 gUnknown_0202C624: @ 0x0202C624
 	.space 0xAC
@@ -541,43 +541,43 @@ gUnknown_0202C6E4: @ 0x0202C6E4
 	.space 0xAC
 gIntroSceneIndex: @ 0x0202C790
 	.space 0x4
-gUnknown_0202C794: @ 0x0202C794
+gPokedexDescriptionPage: @ 0x0202C794
 	.space 0xC
-gUnknown_0202C7A0: @ 0x0202C7A0
+gCatchSpriteFrameBuffer: @ 0x0202C7A0
 	.space 0xFC0
-gUnknown_0202D760: @ 0x0202D760
+gCatchAnimTileBuffer: @ 0x0202D760
 	.space 0x120
-gUnknown_0202D880: @ 0x0202D880
+gKecleonSpriteSets: @ 0x0202D880
 	.space 0x2E40
-gUnknown_020306C0: @ 0x020306C0
+gGameOverLetterXOffsets: @ 0x020306C0
 	.space 0x10
-gUnknown_020306D0: @ 0x020306D0
+gCatchSpritePalettes: @ 0x020306D0
 	.space 0x20
-gUnknown_020306F0: @ 0x020306F0
+gCatchSequencePalA: @ 0x020306F0
 	.space 0x20
-gUnknown_02030710: @ 0x02030710
+gCatchSequencePalB: @ 0x02030710
 	.space 0x20
-gUnknown_02030730: @ 0x02030730
+gCatchSequencePalC: @ 0x02030730
 	.space 0x20
-gUnknown_02030750: @ 0x02030750
+gGameOverLetterAmplitudes: @ 0x02030750
 	.space 0x10
-gUnknown_02030760: @ 0x02030760
+gCatchSpriteGfxBuffer: @ 0x02030760
 	.space 0x900
-gUnknown_02031060: @ 0x02031060
+gCatchSpriteFlashGfx: @ 0x02031060
 	.space 0x480
 gCurrentPinballGame: @ 0x20314E0
 	.space 0x20
-gUnknown_02031500: @ 0x02031500
+gGameOverLetterYOffsets: @ 0x02031500
 	.space 0x10
-gUnknown_02031510: @ 0x02031510
+gReplayFrameCounter: @ 0x02031510
 	.space 0x10
-gUnknown_02031520: @ 0x2031520
+gBoardConfig: @ 0x2031520
 	.space 0x70
-gUnknown_02031590: @ 0x02031590
+gKecleonSpriteOrderMap: @ 0x02031590
 	.space 0x40
-gUnknown_020315D0: @ 0x020315D0
+gCatchSpritePaletteBuffer: @ 0x020315D0
 	.space 0x520
-gUnknown_02031AF0: @ 0x02031AF0
+gCustomButtonConfigs: @ 0x02031AF0
 	.space 0x28
-gUnknown_02031B18: @ 0x02031B18
+gCustomButtonConfigTileIds: @ 0x02031B18
 	.space 0x18
