@@ -119,7 +119,7 @@ void IntroMain(void)
 
 void Intro_State0_929C(void)
 {
-  ResetSomeGraphicsRelatedStuff();
+  ResetDisplayState();
   REG_DISPCNT = 0x80;
   REG_BG1CNT = 5;
   REG_DISPCNT |= DISPCNT_BG1_ON;

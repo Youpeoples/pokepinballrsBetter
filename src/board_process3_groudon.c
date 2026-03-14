@@ -180,7 +180,7 @@ void GroudonBoardProcess_3B_3B49C(void)
         }
         break;
     case 3:
-        ProceessBonusBannerAndScoring();
+        ProcessBonusBannerAndScoring();
         if (gCurrentPinballGame->scoreCounterAnimationEnabled)
             gCurrentPinballGame->stageTimer = 181;
 
@@ -220,7 +220,7 @@ void GroudonBoardProcess_3B_3B49C(void)
         gMain.modeChangeFlags = MODE_CHANGE_BONUS_BANNER;
         break;
     case 5:
-        ProceessBonusBannerAndScoring();
+        ProcessBonusBannerAndScoring();
         if (gCurrentPinballGame->scoreCounterAnimationEnabled)
             gCurrentPinballGame->stageTimer = 181;
 
@@ -243,7 +243,7 @@ void GroudonBoardProcess_3B_3B49C(void)
         }
         break;
     case 6:
-        ProceessBonusBannerAndScoring();
+        ProcessBonusBannerAndScoring();
         gCurrentPinballGame->returnToMainBoardFlag = 1;
         gCurrentPinballGame->boardEntityActive = 1;
         break;

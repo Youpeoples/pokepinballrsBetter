@@ -26,7 +26,7 @@ extern const u8 gSphealFlyingEnemyVariantSprites[][0x120];
 extern const u8 gSphealMinionBodySprites[][0x800];
 extern const u8 gSphealResultsScreenGfx[];
 extern const u8 gWhiscash_Gfx[][0x480];
-extern const u8 gPelliper_Gfx[][0x480];
+extern const u8 gPelipper_Gfx[][0x480];
 extern const s16 gWaterTilePaletteCycle[];
 extern const u16 gSphealFramesetToSpriteMap[][2];
 extern const u16 gSphealAnimTimingTable[][2];
@@ -970,7 +970,7 @@ void UpdateSphealScoreAndDelivery(void)
         if (gMain.tempField == FIELD_RUBY)
             SphealBoard_WhiscashDeliversBall();
         else
-            SphealBoard_PelliperDeliversBall();
+            SphealBoard_PelipperDeliversBall();
     }
 }
 
@@ -1049,7 +1049,7 @@ void SphealBoard_WhiscashDeliversBall(void)
     }
 }
 
-void SphealBoard_PelliperDeliversBall(void)
+void SphealBoard_PelipperDeliversBall(void)
 {
     s16 i;
     struct SpriteGroup *group;
@@ -1059,10 +1059,10 @@ void SphealBoard_PelliperDeliversBall(void)
     group = &gMain.spriteGroups[20];
     if (group->available)
     {
-        group->baseX = (gCurrentPinballGame->pelliperPosX / 10) - (gCurrentPinballGame->cameraXOffset - 146);
-        group->baseY = (gCurrentPinballGame->pelliperPosY / 10) - (gCurrentPinballGame->cameraYOffset - 110) + (gCurrentPinballGame->pelliperYBobOffset / 10);
+        group->baseX = (gCurrentPinballGame->pelipperPosX / 10) - (gCurrentPinballGame->cameraXOffset - 146);
+        group->baseY = (gCurrentPinballGame->pelipperPosY / 10) - (gCurrentPinballGame->cameraYOffset - 110) + (gCurrentPinballGame->pelipperYBobOffset / 10);
         index = gCurrentPinballGame->deliveryAnimFrameIndex;
-        DmaCopy16(3, gPelliper_Gfx[index], (void *)0x060125A0, 0x480);
+        DmaCopy16(3, gPelipper_Gfx[index], (void *)0x060125A0, 0x480);
         for (i = 0; i < 4; i++)
         {
             oamSimple = &group->oam[i];
@@ -1075,12 +1075,12 @@ void SphealBoard_PelliperDeliversBall(void)
     {
         if (gCurrentPinballGame->deliveryAnimTimer == 250)
         {
-            gCurrentPinballGame->pelliperPosX = 920;
-            gCurrentPinballGame->pelliperPosY = -100;
-            gCurrentPinballGame->pelliperFlyVelX = -82;
-            gCurrentPinballGame->pelliperFlyVelY = 0;
-            gCurrentPinballGame->pelliperFrameTimer = 0;
-            gCurrentPinballGame->pelliperState = 8;
+            gCurrentPinballGame->pelipperPosX = 920;
+            gCurrentPinballGame->pelipperPosY = -100;
+            gCurrentPinballGame->pelipperFlyVelX = -82;
+            gCurrentPinballGame->pelipperFlyVelY = 0;
+            gCurrentPinballGame->pelipperFrameTimer = 0;
+            gCurrentPinballGame->pelipperState = 8;
             gCurrentPinballGame->deliveryAnimFrameIndex = 13;
             gMain.spriteGroups[20].available = 1;
             gCurrentPinballGame->boardEntityActive = 1;
@@ -1088,37 +1088,37 @@ void SphealBoard_PelliperDeliversBall(void)
     }
     else
     {
-        gCurrentPinballGame->deliveryAnimFrameIndex = (gCurrentPinballGame->pelliperFrameTimer % 24) / 6 + 13;
-        gCurrentPinballGame->pelliperYBobOffset = (Sin(gCurrentPinballGame->pelliperFrameTimer * 0x400) * 240) / 20000;
-        if (gCurrentPinballGame->pelliperFrameTimer == 0)
+        gCurrentPinballGame->deliveryAnimFrameIndex = (gCurrentPinballGame->pelipperFrameTimer % 24) / 6 + 13;
+        gCurrentPinballGame->pelipperYBobOffset = (Sin(gCurrentPinballGame->pelipperFrameTimer * 0x400) * 240) / 20000;
+        if (gCurrentPinballGame->pelipperFrameTimer == 0)
             m4aSongNumStart(SE_UNKNOWN_0xE4);
 
-        if (gCurrentPinballGame->pelliperFrameTimer < 40)
+        if (gCurrentPinballGame->pelipperFrameTimer < 40)
         {
-            gCurrentPinballGame->pelliperPosX += gCurrentPinballGame->pelliperFlyVelX;
-            gCurrentPinballGame->pelliperPosY += gCurrentPinballGame->pelliperFlyVelY;
+            gCurrentPinballGame->pelipperPosX += gCurrentPinballGame->pelipperFlyVelX;
+            gCurrentPinballGame->pelipperPosY += gCurrentPinballGame->pelipperFlyVelY;
         }
         else
         {
             gMain.spriteGroups[20].available = 0;
         }
 
-        if (gCurrentPinballGame->pelliperFrameTimer == 13)
+        if (gCurrentPinballGame->pelipperFrameTimer == 13)
         {
             gCurrentPinballGame->ball->ballHidden = 0;
-            gCurrentPinballGame->pelliperBallDropVelX = -10;
-            gCurrentPinballGame->pelliperBallDropVelY = -25;
-            gCurrentPinballGame->pelliperBallDropPosX = ((gCurrentPinballGame->pelliperPosX / 10) + 157) * 10;
-            gCurrentPinballGame->pelliperBallDropPosY = ((gCurrentPinballGame->pelliperPosY / 10) + 134) * 10;
+            gCurrentPinballGame->pelipperBallDropVelX = -10;
+            gCurrentPinballGame->pelipperBallDropVelY = -25;
+            gCurrentPinballGame->pelipperBallDropPosX = ((gCurrentPinballGame->pelipperPosX / 10) + 157) * 10;
+            gCurrentPinballGame->pelipperBallDropPosY = ((gCurrentPinballGame->pelipperPosY / 10) + 134) * 10;
             gCurrentPinballGame->ball->oamPriority = 1;
         }
 
         if (gCurrentPinballGame->ballFrozenState)
         {
-            if (gCurrentPinballGame->pelliperFrameTimer < 13)
+            if (gCurrentPinballGame->pelipperFrameTimer < 13)
             {
-                gCurrentPinballGame->ball->positionQ0.x = (gCurrentPinballGame->pelliperPosX / 10) + 157;
-                gCurrentPinballGame->ball->positionQ0.y = (gCurrentPinballGame->pelliperPosY / 10) + 134;
+                gCurrentPinballGame->ball->positionQ0.x = (gCurrentPinballGame->pelipperPosX / 10) + 157;
+                gCurrentPinballGame->ball->positionQ0.y = (gCurrentPinballGame->pelipperPosY / 10) + 134;
                 gCurrentPinballGame->ball->positionQ1.x = gCurrentPinballGame->ball->positionQ0.x * 2;
                 gCurrentPinballGame->ball->positionQ1.y = gCurrentPinballGame->ball->positionQ0.y * 2;
                 gCurrentPinballGame->ball->positionQ8.x = gCurrentPinballGame->ball->positionQ0.x << 8;
@@ -1126,11 +1126,11 @@ void SphealBoard_PelliperDeliversBall(void)
             }
             else
             {
-                gCurrentPinballGame->pelliperBallDropVelY += 2;
-                gCurrentPinballGame->pelliperBallDropPosX += gCurrentPinballGame->pelliperBallDropVelX;
-                gCurrentPinballGame->pelliperBallDropPosY += gCurrentPinballGame->pelliperBallDropVelY;
-                gCurrentPinballGame->ball->positionQ0.x = gCurrentPinballGame->pelliperBallDropPosX / 10;
-                gCurrentPinballGame->ball->positionQ0.y = gCurrentPinballGame->pelliperBallDropPosY / 10;
+                gCurrentPinballGame->pelipperBallDropVelY += 2;
+                gCurrentPinballGame->pelipperBallDropPosX += gCurrentPinballGame->pelipperBallDropVelX;
+                gCurrentPinballGame->pelipperBallDropPosY += gCurrentPinballGame->pelipperBallDropVelY;
+                gCurrentPinballGame->ball->positionQ0.x = gCurrentPinballGame->pelipperBallDropPosX / 10;
+                gCurrentPinballGame->ball->positionQ0.y = gCurrentPinballGame->pelipperBallDropPosY / 10;
                 if (gCurrentPinballGame->ball->positionQ0.y >= 181)
                 {
                     gCurrentPinballGame->ball->positionQ0.y = 181;
@@ -1153,7 +1153,7 @@ void SphealBoard_PelliperDeliversBall(void)
             }
         }
 
-        gCurrentPinballGame->pelliperFrameTimer++;
+        gCurrentPinballGame->pelipperFrameTimer++;
     }
 
     gCurrentPinballGame->deliveryAnimTimer++;

@@ -272,10 +272,10 @@ void UpdateRubyBoardEntityRendering(void)
     {
         DrawHatchTileSprites();
     }
-    UpdateBoardEntityAnimation();
+    UpdateSpoinkAnimation();
     if (gCurrentPinballGame->cameraYViewport > 168)
     {
-        DrawBoardEntitySprite();
+        DrawSpoinkSprite();
     }
     UpdateCatchModeLogic();
     AnimateCatchCounterDisplay();

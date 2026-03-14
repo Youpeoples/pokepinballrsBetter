@@ -646,7 +646,7 @@ gFieldPaletteVariants:: @ 0x08137B3C
 gUnknown_08137B5C:: @ 0x08137B5C
 	.incbin "baserom.gba", 0x137B5C, 0x160
 
-gPelliperFlyAnimTable:: @ 0x08137CBC
+gPelipperFlyAnimTable:: @ 0x08137CBC
 	.incbin "baserom.gba", 0x137CBC, 0x1A
 
 gBumperMosaicValues:: @ 0x08137CD6
@@ -1381,10 +1381,10 @@ gDecimalDigitTilesGfx:: @ 0x08480E0C
 gSapphireShopSignTileGfx:: @ 0x0848108C
 	.incbin "baserom.gba", 0x48108C, 0x2D00
 
-gRubyTravelPelliper_Gfx:: @ 0x08483D8C
+gRubyTravelPelipper_Gfx:: @ 0x08483D8C
 	.incbin "baserom.gba", 0x483D8C, 0x4C80
 
-gSapphireTravelPelliper_Gfx:: @ 0x08488A0C
+gSapphireTravelPelipper_Gfx:: @ 0x08488A0C
 	.incbin "baserom.gba", 0x488A0C, 0x4C80
 
 gPortraitGenericGraphics:: @ 0x0848D68C
@@ -1441,8 +1441,8 @@ gSphealResultsScreenGfx:: @ 0x084B77EC
 gWhiscash_Gfx:: @ 0x084B7FEC
 	.incbin "graphics/stage/ruby/whiscash.4bpp"
 
-gPelliper_Gfx:: @ 0x084BB16C
-	.incbin "graphics/stage/sapphire/pelliper.4bpp"
+gPelipper_Gfx:: @ 0x084BB16C
+	.incbin "graphics/stage/sapphire/pelipper.4bpp"
 	.incbin "graphics/stage/sapphire/charger.4bpp"
 
 gCatchCounterDigitTilesGfx:: @ 0x084C00EC

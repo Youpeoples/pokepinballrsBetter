@@ -1435,8 +1435,8 @@ void ProcessRouletteOutcome(void)
         if (gCurrentPinballGame->outcomeFrameCounter == 150)
         {
             gCurrentPinballGame->bumperHitsSinceReset = 100;
-            gCurrentPinballGame->pelliperFrameTimer = 1800;
-            gCurrentPinballGame->pelliperState = 1;
+            gCurrentPinballGame->pelipperFrameTimer = 1800;
+            gCurrentPinballGame->pelipperState = 1;
         }
         break;
     case 24:

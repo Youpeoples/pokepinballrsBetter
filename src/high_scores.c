@@ -95,7 +95,7 @@ void IdleHighScoresMain(void)
 
 void LoadHighScoreGraphics(void)
 {
-  ResetSomeGraphicsRelatedStuff();
+  ResetDisplayState();
   REG_DISPCNT = DISPCNT_OBJ_ON | DISPCNT_FORCED_BLANK;
   REG_BG2CNT = 0x4006;
   REG_DISPCNT |= DISPCNT_BG2_ON;
@@ -723,7 +723,7 @@ void HighScore_ExitToTitle(void)
 
 void IdleHighScore_LoadGraphics(void)
 {
-    ResetSomeGraphicsRelatedStuff();
+    ResetDisplayState();
     REG_DISPCNT = DISPCNT_OBJ_ON | DISPCNT_FORCED_BLANK;
     REG_BG2CNT = 0x4006;
     REG_DISPCNT |= DISPCNT_BG2_ON;
@@ -841,7 +841,7 @@ void IdleHighScore_Exit(void)
 
 void HighScore_ReloadAfterLink(void)
 {
-    ResetSomeGraphicsRelatedStuff();
+    ResetDisplayState();
     REG_DISPCNT = DISPCNT_OBJ_ON | DISPCNT_FORCED_BLANK;
     REG_BG2CNT = 0x4006;
     REG_DISPCNT |= DISPCNT_BG2_ON;
@@ -2440,7 +2440,7 @@ void FadeOutToWhite(void (*func)(void))
             DmaCopy16(3, gPaletteFadeBuffers[2], (void *)PLTT, 0x400);
         }
     }
-    ForceBlankLDC();
+    ForceBlankLCD();
     MainLoopIter();
     ClearGraphicsMemory();
 }
@@ -2671,7 +2671,7 @@ void UnblankLCD(void)
     gMain.dispcntBackup = REG_DISPCNT;
 }
 
-void ForceBlankLDC(void)
+void ForceBlankLCD(void)
 {
     gMain.dispcntBackup |= DISPCNT_FORCED_BLANK;
     REG_DISPCNT |= DISPCNT_FORCED_BLANK;

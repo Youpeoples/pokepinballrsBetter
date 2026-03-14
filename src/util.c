@@ -92,7 +92,7 @@ s16 LoadSpriteSets(const struct SpriteSet *const *spriteSets, u16 numSpriteSets,
     return loadedCount;
 }
 
-void ResetSomeGraphicsRelatedStuff(void)
+void ResetDisplayState(void)
 {
     gMain.dispcntBackup |= DISPCNT_FORCED_BLANK;
     REG_DISPCNT |= DISPCNT_FORCED_BLANK;

@@ -41,7 +41,7 @@ void FieldSelectMain(void)
 
 void LoadFieldSelectGraphics(void)
 {
-    ResetSomeGraphicsRelatedStuff();
+    ResetDisplayState();
 
     REG_DISPCNT = DISPCNT_MODE_0 | DISPCNT_FORCED_BLANK | DISPCNT_OBJ_ON;
 

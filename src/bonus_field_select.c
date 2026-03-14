@@ -55,7 +55,7 @@ void BonusFieldSelectMain(void)
 
 void LoadBonusFieldSelectGraphics(void)
 {
-    ResetSomeGraphicsRelatedStuff();
+    ResetDisplayState();
 
     REG_DISPCNT = DISPCNT_MODE_0 | DISPCNT_FORCED_BLANK | DISPCNT_OBJ_ON;
     REG_BG0CNT = BGCNT_CHARBASE(1) | BGCNT_SCREENBASE(0) | BGCNT_PRIORITY(1) | BGCNT_TXT256x256;

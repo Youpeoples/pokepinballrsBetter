@@ -148,7 +148,7 @@ void DusclopsBoardProcess_3B_33130(void)
             }
             break;
         case DUSCLOPS_BOARD_STATE_SCORE_PHASE:
-            ProceessBonusBannerAndScoring();
+            ProcessBonusBannerAndScoring();
             if (gCurrentPinballGame->scoreCounterAnimationEnabled)
             {
                 gCurrentPinballGame->stageTimer = 181;
@@ -177,7 +177,7 @@ void DusclopsBoardProcess_3B_33130(void)
 
             break;
         case DUSCLOPS_BOARD_STATE_SCORE_COUNTING_FINISHED:
-            ProceessBonusBannerAndScoring();
+            ProcessBonusBannerAndScoring();
             gCurrentPinballGame->returnToMainBoardFlag = 1;
             break;
     }

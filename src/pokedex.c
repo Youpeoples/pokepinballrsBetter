@@ -109,7 +109,7 @@ void PokedexMain(void)
 
 void LoadPokedexGraphics(void)
 {
-    ResetSomeGraphicsRelatedStuff();
+    ResetDisplayState();
 
     REG_DISPCNT = DISPCNT_MODE_0 | DISPCNT_OBJ_1D_MAP | DISPCNT_FORCED_BLANK | DISPCNT_OBJ_ON;
     REG_BG1CNT = BGCNT_PRIORITY(1) | BGCNT_CHARBASE(1) | BGCNT_16COLOR | BGCNT_SCREENBASE(0) | BGCNT_TXT256x256;

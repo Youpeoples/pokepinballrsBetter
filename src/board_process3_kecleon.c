@@ -177,7 +177,7 @@ void KecleonBoardProcess_3B_35AA4(void)
         }
         break;
     case 3:
-        ProceessBonusBannerAndScoring();
+        ProcessBonusBannerAndScoring();
         if (gCurrentPinballGame->scoreCounterAnimationEnabled)
             gCurrentPinballGame->stageTimer = 181;
 
@@ -206,7 +206,7 @@ void KecleonBoardProcess_3B_35AA4(void)
         }
         break;
     case 4:
-        ProceessBonusBannerAndScoring();
+        ProcessBonusBannerAndScoring();
         gCurrentPinballGame->returnToMainBoardFlag = 1;
         break;
     }

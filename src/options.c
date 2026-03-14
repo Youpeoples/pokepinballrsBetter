@@ -83,7 +83,7 @@ void Options_Main(void)
 
 void Options_LoadGraphics(void)
 {
-    ResetSomeGraphicsRelatedStuff();
+    ResetDisplayState();
 
     REG_DISPCNT = 0x1080;
     REG_BG0CNT = 4;

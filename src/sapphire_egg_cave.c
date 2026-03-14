@@ -432,7 +432,7 @@ void DrawSapphireSeedotAndBasketSprites(void)
     }
 }
 
-void UpdateSapphireTrapDoorAnimation(void)
+void UpdateSapphireShopSignAnimation(void)
 {
     if (gCurrentPinballGame->shopTransitionActive == 0)
     {

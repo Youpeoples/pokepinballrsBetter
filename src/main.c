@@ -157,7 +157,7 @@ static void InitMainState(void)
     gMain.vCount = 144;
     gMain.scoreOverlayActive = 0;
     ClearHighScoreNameEntry();
-    ResetSomeGraphicsRelatedStuff();
+    ResetDisplayState();
 }
 
 static void InitIntrHandlers(void)

@@ -1095,8 +1095,8 @@ void ProcessSapphireCollisionEvent(u8 arg0, u16* arg1, u16* arg2)
                 }
                 else
                 {
-                    gCurrentPinballGame->pelliperFrameTimer = 1800;
-                    gCurrentPinballGame->pelliperState = 1;
+                    gCurrentPinballGame->pelipperFrameTimer = 1800;
+                    gCurrentPinballGame->pelipperState = 1;
 
                     if (gCurrentPinballGame->progressLevel < 99)
                         gCurrentPinballGame->progressLevel++;
@@ -1466,15 +1466,15 @@ void ProcessSapphireCollisionEvent(u8 arg0, u16* arg1, u16* arg2)
     case 15:
         if (gCurrentPinballGame->ball->positionQ0.y < 80)
         {
-            if (gCurrentPinballGame->pelliperState == 1)
-                gCurrentPinballGame->pelliperState = 2;
+            if (gCurrentPinballGame->pelipperState == 1)
+                gCurrentPinballGame->pelipperState = 2;
         }
         else
         {
-            if (gCurrentPinballGame->pelliperState == 2)
+            if (gCurrentPinballGame->pelipperState == 2)
             {
-                gCurrentPinballGame->pelliperState = 3;
-                gCurrentPinballGame->pelliperFrameTimer = 0;
+                gCurrentPinballGame->pelipperState = 3;
+                gCurrentPinballGame->pelipperFrameTimer = 0;
             }
         }
 
@@ -1567,7 +1567,7 @@ s16 COLLISION_CHECK_DUSCLOPS_171C8(struct Vector16* arg0, u16* arg1) {
         break;
     }
 
-    CheckDusclopsAbzorbZoneHit(some_enum, &return_val, arg1);
+    CheckDusclopsAbsorbZoneHit(some_enum, &return_val, arg1);
     return return_val;
 }
 
@@ -1678,7 +1678,7 @@ void CheckDusclopsEntitiesCollision(struct Vector16 *arg0, s16* arg1, u8* arg2) 
     }
 }
 
-void CheckDusclopsAbzorbZoneHit(u8 arg0, u16 *arg1, u16 *arg2)
+void CheckDusclopsAbsorbZoneHit(u8 arg0, u16 *arg1, u16 *arg2)
 {
     switch (arg0)
     {

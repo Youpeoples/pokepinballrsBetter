@@ -47,7 +47,7 @@ void FadeToMainBoard(void)
             }
             else
             {
-                ResetSomeGraphicsRelatedStuff();
+                ResetDisplayState();
                 gCurrentPinballGame->fadeSubState = 2;
             }
         }
@@ -55,7 +55,7 @@ void FadeToMainBoard(void)
     }
 }
 
-void ProceessBonusBannerAndScoring(void)
+void ProcessBonusBannerAndScoring(void)
 {
     s16 i;
     struct SpriteGroup *group;

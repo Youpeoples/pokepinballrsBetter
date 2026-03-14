@@ -4204,10 +4204,10 @@ gSapphirePondAnimFramesets:: @ 0x086AE344
 gTravelEventAnimData:: @ 0x086AE394
 	.incbin "baserom.gba", 0x6AE394, 0x48
 
-gPelliperSwallowAnimData:: @ 0x086AE3DC
+gPelipperSwallowAnimData:: @ 0x086AE3DC
 	.incbin "baserom.gba", 0x6AE3DC, 0x7E
 
-gPelliperIdleFrameIndices:: @ 0x086AE45A
+gPelipperIdleFrameIndices:: @ 0x086AE45A
 	.incbin "baserom.gba", 0x6AE45A, 0x8
 
 gWailmerAnimFrameMap:: @ 0x086AE462
@@ -7048,7 +7048,7 @@ gSapphireBoardSeedotSpritesheetOam:: @ 0x086B3E1E
     packed_sprite_oam x=-0x20, y=-0x18, spriteSize=SPRITE_SIZE_8x32, tileNum=0x201, priority=0x1, paletteNum=0x7
 
 
-gPelliperPondSpritesheetOam:: @ 0x086B3EF6
+gPelipperPondSpritesheetOam:: @ 0x086B3EF6
     packed_sprite_oam x=0x0, y=0x0, mosaic=0x1, spriteSize=SPRITE_SIZE_32x32, tileNum=0x115, priority=0x1, paletteNum=0x4
     packed_sprite_oam x=0x20, y=0x0, mosaic=0x1, spriteSize=SPRITE_SIZE_16x32, tileNum=0x125, priority=0x1, paletteNum=0x4
     packed_sprite_oam x=0x0, y=0x20, mosaic=0x1, spriteSize=SPRITE_SIZE_32x16, tileNum=0x12d, priority=0x1, paletteNum=0x4

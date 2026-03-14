@@ -113,7 +113,7 @@ void PinballGame_State0_49ED4(void)
 
     EnableGbPlayerRumble();
     gCurrentPinballGame = &gPinballGameState;
-    ResetSomeGraphicsRelatedStuff();
+    ResetDisplayState();
     gMain.gameExitState = 0;
     if (gMain.continueFromSave)
         var0 = 0;
@@ -426,8 +426,8 @@ void SetBallPositionForBonusReturn(void)
         gCurrentPinballGame->ball->ballHidden = 1;
         gCurrentPinballGame->ballFrozenState = 1;
         gCurrentPinballGame->trapAnimState = 0;
-        gCurrentPinballGame->pelliperFrameTimer = 0;
-        gCurrentPinballGame->pelliperState = 7;
+        gCurrentPinballGame->pelipperFrameTimer = 0;
+        gCurrentPinballGame->pelipperState = 7;
         gCurrentPinballGame->cameraBaseX = 0;
         gCurrentPinballGame->cameraBaseY = 0;
         break;

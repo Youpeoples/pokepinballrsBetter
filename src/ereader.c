@@ -65,7 +65,7 @@ void EReaderMain(void)
 
 void LoadEReaderGraphics(void)
 {
-    ResetSomeGraphicsRelatedStuff();
+    ResetDisplayState();
     REG_DISPCNT = DISPCNT_OBJ_ON | DISPCNT_OBJ_1D_MAP | DISPCNT_FORCED_BLANK;
     REG_BG0CNT = BGCNT_CHARBASE(1);
     REG_DISPCNT |= DISPCNT_BG0_ON;
@@ -331,7 +331,7 @@ void Ereader_State5_33A0(void)
 
 void Ereader_State6_343C(void)
 {
-    ResetSomeGraphicsRelatedStuff();
+    ResetDisplayState();
     REG_DISPCNT = DISPCNT_OBJ_ON | DISPCNT_OBJ_1D_MAP | DISPCNT_FORCED_BLANK;
     REG_BG0CNT = BGCNT_CHARBASE(1);
     REG_DISPCNT |= DISPCNT_BG0_ON;

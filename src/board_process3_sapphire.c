@@ -24,9 +24,9 @@ void SapphireBoardProcess_3A_326F4(void)
 
     InitSapphireEggCaveState();
     UpdateSapphireEggCaveAnimation();
-    UpdateSapphireTrapDoorAnimation();
+    UpdateSapphireShopSignAnimation();
     DrawSapphireShopSignSprite();
-    UpdatePelliperPondEntity();
+    UpdatePelipperPondEntity();
     DrawBoardEdgeBanner();
 }
 
@@ -80,7 +80,7 @@ void UpdateSapphireBoardEntityRendering(void)
 
     if (gCurrentPinballGame->cameraYViewport < 0x96)
     {
-        UpdatePelliperPondEntity();
+        UpdatePelipperPondEntity();
         DrawSapphireShopSignSprite();
     }
     if (gCurrentPinballGame->cameraYViewport < 0xC4)
@@ -105,10 +105,10 @@ void UpdateSapphireBoardEntityRendering(void)
         DrawSapphireSeedotAndBasketSprites();
     }
 
-    UpdateBoardEntityAnimation();
+    UpdateSpoinkAnimation();
 
     if (0xA8 < gCurrentPinballGame->cameraYViewport)
-        DrawBoardEntitySprite();
+        DrawSpoinkSprite();
 
     UpdateCatchModeLogic();
     AnimateCatchCounterDisplay();
@@ -132,7 +132,7 @@ void UpdateSapphireBoardEntityLogic(void)
 
     UpdateZigzagoonEntity();
     DecrementFieldTimer();
-    UpdateSapphireTrapDoorAnimation();
+    UpdateSapphireShopSignAnimation();
 
     if (!(gMain.modeChangeFlags & MODE_CHANGE_END_OF_GAME))
         UpdateSapphireBumperLogic();
