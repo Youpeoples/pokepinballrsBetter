@@ -4,9 +4,9 @@
 #include "constants/bg_music.h"
 #include "constants/ruby_states.h"
 
-extern const u8 gHatchTileGfx[][0x100];
-extern const s16 gHatchTileGfxFrameIndices[][2];
-extern const u16 gHatchTileAnimDurations[][2];
+extern const u8 gSideBumperGfx[][0x100];
+extern const s16 gSideBumperGfxFrameIndices[][2];
+extern const u16 gSideBumperAnimDurations[][2];
 extern const s16 gGulpinAnimData[][5];
 extern const u16 gGulpinOamData[146][18];
 extern const u8 gRubyStageGulpin_Gfx[][0x180];
@@ -826,7 +826,7 @@ void RubyPond_EntityLogic(void)
             // Heavy shaking starts
             if (gCurrentPinballGame->whiscashFrameIx == WHISCASH_FRAME_GONE_AFTER_HIT)
             {
-                gCurrentPinballGame->horizontalShakeOffset = gWhiscashShakeOffsets[gCurrentPinballGame->whiscashStateTimer % 8];
+                gCurrentPinballGame->screenShakeX = gWhiscashShakeOffsets[gCurrentPinballGame->whiscashStateTimer % 8];
                 if (gCurrentPinballGame->whiscashStateTimer % 4 == 0)
                     MPlayStart(&gMPlayInfo_SE3, &se_whiscash_splashdown);
 
@@ -859,7 +859,7 @@ void RubyPond_EntityLogic(void)
             gCurrentPinballGame->whiscashStateTimer = 0;
             gCurrentPinballGame->rubyPondContentsChanging = TRUE;
             gCurrentPinballGame->rubyPondChangeTimer = 64;
-            gCurrentPinballGame->horizontalShakeOffset = 0;
+            gCurrentPinballGame->screenShakeX = 0;
             break;
         }
     }
@@ -1221,12 +1221,12 @@ void AnimateSharpedoEntity(void)
 
     index = (gMain.systemFrameCount % 55) / 11;
     group = &gMain.spriteGroups[61];
-    DmaCopy16(3, gRubyBoardSharpedo_Gfx[gCurrentPinballGame->sharpedoTileVariant], (void *)0x06012C20, 0x260);
-    if (gCurrentPinballGame->sharpedoOamIndex)
-        index = gCurrentPinballGame->sharpedoOamIndex;
+    DmaCopy16(3, gRubyBoardSharpedo_Gfx[gCurrentPinballGame->catchHoleTileVariant], (void *)0x06012C20, 0x260);
+    if (gCurrentPinballGame->catchHoleAnimFrame)
+        index = gCurrentPinballGame->catchHoleAnimFrame;
 
     var0 = gSharpedoAnimFrameData[index][0];
-    gCurrentPinballGame->sharpedoTileVariant = gSharpedoAnimFrameData[index][1];
+    gCurrentPinballGame->catchHoleTileVariant = gSharpedoAnimFrameData[index][1];
     group->baseX = 179 - gCurrentPinballGame->cameraXOffset;
     group->baseY = 174 - gCurrentPinballGame->cameraYOffset;
     for (i = 0; i < 3; i++)
@@ -1461,14 +1461,14 @@ void UpdateGauntletBossAnimation(void)
             {
                 gMain.spriteGroups[14].available = 1;
                 m4aSongNumStart(SE_UNKNOWN_0xC7);
-                if (gCurrentPinballGame->hatchTileBounceCount[1] > 0)
+                if (gCurrentPinballGame->sideBumperBounceCount[1] > 0)
                 {
-                    gCurrentPinballGame->hatchTileBounceCount[1]++;
+                    gCurrentPinballGame->sideBumperBounceCount[1]++;
                 }
                 else
                 {
-                    gCurrentPinballGame->hatchTileBounceCount[1] = 2;
-                    gCurrentPinballGame->hatchTileAnimTimer[1] = 190;
+                    gCurrentPinballGame->sideBumperBounceCount[1] = 2;
+                    gCurrentPinballGame->sideBumperAnimTimer[1] = 190;
                 }
             }
 
@@ -1476,14 +1476,14 @@ void UpdateGauntletBossAnimation(void)
             {
                 gMain.spriteGroups[14].available = 1;
                 m4aSongNumStart(SE_UNKNOWN_0xC7);
-                if (gCurrentPinballGame->hatchTileBounceCount[0] > 0)
+                if (gCurrentPinballGame->sideBumperBounceCount[0] > 0)
                 {
-                    gCurrentPinballGame->hatchTileBounceCount[0]++;
+                    gCurrentPinballGame->sideBumperBounceCount[0]++;
                 }
                 else
                 {
-                    gCurrentPinballGame->hatchTileBounceCount[0] = 2;
-                    gCurrentPinballGame->hatchTileAnimTimer[0] = 190;
+                    gCurrentPinballGame->sideBumperBounceCount[0] = 2;
+                    gCurrentPinballGame->sideBumperAnimTimer[0] = 190;
                 }
             }
         }
@@ -1516,10 +1516,10 @@ void AnimateGauntletBossSprite(void)
     s16 index;
 
     group = &gMain.spriteGroups[53];
-    if (gCurrentPinballGame->gauntletBossFlashActive)
+    if (gCurrentPinballGame->gauntletFlashActive)
     {
-        index = gGauntletBossFlashFrameIndices[gCurrentPinballGame->gauntletBossFlashTimer / 5];
-        if (gCurrentPinballGame->gauntletBossFlashTimer == 40)
+        index = gGauntletBossFlashFrameIndices[gCurrentPinballGame->gauntletFlashTimer / 5];
+        if (gCurrentPinballGame->gauntletFlashTimer == 40)
         {
             gCurrentPinballGame->gauntletProjectileTimer = 0;
             gCurrentPinballGame->gauntletProjectileX = 0;
@@ -1529,10 +1529,10 @@ void AnimateGauntletBossSprite(void)
             gMain.spriteGroups[13].available = 1;
         }
 
-        if (gCurrentPinballGame->gauntletBossFlashTimer < 54)
-            gCurrentPinballGame->gauntletBossFlashTimer++;
+        if (gCurrentPinballGame->gauntletFlashTimer < 54)
+            gCurrentPinballGame->gauntletFlashTimer++;
         else
-            gCurrentPinballGame->gauntletBossFlashActive = 0;
+            gCurrentPinballGame->gauntletFlashActive = 0;
 
         DmaCopy16(3, gRubyFlashingDecorationTiles[index], (void *)0x06012720, 0x300);
     }
@@ -1692,43 +1692,43 @@ void UpdateGulpinBossState(void)
     }
 }
 
-void UpdateHatchTileAnimation(void)
+void UpdateSideBumperAnimation(void)
 {
     s16 i;
 
     for (i = 0; i < 2; i++)
     {
-        if (gCurrentPinballGame->hatchTileBounceCount[i] > 0)
+        if (gCurrentPinballGame->sideBumperBounceCount[i] > 0)
         {
-            if (gHatchTileAnimDurations[gCurrentPinballGame->hatchTileAnimPhase[i]][0] > gCurrentPinballGame->hatchTileAnimTimer[i])
+            if (gSideBumperAnimDurations[gCurrentPinballGame->sideBumperAnimPhase[i]][0] > gCurrentPinballGame->sideBumperAnimTimer[i])
             {
-                gCurrentPinballGame->hatchTileAnimTimer[i]++;
+                gCurrentPinballGame->sideBumperAnimTimer[i]++;
             }
             else
             {
-                gCurrentPinballGame->hatchTileAnimTimer[i] = 0;
-                gCurrentPinballGame->hatchTileAnimPhase[i]++;
-                if (gCurrentPinballGame->hatchTileAnimPhase[i] > 11)
+                gCurrentPinballGame->sideBumperAnimTimer[i] = 0;
+                gCurrentPinballGame->sideBumperAnimPhase[i]++;
+                if (gCurrentPinballGame->sideBumperAnimPhase[i] > 11)
                 {
-                    gCurrentPinballGame->hatchTileAnimPhase[i] = 0;
-                    gCurrentPinballGame->hatchTileBounceCount[i]--;
+                    gCurrentPinballGame->sideBumperAnimPhase[i] = 0;
+                    gCurrentPinballGame->sideBumperBounceCount[i]--;
                 }
             }
 
-            if (gCurrentPinballGame->hatchTileAnimPhase[i] == 1)
-                gCurrentPinballGame->hatchTileShakeOffset[i] = gCurrentPinballGame->hatchTileAnimTimer[i] / 2;
+            if (gCurrentPinballGame->sideBumperAnimPhase[i] == 1)
+                gCurrentPinballGame->sideBumperShakeOffset[i] = gCurrentPinballGame->sideBumperAnimTimer[i] / 2;
 
-            if (gCurrentPinballGame->hatchTileAnimPhase[i] == 11)
-                gCurrentPinballGame->hatchTileShakeOffset[i] = 14 - gCurrentPinballGame->hatchTileAnimTimer[i] / 2;
+            if (gCurrentPinballGame->sideBumperAnimPhase[i] == 11)
+                gCurrentPinballGame->sideBumperShakeOffset[i] = 14 - gCurrentPinballGame->sideBumperAnimTimer[i] / 2;
 
-            if (gCurrentPinballGame->hatchTileShakeOffset[i] < 3)
-                gCurrentPinballGame->hatchTileShakeOffset[i] = 3;
+            if (gCurrentPinballGame->sideBumperShakeOffset[i] < 3)
+                gCurrentPinballGame->sideBumperShakeOffset[i] = 3;
         }
     }
 
-    if (gCurrentPinballGame->hatchTileHitFlag)
+    if (gCurrentPinballGame->sideBumperHitFlag)
     {
-        if (gCurrentPinballGame->hatchTileHitFlag == 1)
+        if (gCurrentPinballGame->sideBumperHitFlag == 1)
         {
             if (gCurrentPinballGame->boardState != 7)
             {
@@ -1781,22 +1781,22 @@ void UpdateHatchTileAnimation(void)
                 gCurrentPinballGame->rampGateState = 0;
         }
 
-        gCurrentPinballGame->hatchTileBounceCount[0] = 0;
-        gCurrentPinballGame->hatchTileBounceCount[1] = 0;
-        gCurrentPinballGame->hatchTileHitFlag = 0;
+        gCurrentPinballGame->sideBumperBounceCount[0] = 0;
+        gCurrentPinballGame->sideBumperBounceCount[1] = 0;
+        gCurrentPinballGame->sideBumperHitFlag = 0;
         PlayRumble(7);
         m4aSongNumStart(SE_UNKNOWN_0xB7);
         gCurrentPinballGame->scoreAddedInFrame = 3000;
-        gCurrentPinballGame->hatchTileAnimPhase[0] = 0;
-        gCurrentPinballGame->hatchTileAnimPhase[1] = 0;
-        gCurrentPinballGame->hatchTileAnimTimer[0] = 0;
-        gCurrentPinballGame->hatchTileAnimTimer[1] = 0;
-        gCurrentPinballGame->hatchTileShakeOffset[0] = 3;
-        gCurrentPinballGame->hatchTileShakeOffset[1] = 3;
+        gCurrentPinballGame->sideBumperAnimPhase[0] = 0;
+        gCurrentPinballGame->sideBumperAnimPhase[1] = 0;
+        gCurrentPinballGame->sideBumperAnimTimer[0] = 0;
+        gCurrentPinballGame->sideBumperAnimTimer[1] = 0;
+        gCurrentPinballGame->sideBumperShakeOffset[0] = 3;
+        gCurrentPinballGame->sideBumperShakeOffset[1] = 3;
     }
 }
 
-void DrawHatchTileSprites(void)
+void DrawSideBumperSprites(void)
 {
     s16 i, j;
     struct SpriteGroup *group;
@@ -1805,13 +1805,13 @@ void DrawHatchTileSprites(void)
 
     for (i = 0; i < 2; i++)
     {
-        index = gHatchTileGfxFrameIndices[gCurrentPinballGame->hatchTileAnimPhase[i]][0];
-        DmaCopy16(3, gHatchTileGfx[index], (void *)0x06012A20 + i * 0x100, 0x100);
+        index = gSideBumperGfxFrameIndices[gCurrentPinballGame->sideBumperAnimPhase[i]][0];
+        DmaCopy16(3, gSideBumperGfx[index], (void *)0x06012A20 + i * 0x100, 0x100);
         group = &gMain.spriteGroups[59 + i];
         if (group->available)
         {
             int var0 = i * 120 - (gCurrentPinballGame->cameraXOffset - 48);
-            group->baseX = var0 + ((1 - (i * 2)) * (gCurrentPinballGame->hatchTileShakeOffset[i] - 14));
+            group->baseX = var0 + ((1 - (i * 2)) * (gCurrentPinballGame->sideBumperShakeOffset[i] - 14));
             group->baseY = 301 - gCurrentPinballGame->cameraYOffset;
             for (j = 0; j < 3; j++)
             {

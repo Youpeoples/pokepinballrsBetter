@@ -157,13 +157,13 @@ void DrawRubyNuzleafPlatformSprite(void)
     group = &gMain.spriteGroups[66];
     if (group->available)
     {
-        if (gCurrentPinballGame->rubyPondBumperHitFlag)
+        if (gCurrentPinballGame->rampPrizeType)
             group->baseY = (gCurrentPinballGame->globalAnimFrameCounter % 32) / 8 - (gCurrentPinballGame->cameraYOffset - 52);
         else
             group->baseY = 180;
 
         group->baseX = 120 - gCurrentPinballGame->cameraXOffset;
-        if (gCurrentPinballGame->rubyPondBumperHitFlag == 1)
+        if (gCurrentPinballGame->rampPrizeType == 1)
             index = (gCurrentPinballGame->globalAnimFrameCounter % 32) / 8 + 4;
         else
             index = (gCurrentPinballGame->globalAnimFrameCounter % 32) / 8;

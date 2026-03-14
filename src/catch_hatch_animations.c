@@ -964,12 +964,12 @@ void AnimateCoinReward(void)
     }
 }
 
-void InitTravelModeSprites(void)
+void InitPelipperEggDelivery(void)
 {
-    gCurrentPinballGame->modeSpriteX = 1600;
-    gCurrentPinballGame->modeSpriteY = 2080;
-    gCurrentPinballGame->travelSpriteFrame = 0;
-    gCurrentPinballGame->pikaSaverAnimFrameTimer = 0;
+    gCurrentPinballGame->eggDeliveryX = 1600;
+    gCurrentPinballGame->eggDeliveryY = 2080;
+    gCurrentPinballGame->pelipperDeliveryFrame = 0;
+    gCurrentPinballGame->pelipperDeliveryTimer = 0;
     gMain.spriteGroups[82].available = 1;
     gCurrentPinballGame->eggAnimationPhase = 1;
     gCurrentPinballGame->portraitOffsetX = 240;
@@ -979,7 +979,7 @@ void InitTravelModeSprites(void)
     DmaCopy16(3, gCaptureModeTilesGfx, (void *)0x06015800, 0xCA0);
 }
 
-void AnimateTravelModeSprite(void)
+void AnimatePelipperEggDelivery(void)
 {
     s16 i;
     struct SpriteGroup *group;
@@ -990,48 +990,48 @@ void AnimateTravelModeSprite(void)
 
     var0 = 0;
     group = &gMain.spriteGroups[82];
-    if (gPikaSaverFrameData[gCurrentPinballGame->travelSpriteFrame][1] > gCurrentPinballGame->pikaSaverAnimFrameTimer)
+    if (gPikaSaverFrameData[gCurrentPinballGame->pelipperDeliveryFrame][1] > gCurrentPinballGame->pelipperDeliveryTimer)
     {
-        gCurrentPinballGame->pikaSaverAnimFrameTimer++;
+        gCurrentPinballGame->pelipperDeliveryTimer++;
     }
     else
     {
-        gCurrentPinballGame->travelSpriteFrame++;
-        gCurrentPinballGame->pikaSaverAnimFrameTimer = 0;
-        if (gCurrentPinballGame->travelSpriteFrame == 41)
+        gCurrentPinballGame->pelipperDeliveryFrame++;
+        gCurrentPinballGame->pelipperDeliveryTimer = 0;
+        if (gCurrentPinballGame->pelipperDeliveryFrame == 41)
         {
-            gCurrentPinballGame->travelSpriteFrame = 40;
+            gCurrentPinballGame->pelipperDeliveryFrame = 40;
             group->available = 0;
-            gCurrentPinballGame->eggAnimTravelState = 2;
+            gCurrentPinballGame->eggDeliveryState = 2;
             gCurrentPinballGame->activePortraitType = 0;
         }
 
-        if (gCurrentPinballGame->travelSpriteFrame == 1)
+        if (gCurrentPinballGame->pelipperDeliveryFrame == 1)
             m4aSongNumStart(SE_UNKNOWN_0x146);
 
-        if (gCurrentPinballGame->travelSpriteFrame == 7)
+        if (gCurrentPinballGame->pelipperDeliveryFrame == 7)
             m4aSongNumStart(SE_UNKNOWN_0x147);
 
-        if (gCurrentPinballGame->travelSpriteFrame == 13)
+        if (gCurrentPinballGame->pelipperDeliveryFrame == 13)
             m4aSongNumStart(SE_UNKNOWN_0x148);
 
-        if (gCurrentPinballGame->travelSpriteFrame == 39)
+        if (gCurrentPinballGame->pelipperDeliveryFrame == 39)
         {
             gCurrentPinballGame->portraitOffsetX = 0;
             gCurrentPinballGame->portraitOffsetY = 0;
             DmaCopy16(3, gEggFrameTilesGfx[0], (void *)0x06011CE0, 0x200);
         }
 
-        if (gCurrentPinballGame->travelSpriteFrame == 14)
+        if (gCurrentPinballGame->pelipperDeliveryFrame == 14)
             gCurrentPinballGame->scoreAddedInFrame = 2000000;
     }
 
-    if (gCurrentPinballGame->travelSpriteFrame >= 14 && gCurrentPinballGame->travelSpriteFrame < 38 && gCurrentPinballGame->globalAnimFrameCounter % 7 == 0)
+    if (gCurrentPinballGame->pelipperDeliveryFrame >= 14 && gCurrentPinballGame->pelipperDeliveryFrame < 38 && gCurrentPinballGame->globalAnimFrameCounter % 7 == 0)
         m4aSongNumStart(SE_UNKNOWN_0x149);
 
-    group->baseX = gCurrentPinballGame->modeSpriteX / 20 - gCurrentPinballGame->cameraXOffset;
-    group->baseY = gCurrentPinballGame->modeSpriteY / 20 - gCurrentPinballGame->cameraYOffset;
-    var0 = gPikaSaverFrameData[gCurrentPinballGame->travelSpriteFrame][0];
+    group->baseX = gCurrentPinballGame->eggDeliveryX / 20 - gCurrentPinballGame->cameraXOffset;
+    group->baseY = gCurrentPinballGame->eggDeliveryY / 20 - gCurrentPinballGame->cameraYOffset;
+    var0 = gPikaSaverFrameData[gCurrentPinballGame->pelipperDeliveryFrame][0];
     for (i = 0; i < 6; i++)
     {
         oamSimple = &group->oam[i];
@@ -1046,23 +1046,23 @@ void AnimateTravelModeSprite(void)
     }
 }
 
-void InitEvolutionModeSprites(void)
+void InitEggDropDelivery(void)
 {
-    gCurrentPinballGame->modeSpriteTimer = 0;
-    gCurrentPinballGame->modeSpriteX = 3600;
-    gCurrentPinballGame->modeSpriteY = -40;
-    gCurrentPinballGame->modeSpriteVelX = -36;
-    gCurrentPinballGame->modeSpriteVelY = 60;
+    gCurrentPinballGame->eggDropTimer = 0;
+    gCurrentPinballGame->eggDeliveryX = 3600;
+    gCurrentPinballGame->eggDeliveryY = -40;
+    gCurrentPinballGame->eggDeliveryVelX = -36;
+    gCurrentPinballGame->eggDeliveryVelY = 60;
     gMain.spriteGroups[12].available = 1;
     gCurrentPinballGame->eggAnimationPhase = 1;
-    gCurrentPinballGame->portraitOffsetX = gCurrentPinballGame->modeSpriteX / 20 - gFlyingCreatureCameraOffsets[0].x;
-    gCurrentPinballGame->portraitOffsetY = gCurrentPinballGame->modeSpriteY / 20 - gFlyingCreatureCameraOffsets[0].y;
+    gCurrentPinballGame->portraitOffsetX = gCurrentPinballGame->eggDeliveryX / 20 - gFlyingCreatureCameraOffsets[0].x;
+    gCurrentPinballGame->portraitOffsetY = gCurrentPinballGame->eggDeliveryY / 20 - gFlyingCreatureCameraOffsets[0].y;
     gCurrentPinballGame->activePortraitType = 2;
     DmaCopy16(3, gEggModePalette, (void *)0x050003C0, 0x20);
     DmaCopy16(3, gEggModeTilesGfx, (void *)0x06015800, 0x1000);
 }
 
-void AnimateEvolutionModeSprite(void)
+void AnimateEggDropDelivery(void)
 {
     s16 i;
     struct SpriteGroup *group;
@@ -1070,23 +1070,23 @@ void AnimateEvolutionModeSprite(void)
     u16 *dst;
     s16 var0;
 
-    var0 = (gCurrentPinballGame->modeSpriteTimer % 56) / 8;
+    var0 = (gCurrentPinballGame->eggDropTimer % 56) / 8;
     group = &gMain.spriteGroups[12];
-    if (gCurrentPinballGame->modeSpriteTimer < 130)
+    if (gCurrentPinballGame->eggDropTimer < 130)
     {
-        if (gCurrentPinballGame->modeSpriteTimer % 36U == 0)
+        if (gCurrentPinballGame->eggDropTimer % 36U == 0)
             m4aSongNumStart(SE_UNKNOWN_0xB8);
 
-        gCurrentPinballGame->modeSpriteTimer++;
-        gCurrentPinballGame->modeSpriteX += gCurrentPinballGame->modeSpriteVelX;
-        gCurrentPinballGame->modeSpriteY += gCurrentPinballGame->modeSpriteVelY;
-        if (gCurrentPinballGame->modeSpriteVelY > 7 || gMain.systemFrameCount % 3 == 0)
-            gCurrentPinballGame->modeSpriteVelY--;
+        gCurrentPinballGame->eggDropTimer++;
+        gCurrentPinballGame->eggDeliveryX += gCurrentPinballGame->eggDeliveryVelX;
+        gCurrentPinballGame->eggDeliveryY += gCurrentPinballGame->eggDeliveryVelY;
+        if (gCurrentPinballGame->eggDeliveryVelY > 7 || gMain.systemFrameCount % 3 == 0)
+            gCurrentPinballGame->eggDeliveryVelY--;
 
-        if (gCurrentPinballGame->modeSpriteTimer < 78)
+        if (gCurrentPinballGame->eggDropTimer < 78)
         {
-            gCurrentPinballGame->portraitOffsetX = gCurrentPinballGame->modeSpriteX / 20 - gFlyingCreatureCameraOffsets[var0].x;
-            gCurrentPinballGame->portraitOffsetY = gCurrentPinballGame->modeSpriteY / 20 - gFlyingCreatureCameraOffsets[var0].y;
+            gCurrentPinballGame->portraitOffsetX = gCurrentPinballGame->eggDeliveryX / 20 - gFlyingCreatureCameraOffsets[var0].x;
+            gCurrentPinballGame->portraitOffsetY = gCurrentPinballGame->eggDeliveryY / 20 - gFlyingCreatureCameraOffsets[var0].y;
         }
         else
         {
@@ -1094,7 +1094,7 @@ void AnimateEvolutionModeSprite(void)
             gCurrentPinballGame->portraitOffsetY = 0;
         }
 
-        if (gCurrentPinballGame->modeSpriteTimer == 78)
+        if (gCurrentPinballGame->eggDropTimer == 78)
             gCurrentPinballGame->scoreAddedInFrame = 100000;
 
         DmaCopy16(3, gEggFrameTilesGfx[0], (void *)0x06011CE0, 0x200);
@@ -1103,12 +1103,12 @@ void AnimateEvolutionModeSprite(void)
     {
         group->available = 0;
         do {} while (0); // needed to match, there was probably some dead code
-        gCurrentPinballGame->eggAnimTravelState = 2;
+        gCurrentPinballGame->eggDeliveryState = 2;
         gCurrentPinballGame->activePortraitType = 0;
     }
 
-    group->baseX = gCurrentPinballGame->modeSpriteX / 20 - gCurrentPinballGame->cameraXOffset;
-    group->baseY = gCurrentPinballGame->modeSpriteY / 20 - gCurrentPinballGame->cameraYOffset;
+    group->baseX = gCurrentPinballGame->eggDeliveryX / 20 - gCurrentPinballGame->cameraXOffset;
+    group->baseY = gCurrentPinballGame->eggDeliveryY / 20 - gCurrentPinballGame->cameraYOffset;
     for (i = 0; i < 5; i++)
     {
         oamSimple = &group->oam[i];
@@ -1575,7 +1575,7 @@ void UpdateEggHatchDisplay(void)
     }
     else if (gCurrentPinballGame->eggCaveState == 3)
     {
-        if (gCurrentPinballGame->eggAnimTravelState != 2)
+        if (gCurrentPinballGame->eggDeliveryState != 2)
         {
             if (gCurrentPinballGame->eggAnimationPhase == 1)
             {
@@ -1627,7 +1627,7 @@ void UpdateEggHatchDisplay(void)
                 {
                     InitEggModeAnimation();
                     gCurrentPinballGame->eggCaveState = 0;
-                    gCurrentPinballGame->eggAnimTravelState = 0;
+                    gCurrentPinballGame->eggDeliveryState = 0;
                 }
             }
             else
@@ -1649,7 +1649,7 @@ void UpdateEggHatchDisplay(void)
         group->baseY = gCurrentPinballGame->cyndaquilCaveSpriteY - gCurrentPinballGame->cameraYOffset;
         if (gCurrentPinballGame->boardState < 3)
         {
-            if (gCurrentPinballGame->eggCaveState == 3 && gCurrentPinballGame->eggAnimTravelState != 2)
+            if (gCurrentPinballGame->eggCaveState == 3 && gCurrentPinballGame->eggDeliveryState != 2)
                 gCurrentPinballGame->catchArrowPaletteActive = 1;
             else
                 gCurrentPinballGame->catchArrowPaletteActive = 0;
@@ -1695,7 +1695,7 @@ void CleanupEggModeState(void)
     s16 i;
 
     if (gMain.selectedField == FIELD_RUBY)
-        gCurrentPinballGame->eggAnimTravelState = 1;
+        gCurrentPinballGame->eggDeliveryState = 1;
     else
         gCurrentPinballGame->holeCaptureReady = 1;
 

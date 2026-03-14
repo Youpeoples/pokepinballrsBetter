@@ -1773,31 +1773,31 @@ void RenderWindCloudSprites(void)
     {
         gCurrentPinballGame->impactShakeTimer--;
         if (gCurrentPinballGame->impactShakeTimer < 12)
-            gCurrentPinballGame->bonusBoardYOffset = gScreenShakeOscillationValues[gCurrentPinballGame->impactShakeTimer % 12];
+            gCurrentPinballGame->screenShakeY = gScreenShakeOscillationValues[gCurrentPinballGame->impactShakeTimer % 12];
         else if (gCurrentPinballGame->impactShakeTimer < 24)
-            gCurrentPinballGame->bonusBoardYOffset = gScreenShakeOscillationValues[gCurrentPinballGame->impactShakeTimer % 12] * 2;
+            gCurrentPinballGame->screenShakeY = gScreenShakeOscillationValues[gCurrentPinballGame->impactShakeTimer % 12] * 2;
         else if (gCurrentPinballGame->impactShakeTimer < 36)
-            gCurrentPinballGame->bonusBoardYOffset = gScreenShakeOscillationValues[gCurrentPinballGame->impactShakeTimer % 12] * 4;
+            gCurrentPinballGame->screenShakeY = gScreenShakeOscillationValues[gCurrentPinballGame->impactShakeTimer % 12] * 4;
         else if (gCurrentPinballGame->impactShakeTimer < 48)
-            gCurrentPinballGame->bonusBoardYOffset = gScreenShakeOscillationValues[gCurrentPinballGame->impactShakeTimer % 12] * 2;
+            gCurrentPinballGame->screenShakeY = gScreenShakeOscillationValues[gCurrentPinballGame->impactShakeTimer % 12] * 2;
         else
-            gCurrentPinballGame->bonusBoardYOffset = gScreenShakeOscillationValues[gCurrentPinballGame->impactShakeTimer % 12];
+            gCurrentPinballGame->screenShakeY = gScreenShakeOscillationValues[gCurrentPinballGame->impactShakeTimer % 12];
 
         if (gCurrentPinballGame->impactShakeTimer == 0)
-            gCurrentPinballGame->bonusBoardYOffset = 0;
+            gCurrentPinballGame->screenShakeY = 0;
     }
 
     if (gCurrentPinballGame->horizontalShakeTimer > 0)
     {
         s16 var0 = gCurrentPinballGame->horizontalShakeTimer % 4;
         if (var0 / 2 != 0)
-            gCurrentPinballGame->horizontalShakeOffset = 2;
+            gCurrentPinballGame->screenShakeX = 2;
         else
-            gCurrentPinballGame->horizontalShakeOffset = -2;
+            gCurrentPinballGame->screenShakeX = -2;
 
         gCurrentPinballGame->horizontalShakeTimer--;
         if (gCurrentPinballGame->horizontalShakeTimer == 0)
-            gCurrentPinballGame->horizontalShakeOffset = 0;
+            gCurrentPinballGame->screenShakeX = 0;
     }
 }
 

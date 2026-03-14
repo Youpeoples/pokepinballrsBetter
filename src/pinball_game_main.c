@@ -1506,7 +1506,7 @@ void RestoreRubyBoardTileGraphics(void)
     DmaCopy16(3, gRubyBoardHatchCave_Gfx[var0], (void *)0x60122A0, 0x480);
     var0 = (gMain.systemFrameCount % 50) / 25;
     DmaCopy16(3, gRubyFlashingDecorationTiles[var0], (void *)0x6012720, 0x300);
-    DmaCopy16(3, gRubyBoardSharpedo_Gfx[gCurrentPinballGame->sharpedoTileVariant], (void *)0x6012C20, 0x260);
+    DmaCopy16(3, gRubyBoardSharpedo_Gfx[gCurrentPinballGame->catchHoleTileVariant], (void *)0x6012C20, 0x260);
     for (i = 0; i < 2; i++)
         DmaCopy16(3, gRubyFlashingTiles_Secondary[var0], (void *)0x6010000 + (0x174 + i * 8) * 0x20, 0x100);
 

@@ -156,7 +156,7 @@ void MainBoardProcess_2B_4D960(void)
     }
 
     ProcessTiltInput();
-    gMain.bgOffsets[3].xOffset = gCurrentPinballGame->cameraBaseX + gCurrentPinballGame->tiltXOffset + gCurrentPinballGame->horizontalShakeOffset;
+    gMain.bgOffsets[3].xOffset = gCurrentPinballGame->cameraBaseX + gCurrentPinballGame->tiltXOffset + gCurrentPinballGame->screenShakeX;
     gCurrentPinballGame->scrollEffectY = gCurrentPinballGame->cameraBaseY + gCurrentPinballGame->tiltYOffset + gCurrentPinballGame->cameraScrollOffset + gCurrentPinballGame->cameraYAdjust;
     var3 = gMain.bgOffsets[3].yOffset - gCurrentPinballGame->scrollEffectY;
     if (var3 > 8)
@@ -171,7 +171,7 @@ void MainBoardProcess_2B_4D960(void)
     gMain.bgOffsets[2].yOffset = gMain.bgOffsets[3].yOffset;
     gMain.bgOffsets[1].xOffset = gMain.bgOffsets[3].xOffset;
     gMain.bgOffsets[1].yOffset = gMain.bgOffsets[3].yOffset;
-    gCurrentPinballGame->cameraXOffset = gCurrentPinballGame->cameraBaseX + gCurrentPinballGame->tiltXOffset + gCurrentPinballGame->horizontalShakeOffset;
+    gCurrentPinballGame->cameraXOffset = gCurrentPinballGame->cameraBaseX + gCurrentPinballGame->tiltXOffset + gCurrentPinballGame->screenShakeX;
     gCurrentPinballGame->cameraYOffset = gCurrentPinballGame->cameraBaseY + gCurrentPinballGame->tiltYOffset + gCurrentPinballGame->cameraScrollOffset + gCurrentPinballGame->cameraYAdjust;
     gCurrentPinballGame->hudSpriteBaseY = gCurrentPinballGame->cameraYViewport;
     gCurrentPinballGame->cameraYViewport = gCurrentPinballGame->cameraBaseY + gCurrentPinballGame->tiltYOffset + gCurrentPinballGame->cameraScrollOffset + gCurrentPinballGame->cameraYAdjust;
@@ -236,8 +236,8 @@ void BonusBoardProcess_2B_4DBFC(void)
     }
 
     ProcessTiltInput();
-    gMain.bgOffsets[2].xOffset = gCurrentPinballGame->cameraBaseX + gCurrentPinballGame->tiltXOffset + 8 + gCurrentPinballGame->horizontalShakeOffset;
-    gCurrentPinballGame->scrollEffectY = gCurrentPinballGame->cameraBaseY + gCurrentPinballGame->tiltYOffset + gCurrentPinballGame->cameraScrollOffset + gCurrentPinballGame->cameraYAdjust + gCurrentPinballGame->bonusBoardYOffset;
+    gMain.bgOffsets[2].xOffset = gCurrentPinballGame->cameraBaseX + gCurrentPinballGame->tiltXOffset + 8 + gCurrentPinballGame->screenShakeX;
+    gCurrentPinballGame->scrollEffectY = gCurrentPinballGame->cameraBaseY + gCurrentPinballGame->tiltYOffset + gCurrentPinballGame->cameraScrollOffset + gCurrentPinballGame->cameraYAdjust + gCurrentPinballGame->screenShakeY;
     var3 = gCurrentPinballGame->scrollEffectX - gCurrentPinballGame->scrollEffectY;
     if (var3 > 8)
         var3 = 8;
@@ -282,8 +282,8 @@ void BonusBoardProcess_2B_4DBFC(void)
         break;
     }
 
-    gCurrentPinballGame->cameraXOffset = gCurrentPinballGame->cameraBaseX + gCurrentPinballGame->tiltXOffset + gCurrentPinballGame->horizontalShakeOffset;
-    gCurrentPinballGame->cameraYOffset = gCurrentPinballGame->cameraBaseY + gCurrentPinballGame->tiltYOffset + gCurrentPinballGame->cameraScrollOffset + gCurrentPinballGame->cameraYAdjust + gCurrentPinballGame->bonusBoardYOffset;
+    gCurrentPinballGame->cameraXOffset = gCurrentPinballGame->cameraBaseX + gCurrentPinballGame->tiltXOffset + gCurrentPinballGame->screenShakeX;
+    gCurrentPinballGame->cameraYOffset = gCurrentPinballGame->cameraBaseY + gCurrentPinballGame->tiltYOffset + gCurrentPinballGame->cameraScrollOffset + gCurrentPinballGame->cameraYAdjust + gCurrentPinballGame->screenShakeY;
     gCurrentPinballGame->cameraYViewport = gCurrentPinballGame->cameraBaseY + gCurrentPinballGame->tiltYOffset + gCurrentPinballGame->cameraScrollOffset + gCurrentPinballGame->cameraYAdjust;
 }
 
@@ -581,7 +581,7 @@ void ResetBoardStateOnDeath(void)
         gCurrentPinballGame->whiscashStateTimer = 0;
         gCurrentPinballGame->rubyPondContentsChanging = TRUE;
         gCurrentPinballGame->rubyPondChangeTimer = 0x40;
-        gCurrentPinballGame->horizontalShakeOffset = 0;
+        gCurrentPinballGame->screenShakeX = 0;
 
     }
 

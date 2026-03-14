@@ -23,8 +23,8 @@ extern void DrawPikachuSpinner(void);
 extern void UpdateGauntletBossAnimation(void);
 extern void AnimateGauntletBossSprite(void);
 extern void UpdateGulpinBossState(void);
-extern void UpdateHatchTileAnimation(void);
-extern void DrawHatchTileSprites(void);
+extern void UpdateSideBumperAnimation(void);
+extern void DrawSideBumperSprites(void);
 extern void UpdateEvolutionShopSprite(void);
 extern void InitEggModeAnimation(void);
 extern void UpdateEggModeAnimation(void);
@@ -63,11 +63,11 @@ void RubyBoardProcess_3A_19A20(void)
 
     gCurrentPinballGame->catchCounterAnimState = 256;
     gCurrentPinballGame->catchCounterScaleY = 256;
-    gCurrentPinballGame->rubyPondBumperHitFlag = 2;
+    gCurrentPinballGame->rampPrizeType = 2;
     DrawRubyNuzleafPlatformSprite();
 
-    gCurrentPinballGame->hatchTileShakeOffset[0] = 3;
-    gCurrentPinballGame->hatchTileShakeOffset[1] = 3;
+    gCurrentPinballGame->sideBumperShakeOffset[0] = 3;
+    gCurrentPinballGame->sideBumperShakeOffset[1] = 3;
     DrawBoardEdgeBanner();
 }
 
@@ -223,13 +223,13 @@ void UpdateRubyBoardEntityRendering(void)
 
     ProcessBannerCameraTransition();
     SelectShopDoorState();
-    if (gCurrentPinballGame->rubyPondBumperTimer != 0)
+    if (gCurrentPinballGame->rampPrizeRespawnTimer != 0)
     {
-        gCurrentPinballGame->rubyPondBumperTimer--;
-        if (gCurrentPinballGame->rubyPondBumperTimer == 0)
+        gCurrentPinballGame->rampPrizeRespawnTimer--;
+        if (gCurrentPinballGame->rampPrizeRespawnTimer == 0)
         {
             randNum = Random();
-            gCurrentPinballGame->rubyPondBumperHitFlag = ((randNum + gMain.systemFrameCount) % 100) + 1;
+            gCurrentPinballGame->rampPrizeType = ((randNum + gMain.systemFrameCount) % 100) + 1;
         }
     }
 
@@ -270,7 +270,7 @@ void UpdateRubyBoardEntityRendering(void)
     }
     if (gCurrentPinballGame->cameraYViewport > 130)
     {
-        DrawHatchTileSprites();
+        DrawSideBumperSprites();
     }
     UpdateSpoinkAnimation();
     if (gCurrentPinballGame->cameraYViewport > 168)
@@ -305,7 +305,7 @@ void UpdateRubyBoardEntityLogic(void)
     RubyPond_EntityLogic();
     UpdateCatchModeAnimation();
     UpdatePikachuChargeCounter();
-    UpdateHatchTileAnimation();
+    UpdateSideBumperAnimation();
     if (gCurrentPinballGame->mainBoardCountdownTimer != 0)
     {
         gCurrentPinballGame->mainBoardCountdownTimer--;

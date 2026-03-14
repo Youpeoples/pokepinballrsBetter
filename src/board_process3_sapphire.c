@@ -256,7 +256,7 @@ void InitSapphireWailmerCatch(void)
         RequestBoardStateTransition(4);
 
     gCurrentPinballGame->modeAnimTimer = 100;
-    gCurrentPinballGame->sharpedoOamIndex = 2;
+    gCurrentPinballGame->catchHoleAnimFrame = 2;
     gCurrentPinballGame->cameraScrollOffset = 0;
     gCurrentPinballGame->cameraScrollTarget = 30;
     gCurrentPinballGame->cameraScrollEnabled = 0;
@@ -279,55 +279,55 @@ void UpdateSapphireWailmerCatchSequence(void)
         if (gCurrentPinballGame->modeAnimTimer > 97)
         {
             gCurrentPinballGame->boardEntityActive = 1;
-            gCurrentPinballGame->sharpedoOamIndex = 2;
+            gCurrentPinballGame->catchHoleAnimFrame = 2;
             gCurrentPinballGame->ball->positionQ0.x = 0xb5;
             gCurrentPinballGame->ball->positionQ0.y = 0xc3;
         }
         else if (gCurrentPinballGame->modeAnimTimer > 94)
         {
-            gCurrentPinballGame->sharpedoOamIndex = 3;
+            gCurrentPinballGame->catchHoleAnimFrame = 3;
             gCurrentPinballGame->ball->positionQ0.x = 0xb8;
             gCurrentPinballGame->ball->positionQ0.y = 0xbb;
         }
         else if (gCurrentPinballGame->modeAnimTimer > 91)
         {
             gCurrentPinballGame->ball->ballHidden = 1;
-            gCurrentPinballGame->sharpedoOamIndex = 4;
+            gCurrentPinballGame->catchHoleAnimFrame = 4;
         }
         else if (gCurrentPinballGame->modeAnimTimer > 83)
         {
-            gCurrentPinballGame->sharpedoOamIndex = 5;
+            gCurrentPinballGame->catchHoleAnimFrame = 5;
         }
         else if (gCurrentPinballGame->modeAnimTimer > 34)
         {
-            gCurrentPinballGame->sharpedoOamIndex = 6;
+            gCurrentPinballGame->catchHoleAnimFrame = 6;
 
         }
         else if (gCurrentPinballGame->modeAnimTimer > 26)
         {
-            gCurrentPinballGame->sharpedoOamIndex = 7;
+            gCurrentPinballGame->catchHoleAnimFrame = 7;
 
         }
         else if (gCurrentPinballGame->modeAnimTimer > 18)
         {
-            gCurrentPinballGame->sharpedoOamIndex = 8;
+            gCurrentPinballGame->catchHoleAnimFrame = 8;
 
         }
         else if (gCurrentPinballGame->modeAnimTimer > 10)
         {
-            gCurrentPinballGame->sharpedoOamIndex = 9;
+            gCurrentPinballGame->catchHoleAnimFrame = 9;
 
         }
         else if (gCurrentPinballGame->modeAnimTimer > 4)
         {
             gCurrentPinballGame->ball->ballHidden = 0;
-            gCurrentPinballGame->sharpedoOamIndex = 10;
+            gCurrentPinballGame->catchHoleAnimFrame = 10;
             gCurrentPinballGame->ball->positionQ0.x = 0xb5;
             gCurrentPinballGame->ball->positionQ0.y = 0xc3;
         }
         else
         {
-            gCurrentPinballGame->sharpedoOamIndex = 11;
+            gCurrentPinballGame->catchHoleAnimFrame = 11;
             gCurrentPinballGame->ball->positionQ0.x = 0xb0;
             gCurrentPinballGame->ball->positionQ0.y = 0xca;
         }
@@ -339,7 +339,7 @@ void UpdateSapphireWailmerCatchSequence(void)
     }
     else
     {
-        gCurrentPinballGame->sharpedoOamIndex = 0;
+        gCurrentPinballGame->catchHoleAnimFrame = 0;
         gCurrentPinballGame->ballFrozenState = 0;
         gCurrentPinballGame->collisionCooldownTimer = 60;
         gCurrentPinballGame->ball->spinSpeed = 0;

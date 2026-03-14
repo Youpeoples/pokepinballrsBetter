@@ -379,19 +379,19 @@ struct PinballGame
     /*0x29A*/ u16 catchEmModeStartCount;
     /*0x29C*/ u16 bgmFadeTimer;
     /*0x29E*/ u8 boardCollisionConfigChanged;
-    /*0x29F*/ s8 rubyPondBumperHitFlag;
-    /*0x2A0*/ u16 rubyPondBumperTimer;
+    /*0x29F*/ s8 rampPrizeType;
+    /*0x2A0*/ u16 rampPrizeRespawnTimer;
     /*0x2A2*/ s8 whiscashState;
     /*0x2A3*/ s8 whiscashInvulnerable;
     /*0x2A4*/ s8 shouldProcessWhiscash;
     /*0x2A5*/ s8 whiscashFrameIx;
     /*0x2A6*/ u16 whiscashStateTimer;
     /*0x2A8*/ u16 pondSwitchesSinceLastWhiscash;
-    /*0x2AA*/ u16 horizontalShakeOffset;
-    /*0x2AC*/ s16 bonusBoardYOffset;
+    /*0x2AA*/ u16 screenShakeX;
+    /*0x2AC*/ s16 screenShakeY;
     /*0x2AE*/ u8 filler2AE[0x2];
-    /*0x2B0*/ u16 gauntletBossFlashTimer;
-    /*0x2B2*/ s8 gauntletBossFlashActive;
+    /*0x2B0*/ u16 gauntletFlashTimer;
+    /*0x2B2*/ s8 gauntletFlashActive;
     /*0x2B3*/ u8 filler2B3[0x1];
     /*0x2B4*/ s16 gauntletProjectileX;
     /*0x2B6*/ s16 gauntletProjectileY;
@@ -401,14 +401,14 @@ struct PinballGame
     /*0x2BE*/ s8 gulpinCurrentLevel;
     /*0x2C0*/ u16 gulpinAnimFrameTimer;
     /*0x2C2*/ s8 gulpinAnimFrameIndex;
-    /*0x2C3*/ s8 travelSpriteFrame;
-    /*0x2C4*/ u16 pikaSaverAnimFrameTimer;
-    /*0x2C6*/ u16 modeSpriteTimer;
-    /*0x2C8*/ s16 modeSpriteX;
-    /*0x2CA*/ s16 modeSpriteY;
-    /*0x2CC*/ s16 modeSpriteVelX;
-    /*0x2CE*/ s16 modeSpriteVelY;
-    /*0x2D0*/ s8 eggAnimTravelState;
+    /*0x2C3*/ s8 pelipperDeliveryFrame;
+    /*0x2C4*/ u16 pelipperDeliveryTimer;
+    /*0x2C6*/ u16 eggDropTimer;
+    /*0x2C8*/ s16 eggDeliveryX;
+    /*0x2CA*/ s16 eggDeliveryY;
+    /*0x2CC*/ s16 eggDeliveryVelX;
+    /*0x2CE*/ s16 eggDeliveryVelY;
+    /*0x2D0*/ s8 eggDeliveryState;
     /*0x2D1*/ u8 filler2D1[3];
     /*0x2D4*/ u16 cyndaquilCaveSpriteX;
     /*0x2D6*/ u16 cyndaquilCaveSpriteY;
@@ -418,17 +418,17 @@ struct PinballGame
     /*0x2DB*/ u8 filler2DB[0x3];
     /*0x2DE*/ u16 eggCaveLiftTimer;
     /*0x2E0*/ u16 eggCaveExitDelayTimer;
-    /*0x2E2*/ s8 hatchTileHitFlag;
-    /*0x2E3*/ s8 hatchTileBounceCount[2];
-    /*0x2E5*/ s8 hatchTileAnimPhase[2];
+    /*0x2E2*/ s8 sideBumperHitFlag;
+    /*0x2E3*/ s8 sideBumperBounceCount[2];
+    /*0x2E5*/ s8 sideBumperAnimPhase[2];
     /*0x2E7*/ u8 filler2E7[0x1];
-    /*0x2E8*/ u16 hatchTileAnimTimer[2];
-    /*0x2EC*/ s16 hatchTileShakeOffset[2];
+    /*0x2E8*/ u16 sideBumperAnimTimer[2];
+    /*0x2EC*/ s16 sideBumperShakeOffset[2];
     /*0x2F0*/ u8 shopDoorTargetFrame;
     /*0x2F1*/ u8 shopDoorCurrentFrame;
     /*0x2F2*/ u16 shopDoorAnimDelay;
-    /*0x2F4*/ s8 sharpedoOamIndex; //Sharpedo/Wailmer Oam Ix
-    /*0x2F5*/ s8 sharpedoTileVariant; //Sharpedo tile variant Ix
+    /*0x2F4*/ s8 catchHoleAnimFrame; //Sharpedo/Wailmer Oam Ix
+    /*0x2F5*/ s8 catchHoleTileVariant; //Sharpedo tile variant Ix
     /*0x2F6*/ u16 catchHolePauseTimer;
     /*0x2F8*/ s8 ballPowerUpOverride;
     /*0x2F9*/ s8 nuzleafPositionIndex;

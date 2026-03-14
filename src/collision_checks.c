@@ -223,10 +223,10 @@ void CheckRubyPondBumperCollision(struct Vector16* arg0, u16* arg1, u8* arg2)
     {
         if ((*arg2 & 0xF) == 0)
         {
-            if (gCurrentPinballGame->hatchTileAnimPhase[0] > 0)
+            if (gCurrentPinballGame->sideBumperAnimPhase[0] > 0)
             {
                 s16 deltaY_alt;
-                deltaX = 2 * (-24 -gCurrentPinballGame->hatchTileShakeOffset[0]) + arg0->x;
+                deltaX = 2 * (-24 -gCurrentPinballGame->sideBumperShakeOffset[0]) + arg0->x;
                 deltaY_alt = arg0->y -580;
 
                 if (deltaX <= 71U && deltaY_alt <= 71U)
@@ -236,15 +236,15 @@ void CheckRubyPondBumperCollision(struct Vector16* arg0, u16* arg1, u8* arg2)
 
                     if (*arg2 & 1)
                     {
-                        gCurrentPinballGame->hatchTileHitFlag = 1;
+                        gCurrentPinballGame->sideBumperHitFlag = 1;
                         *arg2 = 6;
                     }
                 }
             }
 
-            if (gCurrentPinballGame->hatchTileAnimPhase[1] > 0)
+            if (gCurrentPinballGame->sideBumperAnimPhase[1] > 0)
             {
-                deltaX = ((gCurrentPinballGame->hatchTileShakeOffset[1] - 180) * 2) + arg0->x;
+                deltaX = ((gCurrentPinballGame->sideBumperShakeOffset[1] - 180) * 2) + arg0->x;
                 deltaY = arg0->y -580;
 
                 if (deltaX <= 71U && deltaY <= 71U)
@@ -254,7 +254,7 @@ void CheckRubyPondBumperCollision(struct Vector16* arg0, u16* arg1, u8* arg2)
 
                     if (*arg2 & 1)
                     {
-                        gCurrentPinballGame->hatchTileHitFlag = 2;
+                        gCurrentPinballGame->sideBumperHitFlag = 2;
                         *arg2 = 6;
                         return;
                     }
@@ -347,10 +347,10 @@ void ProcessRubyCollisionEvent(s32 arg0, s16* arg1, u16* arg2)
             {
                 gCurrentPinballGame->scoreAddedInFrame = 1000;
 
-                if (gCurrentPinballGame->gauntletBossFlashActive == 0)
+                if (gCurrentPinballGame->gauntletFlashActive == 0)
                 {
-                    gCurrentPinballGame->gauntletBossFlashActive = 1;
-                    gCurrentPinballGame->gauntletBossFlashTimer = 0;
+                    gCurrentPinballGame->gauntletFlashActive = 1;
+                    gCurrentPinballGame->gauntletFlashTimer = 0;
                 }
             }
             gCurrentPinballGame->mainBoardCountdownTimer = 45;
@@ -693,10 +693,10 @@ void ProcessRubyCollisionEvent(s32 arg0, s16* arg1, u16* arg2)
             if (gCurrentPinballGame->nuzleafAnimState == 5)
                 gCurrentPinballGame->nuzleafAnimState = 6;
 
-            if (gCurrentPinballGame->rubyPondBumperHitFlag == 0)
+            if (gCurrentPinballGame->rampPrizeType == 0)
                 return;
 
-            if (gCurrentPinballGame->rubyPondBumperHitFlag == 1)
+            if (gCurrentPinballGame->rampPrizeType == 1)
                 gCurrentPinballGame->oneUpAnimTimer = 90;
             else
             {
@@ -706,8 +706,8 @@ void ProcessRubyCollisionEvent(s32 arg0, s16* arg1, u16* arg2)
                 m4aSongNumStart(SE_UNKNOWN_0xD8);
             }
 
-            gCurrentPinballGame->rubyPondBumperHitFlag = 0;
-            gCurrentPinballGame->rubyPondBumperTimer = 600;
+            gCurrentPinballGame->rampPrizeType = 0;
+            gCurrentPinballGame->rampPrizeRespawnTimer = 600;
             return;
         }
 

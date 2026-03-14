@@ -4119,10 +4119,10 @@ gGauntletBossFlashFrameIndices:: @ 0x086ADA58
 gGulpinAnimData:: @ 0x086ADA6E
 	.incbin "baserom.gba", 0x6ADA6E, 0x442
 
-gHatchTileGfxFrameIndices:: @ 0x086ADEB0
+gSideBumperGfxFrameIndices:: @ 0x086ADEB0
 	.2byte 0x00
 
-gHatchTileAnimDurations:: @ 0x086ADEB2
+gSideBumperAnimDurations:: @ 0x086ADEB2
 	.incbin "baserom.gba", 0x6ADEB2, 0x2E
 
 gCatchOverlayAnimData:: @ 0x086ADEE0

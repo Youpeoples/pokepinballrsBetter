@@ -57,7 +57,7 @@ void MainBoardProcess_7B_12524(void)
     {
         SetMatrixScale(currentBallState->scale, currentBallState->scale, 0);
 
-        spriteGroup->baseX = -(gCurrentPinballGame->cameraBaseX + 7) + currentBallState->positionQ0.x - gCurrentPinballGame->horizontalShakeOffset;
+        spriteGroup->baseX = -(gCurrentPinballGame->cameraBaseX + 7) + currentBallState->positionQ0.x - gCurrentPinballGame->screenShakeX;
         spriteGroup->baseY = -(gCurrentPinballGame->cameraBaseY + 7) + currentBallState->positionQ0.y - gCurrentPinballGame->cameraScrollOffset - gCurrentPinballGame->cameraYAdjust + gCurrentPinballGame->sapphireSpriteTimer;
 
         currentBallState->screenPosition.x = spriteGroup->baseX;
@@ -99,7 +99,7 @@ void MainBoardProcess_7B_12524(void)
     {
         SetMatrixScale(currentBallState->scale, currentBallState->scale, 0);
 
-        spriteGroup->baseX = -(gCurrentPinballGame->cameraBaseX + 7) + currentBallState->positionQ0.x - gCurrentPinballGame->horizontalShakeOffset;
+        spriteGroup->baseX = -(gCurrentPinballGame->cameraBaseX + 7) + currentBallState->positionQ0.x - gCurrentPinballGame->screenShakeX;
         spriteGroup->baseY = -(gCurrentPinballGame->cameraBaseY + 7) + currentBallState->positionQ0.y - gCurrentPinballGame->cameraScrollOffset - gCurrentPinballGame->cameraYAdjust + gCurrentPinballGame->sapphireSpriteTimer;
 
         currentBallState->screenPosition.x = spriteGroup->baseX;
@@ -273,13 +273,13 @@ void BonusBoardProcess_7B_12BF8()
 
     spriteGroup->baseX = primaryBall->positionQ0.x
         - (gCurrentPinballGame->cameraBaseX + 7)
-        - gCurrentPinballGame->horizontalShakeOffset;
+        - gCurrentPinballGame->screenShakeX;
     spriteGroup->baseY = primaryBall->positionQ0.y
         - 7
         - gCurrentPinballGame->cameraBaseY
         - gCurrentPinballGame->cameraScrollOffset
         - gCurrentPinballGame->cameraYAdjust
-        - gCurrentPinballGame->bonusBoardYOffset
+        - gCurrentPinballGame->screenShakeY
         - (gCurrentPinballGame->bossRenderOffsetY / 10);
 
     if (spriteGroup->baseY < -60)

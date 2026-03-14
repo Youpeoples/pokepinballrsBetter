@@ -12,9 +12,9 @@ void AnimateEvolutionShopSequence(void);
 void InitCenterTrapMode(void);
 void AnimateCenterTrapSequence(void);
 void RequestBoardStateTransition(u8);
-void AnimateTravelModeSprite(void);
-void InitEvolutionModeSprites(void);
-void AnimateEvolutionModeSprite(void);
+void AnimatePelipperEggDelivery(void);
+void InitEggDropDelivery(void);
+void AnimateEggDropDelivery(void);
 
 
 void DispatchCatchModeInit(void)
@@ -121,25 +121,25 @@ void AnimateSharpedoCatchSequence(void)
                 }
                 //Presumed controling either the message board 'state'/'tile'
                 // or the sharpedo animation 'state'/tile.
-                gCurrentPinballGame->sharpedoOamIndex =6;
+                gCurrentPinballGame->catchHoleAnimFrame =6;
             }
             else if (gCurrentPinballGame->modeAnimTimer > 104)
             {
                 gCurrentPinballGame->ball->positionQ0.x = 197;
                 gCurrentPinballGame->ball->positionQ0.y = 219;
-                gCurrentPinballGame->sharpedoOamIndex = 7;
+                gCurrentPinballGame->catchHoleAnimFrame = 7;
             }
             else
             {
                 gCurrentPinballGame->ball->ballHidden = 1;
-                gCurrentPinballGame->sharpedoOamIndex = 8;
+                gCurrentPinballGame->catchHoleAnimFrame = 8;
             }
         }
         else if (gCurrentPinballGame->modeAnimTimer > 20)
         {
             if (gCurrentPinballGame->modeAnimTimer > 77)
             {
-                gCurrentPinballGame->sharpedoOamIndex = 9;
+                gCurrentPinballGame->catchHoleAnimFrame = 9;
 
                 if (gCurrentPinballGame->modeAnimTimer < 80)
                 {
@@ -152,30 +152,30 @@ void AnimateSharpedoCatchSequence(void)
             }
             else if (gCurrentPinballGame->modeAnimTimer > 72)
             {
-                gCurrentPinballGame->sharpedoOamIndex = 10;
+                gCurrentPinballGame->catchHoleAnimFrame = 10;
             }
             else if (gCurrentPinballGame->modeAnimTimer > 67)
             {
-                gCurrentPinballGame->sharpedoOamIndex = 11;
+                gCurrentPinballGame->catchHoleAnimFrame = 11;
             }
             else if (gCurrentPinballGame->modeAnimTimer > 44)
             {
-                gCurrentPinballGame->sharpedoOamIndex = 12;
+                gCurrentPinballGame->catchHoleAnimFrame = 12;
             }
             else if (gCurrentPinballGame->modeAnimTimer > 38)
             {
-                gCurrentPinballGame->sharpedoOamIndex = 13;
+                gCurrentPinballGame->catchHoleAnimFrame = 13;
             }
             else if (gCurrentPinballGame->modeAnimTimer > 28)
             {
-                gCurrentPinballGame->sharpedoOamIndex = 14;
+                gCurrentPinballGame->catchHoleAnimFrame = 14;
             }
             else if (gCurrentPinballGame->modeAnimTimer > 23)
             {
-                gCurrentPinballGame->sharpedoOamIndex = 15;
+                gCurrentPinballGame->catchHoleAnimFrame = 15;
             }
             else {
-                gCurrentPinballGame->sharpedoOamIndex = 16;
+                gCurrentPinballGame->catchHoleAnimFrame = 16;
             }
         }
         else if (gCurrentPinballGame->modeAnimTimer > 18)
@@ -183,7 +183,7 @@ void AnimateSharpedoCatchSequence(void)
             gCurrentPinballGame->ball->positionQ0.x = 193;
             gCurrentPinballGame->ball->positionQ0.y = 226;
             gCurrentPinballGame->ball->ballHidden = 0;
-            gCurrentPinballGame->sharpedoOamIndex = 17;
+            gCurrentPinballGame->catchHoleAnimFrame = 17;
         }
         else if (gCurrentPinballGame->modeAnimTimer > 16)
         {
@@ -196,7 +196,7 @@ void AnimateSharpedoCatchSequence(void)
             gCurrentPinballGame->ball->velocity.y = 220;
             gCurrentPinballGame->ball->positionQ0.x = 190;
             gCurrentPinballGame->ball->positionQ0.y = 232;
-            gCurrentPinballGame->sharpedoOamIndex = 18;
+            gCurrentPinballGame->catchHoleAnimFrame = 18;
             if (gCurrentPinballGame->modeAnimTimer == 18)
             {
                 m4aSongNumStart(194);
@@ -206,21 +206,21 @@ void AnimateSharpedoCatchSequence(void)
         else if (gCurrentPinballGame->modeAnimTimer > 12)
         {
             gCurrentPinballGame->ball->spinSpeed = 0;
-            gCurrentPinballGame->sharpedoOamIndex = 19;
+            gCurrentPinballGame->catchHoleAnimFrame = 19;
         }
         else if (gCurrentPinballGame->modeAnimTimer > 8)
         {
             gCurrentPinballGame->ball->spinSpeed = 0;
-            gCurrentPinballGame->sharpedoOamIndex = 20;
+            gCurrentPinballGame->catchHoleAnimFrame = 20;
         }
         else if (gCurrentPinballGame->modeAnimTimer > 4)
         {
             gCurrentPinballGame->ball->spinSpeed = 0;
-            gCurrentPinballGame->sharpedoOamIndex = 21;
+            gCurrentPinballGame->catchHoleAnimFrame = 21;
         }
         else
         {
-            gCurrentPinballGame->sharpedoOamIndex = 22;
+            gCurrentPinballGame->catchHoleAnimFrame = 22;
         }
         gCurrentPinballGame->ball->positionQ1.x = gCurrentPinballGame->ball->positionQ0.x * 2;
         gCurrentPinballGame->ball->positionQ1.y = gCurrentPinballGame->ball->positionQ0.y * 2;
@@ -237,7 +237,7 @@ void AnimateSharpedoCatchSequence(void)
         gCurrentPinballGame->ball->positionQ1.y = gCurrentPinballGame->ball->positionQ0.y * 2;
         gCurrentPinballGame->ballCatchState = 0;
         gCurrentPinballGame->ballUpgradeTimerFrozen = 0;
-        gCurrentPinballGame->sharpedoOamIndex = 0;
+        gCurrentPinballGame->catchHoleAnimFrame = 0;
     }
 }
 
@@ -252,7 +252,7 @@ void InitEggHatchMode(void)
         PlayRumble(7);
         gCurrentPinballGame->modeAnimTimer = 500;
     }
-    else if (gCurrentPinballGame->eggAnimTravelState !=0)
+    else if (gCurrentPinballGame->eggDeliveryState !=0)
     {
         gCurrentPinballGame->modeAnimTimer = 300;
     }
@@ -282,7 +282,7 @@ void AnimateEggHatchSequence(void)
         gCurrentPinballGame->ball->positionQ1.x = gCurrentPinballGame->ball->positionQ0.x * 2;
         gCurrentPinballGame->ball->positionQ1.y = gCurrentPinballGame->ball->positionQ0.y * 2;
 
-        if (gCurrentPinballGame->eggAnimTravelState != 1)
+        if (gCurrentPinballGame->eggDeliveryState != 1)
             return;
         if (gCurrentPinballGame->modeAnimTimer > 0xC8)
             return;
@@ -294,17 +294,17 @@ void AnimateEggHatchSequence(void)
             else
             {
                 if (gCurrentPinballGame->scoreHi != 0 && gCurrentPinballGame->rubyPondState == RUBY_POND_STATE_LOTAD)
-                    InitTravelModeSprites();
+                    InitPelipperEggDelivery();
                 else
-                    InitEvolutionModeSprites();
+                    InitEggDropDelivery();
             }
         }
         else
         {
             if (gCurrentPinballGame->scoreHi != 0 && gCurrentPinballGame->rubyPondState == RUBY_POND_STATE_LOTAD)
-                AnimateTravelModeSprite();
+                AnimatePelipperEggDelivery();
             else
-                AnimateEvolutionModeSprite();
+                AnimateEggDropDelivery();
         }
         if (gCurrentPinballGame->modeAnimTimer <= 9)
             gCurrentPinballGame->modeAnimTimer++;
@@ -321,7 +321,7 @@ void AnimateEggHatchSequence(void)
         gCurrentPinballGame->ball->positionQ1.y = gCurrentPinballGame->ball->positionQ0.y * 2;
         gCurrentPinballGame->ballUpgradeTimerFrozen = 0;
 
-        if (gCurrentPinballGame->eggAnimTravelState == 2)
+        if (gCurrentPinballGame->eggDeliveryState == 2)
         {
             gCurrentPinballGame->eggCaveState = 3;
             gCurrentPinballGame->eggCaveLiftTimer = 0x30;

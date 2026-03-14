@@ -1205,8 +1205,8 @@ void AnimateWailmerEntity(void)
 
     index = (gCurrentPinballGame->globalAnimFrameCounter % 32) / 16;
     group = &gMain.spriteGroups[75];
-    if (gCurrentPinballGame->sharpedoOamIndex)
-        index = gCurrentPinballGame->sharpedoOamIndex;
+    if (gCurrentPinballGame->catchHoleAnimFrame)
+        index = gCurrentPinballGame->catchHoleAnimFrame;
 
     var0 = gWailmerAnimFrameMap[index][0];
     index = gWailmerAnimFrameMap[index][1];

@@ -747,12 +747,12 @@ void UpdateGroudonEntityLogic(void)
     {
         gCurrentPinballGame->impactShakeTimer--;
         if (gCurrentPinballGame->impactShakeTimer < 20)
-            gCurrentPinballGame->bonusBoardYOffset = gScreenShakeOscillationValues[gCurrentPinballGame->impactShakeTimer % 12] * 2;
+            gCurrentPinballGame->screenShakeY = gScreenShakeOscillationValues[gCurrentPinballGame->impactShakeTimer % 12] * 2;
         else
-            gCurrentPinballGame->bonusBoardYOffset = gScreenShakeOscillationValues[gCurrentPinballGame->impactShakeTimer % 12] * 4;
+            gCurrentPinballGame->screenShakeY = gScreenShakeOscillationValues[gCurrentPinballGame->impactShakeTimer % 12] * 4;
 
         if (gCurrentPinballGame->impactShakeTimer == 0)
-            gCurrentPinballGame->bonusBoardYOffset = 0;
+            gCurrentPinballGame->screenShakeY = 0;
 
         if (gCurrentPinballGame->impactShakeTimer == 8)
         {
@@ -787,15 +787,15 @@ void UpdateGroudonEntityLogic(void)
         gCurrentPinballGame->footstepShakeTimer--;
         if (gCurrentPinballGame->footstepShakePattern < 6)
         {
-            gCurrentPinballGame->bonusBoardYOffset = gGroudonFootstepShakePatterns[gCurrentPinballGame->footstepShakePattern][30 - gCurrentPinballGame->footstepShakeTimer % 31];
+            gCurrentPinballGame->screenShakeY = gGroudonFootstepShakePatterns[gCurrentPinballGame->footstepShakePattern][30 - gCurrentPinballGame->footstepShakeTimer % 31];
         }
         else
         {
-            gCurrentPinballGame->bonusBoardYOffset = gGroudonCryShakePattern[69 - gCurrentPinballGame->footstepShakeTimer % 70];
+            gCurrentPinballGame->screenShakeY = gGroudonCryShakePattern[69 - gCurrentPinballGame->footstepShakeTimer % 70];
         }
 
         if (gCurrentPinballGame->footstepShakeTimer == 0)
-            gCurrentPinballGame->bonusBoardYOffset = 0;
+            gCurrentPinballGame->screenShakeY = 0;
     }
 
     if (gCurrentPinballGame->bossRoarTimer)
