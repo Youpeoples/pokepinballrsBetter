@@ -803,7 +803,7 @@ void UpdateGroudonEntityLogic(void)
         gCurrentPinballGame->bossRoarTimer--;
         if (gCurrentPinballGame->bossRoarTimer == 20)
         {
-            PlayCry_Normal(gSpeciesInfo[SPECIES_GROUDON].mainSeriesIndexNumber, 0);
+            PlayCry_Normal(gSpeciesInfo[SPECIES_GROUDON].speciesIdRS, 0);
             gCurrentPinballGame->footstepShakeTimer = 70;
             gCurrentPinballGame->footstepShakePattern = 6;
         }

@@ -670,7 +670,7 @@ void RunEvolutionCutscene(void)
             if (var0 == 32)
             {
                 gCurrentPinballGame->bgmFadeTimer = 140;
-                PlayCry_Normal(gSpeciesInfo[gCurrentPinballGame->currentSpecies].mainSeriesIndexNumber, 0);
+                PlayCry_Normal(gSpeciesInfo[gCurrentPinballGame->currentSpecies].speciesIdRS, 0);
             }
 
             if (var0 == 64)

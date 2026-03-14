@@ -205,7 +205,7 @@ void UpdateCatchEmMode(void)
         gCurrentPinballGame->jirachiCollisionEnabled = 1;
         gCurrentPinballGame->boardSubState++;
         gCurrentPinballGame->bgmFadeTimer = 140;
-        PlayCry_Normal(gSpeciesInfo[gCurrentPinballGame->currentSpecies].mainSeriesIndexNumber, 0);
+        PlayCry_Normal(gSpeciesInfo[gCurrentPinballGame->currentSpecies].speciesIdRS, 0);
         gCurrentPinballGame->stageTimer = 0;
         return;
     case 9:

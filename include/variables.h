@@ -295,7 +295,7 @@ extern s8 gPokedexShowPopupWindow;
  *  3= transfer complete?
  *  4= delete save data confirmation
  * ****/
-extern s8 Pokedex_PopupTypeIx;
+extern s8 gPokedexPopupTypeIndex;
 extern s8 gPokedex_EraseSaveDataAccessCounter;
 extern s8 gPokedex_EraseSaveDataAccessStep;
 extern s8 gPokedexDescriptionPage;

@@ -467,7 +467,7 @@ gPokedexPageIndicatorTimer: @ 0x0202BEF4
 	.space 0x4
 gEReaderExitTargetState: @ 0x0202BEF8
 	.space 0x4
-Pokedex_PopupTypeIx: @ 0x0202BEFC
+gPokedexPopupTypeIndex: @ 0x0202BEFC
 	.space 0x4
 gPokedexAnimatedIconTimer: @ 0x0202BF00
 	.space 0x4

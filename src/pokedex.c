@@ -192,7 +192,7 @@ void InitPokedexState(void)
     }
 
     gPokedexShowPopupWindow = 0;
-    Pokedex_PopupTypeIx = POKEDEX_POPUP_TRANSMISSION_CONNECT_PROMPT;
+    gPokedexPopupTypeIndex = POKEDEX_POPUP_TRANSMISSION_CONNECT_PROMPT;
     gPokedexLinkStateTimer = 0;
     gPokedex_EraseSaveDataAccessCounter = 0;
     gPokedex_EraseSaveDataAccessStep = 0;
@@ -340,7 +340,7 @@ void Pokedex_HandleListInput(void)
         {
             m4aSongNumStart(SE_MENU_POPUP_OPEN);
             gPokedexShowPopupWindow = 1;
-            Pokedex_PopupTypeIx = POKEDEX_POPUP_TRANSMISSION_CONNECT_PROMPT;
+            gPokedexPopupTypeIndex = POKEDEX_POPUP_TRANSMISSION_CONNECT_PROMPT;
             gPokedexShowButtonPrompt = 0;
             gPokedexShowAnimSprite = 0;
             gMain.subState = POKEDEX_STATE_LINK_SETUP;
@@ -399,7 +399,7 @@ void Pokedex_InfoWindowSlideIn(void)
         DmaCopy16(3, gPokedexInfoWindowTiles, (void *)0x6000280, 2*0xE0);
         PrintDexDescription(gPokedexSelectedMon, gPokedexDescriptionPage);
         m4aMPlayVolumeControl(&gMPlayInfo_BGM, TRACKS_ALL, 0x40);
-        PlayCry_NormalNoDucking(gSpeciesInfo[gPokedexSelectedMon].mainSeriesIndexNumber, 0, 127, 10);
+        PlayCry_NormalNoDucking(gSpeciesInfo[gPokedexSelectedMon].speciesIdRS, 0, 127, 10);
         gMain.subState = POKEDEX_STATE_5;
     }
 
@@ -590,7 +590,7 @@ void Pokedex_LinkTransferLoop(void)
     {
         m4aSongNumStart(SE_MENU_CANCEL);
         gPokedexShowPopupWindow = 0;
-        Pokedex_PopupTypeIx = POKEDEX_POPUP_TRANSMISSION_CONNECT_PROMPT;
+        gPokedexPopupTypeIndex = POKEDEX_POPUP_TRANSMISSION_CONNECT_PROMPT;
         gPokedexShowButtonPrompt = 1;
         gPokedexShowAnimSprite = 1;
         ResetSerialAndInterrupts();
@@ -616,7 +616,7 @@ void Pokedex_LinkTransferLoop(void)
                 }
                 else if (var0 == 1)
                 {
-                    Pokedex_PopupTypeIx = POKEDEX_POPUP_TRANSMISSION_ERROR;
+                    gPokedexPopupTypeIndex = POKEDEX_POPUP_TRANSMISSION_ERROR;
                     gMain.subState = POKEDEX_STATE_8;
                     m4aSongNumStart(SE_FAILURE);
                 }
@@ -629,7 +629,7 @@ void Pokedex_LinkTransferLoop(void)
                 gLinkTimeoutCounter++;
                 if (0xB4 < gLinkTimeoutCounter)
                 {
-                    Pokedex_PopupTypeIx = POKEDEX_POPUP_TRANSMISSION_ERROR;
+                    gPokedexPopupTypeIndex = POKEDEX_POPUP_TRANSMISSION_ERROR;
                     gMain.subState = POKEDEX_STATE_8;
                     m4aSongNumStart(SE_FAILURE);
                 }
@@ -659,7 +659,7 @@ void Pokedex_LinkErrorTimeout(void)
     {
         gPokedexLinkStateTimer = 0;
         gPokedexShowPopupWindow = 0;
-        Pokedex_PopupTypeIx = POKEDEX_POPUP_TRANSMISSION_CONNECT_PROMPT;
+        gPokedexPopupTypeIndex = POKEDEX_POPUP_TRANSMISSION_CONNECT_PROMPT;
         gPokedexShowButtonPrompt = 1;
         gPokedexShowAnimSprite = 1;
 
@@ -690,13 +690,13 @@ void Pokedex_LinkSuccessSequence(void)
             DisableSerial();
             break;
         case 0x82:
-            Pokedex_PopupTypeIx = POKEDEX_POPUP_TRANSMISSION_COMPLETE;
+            gPokedexPopupTypeIndex = POKEDEX_POPUP_TRANSMISSION_COMPLETE;
             m4aSongNumStart(SE_MENU_SELECT);
             break;
         case 0xFA:
             gPokedexLinkStateTimer = 0;
             gPokedexShowPopupWindow = 0;
-            Pokedex_PopupTypeIx = POKEDEX_POPUP_TRANSMISSION_CONNECT_PROMPT;
+            gPokedexPopupTypeIndex = POKEDEX_POPUP_TRANSMISSION_CONNECT_PROMPT;
             gPokedexShowButtonPrompt = 1;
             gPokedexShowAnimSprite = 1;
             for(index = 0; index < 0xE1; index++)
@@ -737,7 +737,7 @@ void Pokedex_DeleteConfirmation(void)
         }
 
         gPokedexShowPopupWindow = 0;
-        Pokedex_PopupTypeIx = POKEDEX_POPUP_TRANSMISSION_CONNECT_PROMPT;
+        gPokedexPopupTypeIndex = POKEDEX_POPUP_TRANSMISSION_CONNECT_PROMPT;
         gPokedexShowButtonPrompt = 1;
         gPokedexShowAnimSprite = 1;
 
@@ -751,7 +751,7 @@ void Pokedex_DeleteConfirmation(void)
     {
         m4aSongNumStart(SE_MENU_CANCEL);
         gPokedexShowPopupWindow = 0;
-        Pokedex_PopupTypeIx = POKEDEX_POPUP_TRANSMISSION_CONNECT_PROMPT;
+        gPokedexPopupTypeIndex = POKEDEX_POPUP_TRANSMISSION_CONNECT_PROMPT;
         gPokedexShowButtonPrompt = 1;
         gPokedexShowAnimSprite = 1;
         gMain.subState = POKEDEX_STATE_HANDLE_LIST_INPUT;
@@ -900,7 +900,7 @@ void Pokedex_CheckDeleteKeyComboPressed(void)
             gPokedex_EraseSaveDataAccessCounter = 0;
             m4aSongNumStart(SE_MENU_POPUP_OPEN);
             gPokedexShowPopupWindow = 1;
-            Pokedex_PopupTypeIx = POKEDEX_POPUP_DELETE_CONFIRMATION_PROMPT;
+            gPokedexPopupTypeIndex = POKEDEX_POPUP_DELETE_CONFIRMATION_PROMPT;
             gPokedexShowButtonPrompt = 0;
             gPokedexShowAnimSprite = 0;
             gMain.subState = POKEDEX_STATE_DELETE_CONFIRMATION;
@@ -1010,7 +1010,7 @@ void RenderPokedexSprites(void)
     group3 = &gMain_spriteGroups[3];
     group4 = &gMain_spriteGroups[4];
     group5 = &gMain_spriteGroups[5 + gPokedexAnimatedIconFrame];
-    group6 = &gMain_spriteGroups[17 + Pokedex_PopupTypeIx];
+    group6 = &gMain_spriteGroups[17 + gPokedexPopupTypeIndex];
     group7 = &gMain_spriteGroups[22 + gPokedexButtonPromptFrame];
     group8 = &gMain_spriteGroups[24];
     group9 = &gMain_spriteGroups[25 + gPokedexSpriteIndexBase * 2 + gPokedexPageIndicatorBlink];
@@ -1136,8 +1136,8 @@ void RenderPokedexSprites(void)
 
     if (group6->available == 1)
     {
-        if (Pokedex_PopupTypeIx == POKEDEX_POPUP_TRANSMISSION_CONNECT_PROMPT ||
-            Pokedex_PopupTypeIx == POKEDEX_POPUP_DELETE_CONFIRMATION_PROMPT)
+        if (gPokedexPopupTypeIndex == POKEDEX_POPUP_TRANSMISSION_CONNECT_PROMPT ||
+            gPokedexPopupTypeIndex == POKEDEX_POPUP_DELETE_CONFIRMATION_PROMPT)
         {
             group6->baseX = 120;
             group6->baseY = 100;
@@ -1148,7 +1148,7 @@ void RenderPokedexSprites(void)
             group6->baseY = 80;
         }
 
-        spriteSet = gPokedexSpriteSets[17 + Pokedex_PopupTypeIx];
+        spriteSet = gPokedexSpriteSets[17 + gPokedexPopupTypeIndex];
         for (i = 0; i < spriteSet->count; i++)
         {
             groupOam = &group6->oam[i];
@@ -1226,7 +1226,7 @@ static void RenderLinkGraphics(void)
     group3 = &gMain_spriteGroups[3];
     group4 = &gMain_spriteGroups[4];
     group6 = &gMain_spriteGroups[5 + gPokedexAnimatedIconFrame];
-    group7 = &gMain_spriteGroups[17 + Pokedex_PopupTypeIx];
+    group7 = &gMain_spriteGroups[17 + gPokedexPopupTypeIndex];
     group5 = &gMain_spriteGroups[24];
 
     group0->available = TRUE;
@@ -1309,8 +1309,8 @@ static void RenderLinkGraphics(void)
 
     if (group7->available == 1)
     {
-        if (Pokedex_PopupTypeIx == POKEDEX_POPUP_TRANSMISSION_CONNECT_PROMPT ||
-            Pokedex_PopupTypeIx == POKEDEX_POPUP_DELETE_CONFIRMATION_PROMPT)
+        if (gPokedexPopupTypeIndex == POKEDEX_POPUP_TRANSMISSION_CONNECT_PROMPT ||
+            gPokedexPopupTypeIndex == POKEDEX_POPUP_DELETE_CONFIRMATION_PROMPT)
         {
             group7->baseX = 120;
             group7->baseY = 100;
@@ -1321,7 +1321,7 @@ static void RenderLinkGraphics(void)
             group7->baseY = 80;
         }
 
-        spriteSet = gPokedexSpriteSets[17 + Pokedex_PopupTypeIx];
+        spriteSet = gPokedexSpriteSets[17 + gPokedexPopupTypeIndex];
         for (i = 0; i < spriteSet->count; i++)
         {
             groupOam = &group7->oam[i];
@@ -1550,7 +1550,7 @@ int MasterReceivePokedexFlags(void)
                 if (gLinkRecvBuffer[0][0] == 0xECEC && gLinkRecvBuffer[0][1] == 0xECEC)
                 {
                     gPokedexLinkTransferPhase = -1;
-                    Pokedex_PopupTypeIx = POKEDEX_POPUP_TRANSMITTING_ACTIVE;
+                    gPokedexPopupTypeIndex = POKEDEX_POPUP_TRANSMITTING_ACTIVE;
                     gPokedexLinkSendCounter = 1;
                 }
                 else if (++gPokedexHandshakeRetryCount > 10)
@@ -1639,7 +1639,7 @@ static int ClientReceivePokedexFlags(void)
                 if (gLinkRecvBuffer[0][0] == 0xECEC && gLinkRecvBuffer[0][1] == 0xECEC)
                 {
                     gPokedexLinkTransferPhase = -1;
-                    Pokedex_PopupTypeIx = POKEDEX_POPUP_TRANSMITTING_ACTIVE;
+                    gPokedexPopupTypeIndex = POKEDEX_POPUP_TRANSMITTING_ACTIVE;
                     gPokedexLinkSendCounter = 1;
                 }
                 else if (++gPokedexHandshakeRetryCount > 10)

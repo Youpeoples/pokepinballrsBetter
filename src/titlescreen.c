@@ -201,7 +201,7 @@ void TitleScreen1_WaitForStartButton(void)
     RenderTitlePressStartSprites();
 }
 
-void TitleScreen2_8010CF0(void)
+void TitleScreen2_AnimOpenMenu(void)
 {
     if (JOY_HELD(RESTART_GAME_BUTTONS) == RESTART_GAME_BUTTONS)
     {
@@ -231,7 +231,7 @@ void TitleScreen2_8010CF0(void)
     RenderTitlePressStartSprites();
 }
 
-void TitleScreen9_8010D84(void)
+void TitleScreen9_DeleteSaveConfirmation(void)
 {
     if (JOY_HELD(RESTART_GAME_BUTTONS) == RESTART_GAME_BUTTONS)
     {

@@ -3779,10 +3779,10 @@ gBounceBackForceMagnitudes:: @ 0x086ACDF4
 @ suspected as board level collision detection logic; one per board; 
 @ similar contents for boards decompiled.
 BoardCollisionFuncts_086ACE0C:: @ 0x086ACE0C
-	.4byte COLLISION_CHECK_RUBY_14E08, COLLISION_CHECK_SAPPHIRE_16090;
-	.4byte COLLISION_CHECK_DUSCLOPS_171C8, COLLISION_CHECK_KECLEON_176B0;
-	.4byte COLLISION_CHECK_KYOGRE_17F28, COLLISION_CHECK_GROUDON_18324;
-	.4byte COLLISION_CHECK_RAYQUAZA_187F4, COLLISION_CHECK_SPHEAL_18B50;
+	.4byte CollisionCheck_Ruby, CollisionCheck_Sapphire;
+	.4byte CollisionCheck_Dusclops, CollisionCheck_Kecleon;
+	.4byte CollisionCheck_Kyogre, CollisionCheck_Groudon;
+	.4byte CollisionCheck_Rayquaza, CollisionCheck_Spheal;
 
 gFlipperLaunchVelocityParams:: @ 0x086ACE2C
 	.incbin "baserom.gba", 0x6ACE2C, 0x34

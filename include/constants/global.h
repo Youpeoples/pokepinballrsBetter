@@ -7,7 +7,7 @@
 #define STATE_GAME_IDLE             3
 #define STATE_OPTIONS               4
 #define STATE_POKEDEX               5
-#define STATE_UNKNOWN6              6
+#define STATE_SAVE_ERASE              6
 #define STATE_EREADER               7
 #define STATE_SCORES_MAIN           8
 #define STATE_SCORES_IDLE           9

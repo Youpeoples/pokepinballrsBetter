@@ -688,7 +688,7 @@ void UpdateRayquazaEntityLogic(void)
     {
         gCurrentPinballGame->bossRoarTimer--;
         if (gCurrentPinballGame->bossRoarTimer == 20)
-            PlayCry_Normal(gSpeciesInfo[SPECIES_RAYQUAZA].mainSeriesIndexNumber, 0);
+            PlayCry_Normal(gSpeciesInfo[SPECIES_RAYQUAZA].speciesIdRS, 0);
 
         if (gCurrentPinballGame->bossRoarTimer == 0)
             m4aMPlayVolumeControl(&gMPlayInfo_BGM, TRACKS_ALL, 0x100);

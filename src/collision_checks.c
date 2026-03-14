@@ -13,7 +13,7 @@ extern struct SongHeader se_unk_99;
 extern u16 gSapphireTargetBumperIndexMap[];
 
 
-s16 COLLISION_CHECK_RUBY_14E08(struct Vector16 *arg0, u16* arg1) {
+s16 CollisionCheck_Ruby(struct Vector16 *arg0, u16* arg1) {
     struct Vector16 vec1;
     struct Vector16 vec2;
     u16 sp00;
@@ -843,7 +843,7 @@ void ProcessRubyCollisionEvent(s32 arg0, s16* arg1, u16* arg2)
 }
 
 
-s16 COLLISION_CHECK_SAPPHIRE_16090(struct Vector16 *arg0, u16* arg1) {
+s16 CollisionCheck_Sapphire(struct Vector16 *arg0, u16* arg1) {
     struct Vector16 vec1;
     struct Vector16 vec2;
     u16 sp00;
@@ -1482,7 +1482,7 @@ void ProcessSapphireCollisionEvent(u8 arg0, u16* arg1, u16* arg2)
     }
 }
 
-s16 COLLISION_CHECK_DUSCLOPS_171C8(struct Vector16* arg0, u16* arg1) {
+s16 CollisionCheck_Dusclops(struct Vector16* arg0, u16* arg1) {
     struct Vector16 vec1;
     struct Vector16 vec2;
     u16 sp00;
@@ -1706,7 +1706,7 @@ void CheckDusclopsAbsorbZoneHit(u8 arg0, u16 *arg1, u16 *arg2)
     }
 }
 
-s16 COLLISION_CHECK_KECLEON_176B0(struct Vector16 *arg0, u16 *arg1)
+s16 CollisionCheck_Kecleon(struct Vector16 *arg0, u16 *arg1)
 {
     struct Vector16 vec1;
     struct Vector16 vec2;
@@ -2117,7 +2117,7 @@ void CheckKecleonProjectileCollision(struct Vector16 *arg0)
     }
 }
 
-s16 COLLISION_CHECK_KYOGRE_17F28(struct Vector16 *arg0, u16 *arg1)
+s16 CollisionCheck_Kyogre(struct Vector16 *arg0, u16 *arg1)
 {
     struct Vector16 vec1;
     struct Vector16 vec2;
@@ -2313,7 +2313,7 @@ void ProcessKyogreCollisionEvent(u8 arg0, u16 *arg1, u16 *arg2)
     }
 }
 
-s16 COLLISION_CHECK_GROUDON_18324(struct Vector16 *arg0, u16 *arg1)
+s16 CollisionCheck_Groudon(struct Vector16 *arg0, u16 *arg1)
 {
     struct Vector16 vec1;
     struct Vector16 vec2;
@@ -2515,7 +2515,7 @@ void ProcessGroudonCollisionEvent(u8 arg0, u16 *arg1, u16 *arg2)
 }
 
 //One known callsite is 080145D2 during the rayquaza bonus stage
-s16 COLLISION_CHECK_RAYQUAZA_187F4(struct Vector16 *arg0, u16 *arg1)
+s16 CollisionCheck_Rayquaza(struct Vector16 *arg0, u16 *arg1)
 {
     struct Vector16 vec1;
     struct Vector16 vec2;
@@ -2665,7 +2665,7 @@ void ProcessRayquazaCollisionEvent(u8 arg0, u16 *arg1, u16 *arg2)
     }
 }
 
-s16 COLLISION_CHECK_SPHEAL_18B50(struct Vector16 *arg0, u16 *arg1)
+s16 CollisionCheck_Spheal(struct Vector16 *arg0, u16 *arg1)
 {
     u16 sp0;
     u8 sp2;

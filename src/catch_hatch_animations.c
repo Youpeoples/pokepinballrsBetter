@@ -1792,7 +1792,7 @@ void UpdateEggMode(void)
                 if (gCurrentPinballGame->creatureWaypointIndex == 10)
                 {
                     gCurrentPinballGame->bgmFadeTimer = 140;
-                    PlayCry_Normal(gSpeciesInfo[gCurrentPinballGame->currentSpecies].mainSeriesIndexNumber, 0);
+                    PlayCry_Normal(gSpeciesInfo[gCurrentPinballGame->currentSpecies].speciesIdRS, 0);
                 }
 
                 if (gCurrentPinballGame->creatureWaypointIndex == 12)
