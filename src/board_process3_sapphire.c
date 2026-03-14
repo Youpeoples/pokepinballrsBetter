@@ -10,8 +10,8 @@ extern void HandleSapphireFlipperButtonInput(void);
 void SapphireBoardProcess_3A_326F4(void)
 {
     gCurrentPinballGame->catchModeArrows = 2;
-    gCurrentPinballGame->pikachuSpinDirection = 0;
-    gCurrentPinballGame->pikachuSpinEnabled = 1;
+    gCurrentPinballGame->pikachuSpinFrame = 0;
+    gCurrentPinballGame->pikachuSpinPrevFrame = 1;
 
     UpdatePikachuChargeCounter();
     AnimateCatchCounterDisplay();
@@ -25,7 +25,7 @@ void SapphireBoardProcess_3A_326F4(void)
     InitSapphireEggCaveState();
     UpdateSapphireEggCaveAnimation();
     UpdateSapphireTrapDoorAnimation();
-    DrawSapphirePelipperSprite();
+    DrawSapphireShopSignSprite();
     UpdatePelliperPondEntity();
     DrawBoardEdgeBanner();
 }
@@ -81,7 +81,7 @@ void UpdateSapphireBoardEntityRendering(void)
     if (gCurrentPinballGame->cameraYViewport < 0x96)
     {
         UpdatePelliperPondEntity();
-        DrawSapphirePelipperSprite();
+        DrawSapphireShopSignSprite();
     }
     if (gCurrentPinballGame->cameraYViewport < 0xC4)
     {
@@ -367,7 +367,7 @@ void HandleSapphireFlipperButtonInput(void)
 
     if (gCurrentPinballGame->newButtonActions[0])
     {
-        if (gCurrentPinballGame->catchCounterBlinkState == 0 && gCurrentPinballGame->outLanePikaPosition != 2 &&
+        if (gCurrentPinballGame->pikaKickbackTimer == 0 && gCurrentPinballGame->outLanePikaPosition != 2 &&
             gCurrentPinballGame->pikaSaverTimer == 0 && gCurrentPinballGame->entityOverlayCollisionState == 0)
         {
             gCurrentPinballGame->outLanePikaPosition = 0;
@@ -387,7 +387,7 @@ void HandleSapphireFlipperButtonInput(void)
 
     if (gCurrentPinballGame->newButtonActions[1])
     {
-        if (gCurrentPinballGame->catchCounterBlinkState == 0 && gCurrentPinballGame->outLanePikaPosition != 2 &&
+        if (gCurrentPinballGame->pikaKickbackTimer == 0 && gCurrentPinballGame->outLanePikaPosition != 2 &&
             gCurrentPinballGame->pikaSaverTimer == 0 && gCurrentPinballGame->entityOverlayCollisionState == 0)
         {
             gCurrentPinballGame->outLanePikaPosition = 1;

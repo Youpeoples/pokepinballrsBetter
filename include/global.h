@@ -146,7 +146,7 @@ struct PinballGame
     /*0x01E*/ u8 gravityStrengthIndex;
     /*0x01F*/ u8 ballFrozenState;
     /*0x020*/ u8 ballInLaunchChute;
-    /*0x021*/ u8 tiltInputDirection;
+    /*0x021*/ u8 launcherCharging;
     /*0x022*/ s8 collisionResponseType;
     /*0x023*/ u8 collisionSurfaceType; // Holds the value of some enum state
     /*0x024*/ s8 boardLayerDepth;
@@ -231,10 +231,10 @@ struct PinballGame
     /*0x114*/ s32 ballSaverBallPosY;
     /*0x118*/ s8 tiltShakeAmplitude[4];
     /*0x11C*/ s8 tiltShakeVelocity[4];
-    /*0x120*/ s8 tiltShakeDecay;
-    /*0x121*/ s8 tiltEnabled;
-    /*0x122*/ s8 tiltCooldownTimer;
-    /*0x123*/ s8 tiltWarningCount;
+    /*0x120*/ s8 tiltXOffset;
+    /*0x121*/ s8 tiltYOffset;
+    /*0x122*/ s8 tiltTargetXOffset;
+    /*0x123*/ s8 tiltTargetYOffset;
     /*0x124*/ s8 tiltInputCounterX;
     /*0x125*/ s8 tiltInputCounterY;
     /*0x126*/ s8 tiltLockoutTimer;
@@ -281,8 +281,8 @@ struct PinballGame
     /*0x1A9*/ u8 shopBgAnimFrame;
     /*0x1AA*/ s8 shopPikaSaverMaxed;
     /*0x1AB*/ s8 shopDoorOpenLevel;
-    /*0x1AC*/ s8 trapDoorFrame;
-    /*0x1AD*/ s8 trapDoorPaletteVariant;
+    /*0x1AC*/ s8 shopSignFrame;
+    /*0x1AD*/ s8 shopSignPaletteIndex;
     /*0x1AE*/ u8 shopOutcomeRepeatCount;
     /*0x1AF*/ u8 shopBonusStageAlreadyBought;
     /*0x1B0*/ s8 evoNameSlideOnly;
@@ -298,7 +298,7 @@ struct PinballGame
     /*0x1C0*/ u16 pikaSaverTimer;
     /*0x1C2*/ s8 outLaneSide;
     /*0x1C3*/ u8 filler1C3[0x1];
-    /*0x1C4*/ u16 catchCounterBlinkState;
+    /*0x1C4*/ u16 pikaKickbackTimer;
     /*0x1C6*/ s16 pikaChargeTarget;
     /*0x1C8*/ s16 pikaChargeProgress;
     /*0x1CA*/ s16 catchCounterValue;
@@ -315,8 +315,8 @@ struct PinballGame
     /*0x1E0*/ u16 catchAnimDuration;
     /*0x1E2*/ s8 outLanePikaPosition; //Pikachu coverage. 0= left lane, 1=right lane, 2 = both
     /*0x1E3*/ s8 catchHoleOccupied[2];
-    /*0x1E5*/ s8 pikachuSpinDirection;
-    /*0x1E6*/ s8 pikachuSpinEnabled;
+    /*0x1E5*/ s8 pikachuSpinFrame;
+    /*0x1E6*/ s8 pikachuSpinPrevFrame;
     /*0x1E7*/ u8 filler1E7[0x1];
     /*0x1E8*/ s16 eggBasePosX;
     /*0x1EA*/ s16 eggBasePosY;

@@ -1078,7 +1078,7 @@ void RestoreGameState(u16 arg0)
         if (arg0 == 1 && gMain.selectedField < MAIN_FIELD_COUNT)
         {
             gCurrentPinballGame->cameraYViewport = gCurrentPinballGame->cameraBaseY +
-                                         gCurrentPinballGame->tiltEnabled +
+                                         gCurrentPinballGame->tiltYOffset +
                                          gCurrentPinballGame->cameraScrollOffset +
                                          gCurrentPinballGame->cameraYAdjust;
         }
@@ -1377,8 +1377,8 @@ void RestoreMainFieldDynamicGraphics(void)
         DmaCopy16(3, gMonIconTilesGfx + ((var0 =gCurrentPinballGame->monIconTileIndex[i]) * 0x180), 0x06010480 + (i * 0x180), 0x180);
     }
 
-    var0 = gCurrentPinballGame->pikachuSpinDirection;
-    DmaCopy16(3, gMainBoardPikaSpinner_Gfx[var0 = gCurrentPinballGame->pikachuSpinDirection], 0x06010780, 0x120);
+    var0 = gCurrentPinballGame->pikachuSpinFrame;
+    DmaCopy16(3, gMainBoardPikaSpinner_Gfx[var0 = gCurrentPinballGame->pikachuSpinFrame], 0x06010780, 0x120);
     var0 = gCurrentPinballGame->catchCounterValue;
     DmaCopy16(3, gCatchCounterDigitTilesGfx[var0], 0x06010AE0, 0x80);
 

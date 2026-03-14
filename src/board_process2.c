@@ -156,8 +156,8 @@ void MainBoardProcess_2B_4D960(void)
     }
 
     ProcessTiltInput();
-    gMain.bgOffsets[3].xOffset = gCurrentPinballGame->cameraBaseX + gCurrentPinballGame->tiltShakeDecay + gCurrentPinballGame->horizontalShakeOffset;
-    gCurrentPinballGame->scrollEffectY = gCurrentPinballGame->cameraBaseY + gCurrentPinballGame->tiltEnabled + gCurrentPinballGame->cameraScrollOffset + gCurrentPinballGame->cameraYAdjust;
+    gMain.bgOffsets[3].xOffset = gCurrentPinballGame->cameraBaseX + gCurrentPinballGame->tiltXOffset + gCurrentPinballGame->horizontalShakeOffset;
+    gCurrentPinballGame->scrollEffectY = gCurrentPinballGame->cameraBaseY + gCurrentPinballGame->tiltYOffset + gCurrentPinballGame->cameraScrollOffset + gCurrentPinballGame->cameraYAdjust;
     var3 = gMain.bgOffsets[3].yOffset - gCurrentPinballGame->scrollEffectY;
     if (var3 > 8)
         var3 = 8;
@@ -171,10 +171,10 @@ void MainBoardProcess_2B_4D960(void)
     gMain.bgOffsets[2].yOffset = gMain.bgOffsets[3].yOffset;
     gMain.bgOffsets[1].xOffset = gMain.bgOffsets[3].xOffset;
     gMain.bgOffsets[1].yOffset = gMain.bgOffsets[3].yOffset;
-    gCurrentPinballGame->cameraXOffset = gCurrentPinballGame->cameraBaseX + gCurrentPinballGame->tiltShakeDecay + gCurrentPinballGame->horizontalShakeOffset;
-    gCurrentPinballGame->cameraYOffset = gCurrentPinballGame->cameraBaseY + gCurrentPinballGame->tiltEnabled + gCurrentPinballGame->cameraScrollOffset + gCurrentPinballGame->cameraYAdjust;
+    gCurrentPinballGame->cameraXOffset = gCurrentPinballGame->cameraBaseX + gCurrentPinballGame->tiltXOffset + gCurrentPinballGame->horizontalShakeOffset;
+    gCurrentPinballGame->cameraYOffset = gCurrentPinballGame->cameraBaseY + gCurrentPinballGame->tiltYOffset + gCurrentPinballGame->cameraScrollOffset + gCurrentPinballGame->cameraYAdjust;
     gCurrentPinballGame->hudSpriteBaseY = gCurrentPinballGame->cameraYViewport;
-    gCurrentPinballGame->cameraYViewport = gCurrentPinballGame->cameraBaseY + gCurrentPinballGame->tiltEnabled + gCurrentPinballGame->cameraScrollOffset + gCurrentPinballGame->cameraYAdjust;
+    gCurrentPinballGame->cameraYViewport = gCurrentPinballGame->cameraBaseY + gCurrentPinballGame->tiltYOffset + gCurrentPinballGame->cameraScrollOffset + gCurrentPinballGame->cameraYAdjust;
 }
 
 void BonusBoardProcess_2B_4DBFC(void)
@@ -236,8 +236,8 @@ void BonusBoardProcess_2B_4DBFC(void)
     }
 
     ProcessTiltInput();
-    gMain.bgOffsets[2].xOffset = gCurrentPinballGame->cameraBaseX + gCurrentPinballGame->tiltShakeDecay + 8 + gCurrentPinballGame->horizontalShakeOffset;
-    gCurrentPinballGame->scrollEffectY = gCurrentPinballGame->cameraBaseY + gCurrentPinballGame->tiltEnabled + gCurrentPinballGame->cameraScrollOffset + gCurrentPinballGame->cameraYAdjust + gCurrentPinballGame->bonusBoardYOffset;
+    gMain.bgOffsets[2].xOffset = gCurrentPinballGame->cameraBaseX + gCurrentPinballGame->tiltXOffset + 8 + gCurrentPinballGame->horizontalShakeOffset;
+    gCurrentPinballGame->scrollEffectY = gCurrentPinballGame->cameraBaseY + gCurrentPinballGame->tiltYOffset + gCurrentPinballGame->cameraScrollOffset + gCurrentPinballGame->cameraYAdjust + gCurrentPinballGame->bonusBoardYOffset;
     var3 = gCurrentPinballGame->scrollEffectX - gCurrentPinballGame->scrollEffectY;
     if (var3 > 8)
         var3 = 8;
@@ -282,9 +282,9 @@ void BonusBoardProcess_2B_4DBFC(void)
         break;
     }
 
-    gCurrentPinballGame->cameraXOffset = gCurrentPinballGame->cameraBaseX + gCurrentPinballGame->tiltShakeDecay + gCurrentPinballGame->horizontalShakeOffset;
-    gCurrentPinballGame->cameraYOffset = gCurrentPinballGame->cameraBaseY + gCurrentPinballGame->tiltEnabled + gCurrentPinballGame->cameraScrollOffset + gCurrentPinballGame->cameraYAdjust + gCurrentPinballGame->bonusBoardYOffset;
-    gCurrentPinballGame->cameraYViewport = gCurrentPinballGame->cameraBaseY + gCurrentPinballGame->tiltEnabled + gCurrentPinballGame->cameraScrollOffset + gCurrentPinballGame->cameraYAdjust;
+    gCurrentPinballGame->cameraXOffset = gCurrentPinballGame->cameraBaseX + gCurrentPinballGame->tiltXOffset + gCurrentPinballGame->horizontalShakeOffset;
+    gCurrentPinballGame->cameraYOffset = gCurrentPinballGame->cameraBaseY + gCurrentPinballGame->tiltYOffset + gCurrentPinballGame->cameraScrollOffset + gCurrentPinballGame->cameraYAdjust + gCurrentPinballGame->bonusBoardYOffset;
+    gCurrentPinballGame->cameraYViewport = gCurrentPinballGame->cameraBaseY + gCurrentPinballGame->tiltYOffset + gCurrentPinballGame->cameraScrollOffset + gCurrentPinballGame->cameraYAdjust;
 }
 
 void ProcessTiltInput(void)
@@ -376,41 +376,41 @@ void ProcessTiltInput(void)
             sp0[i] = gCurrentPinballGame->tiltShakeVelocity[i] * (6 - gCurrentPinballGame->tiltShakeAmplitude[i]);
     }
 
-    gCurrentPinballGame->tiltShakeDecay = sp0[0] + sp0[1];
-    gCurrentPinballGame->tiltEnabled = sp0[2] + sp0[3];
+    gCurrentPinballGame->tiltXOffset = sp0[0] + sp0[1];
+    gCurrentPinballGame->tiltYOffset = sp0[2] + sp0[3];
 
-    if (gCurrentPinballGame->tiltShakeDecay == 0 && gCurrentPinballGame->tiltEnabled == 0)
+    if (gCurrentPinballGame->tiltXOffset == 0 && gCurrentPinballGame->tiltYOffset == 0)
     {
         gCurrentPinballGame->tiltLockoutTimer = 0;
         gCurrentPinballGame->tiltLockoutActive = 0;
     }
 
-    if (gCurrentPinballGame->tiltShakeDecay > 0)
+    if (gCurrentPinballGame->tiltXOffset > 0)
     {
-        if (gCurrentPinballGame->tiltShakeDecay < gCurrentPinballGame->tiltCooldownTimer)
-            gCurrentPinballGame->tiltCooldownTimer--;
+        if (gCurrentPinballGame->tiltXOffset < gCurrentPinballGame->tiltTargetXOffset)
+            gCurrentPinballGame->tiltTargetXOffset--;
     }
-    else if (gCurrentPinballGame->tiltShakeDecay < 0)
+    else if (gCurrentPinballGame->tiltXOffset < 0)
     {
-        if (gCurrentPinballGame->tiltShakeDecay > gCurrentPinballGame->tiltCooldownTimer)
-            gCurrentPinballGame->tiltCooldownTimer++;
+        if (gCurrentPinballGame->tiltXOffset > gCurrentPinballGame->tiltTargetXOffset)
+            gCurrentPinballGame->tiltTargetXOffset++;
     }
 
-    if (gCurrentPinballGame->tiltEnabled > 0)
+    if (gCurrentPinballGame->tiltYOffset > 0)
     {
-        if (gCurrentPinballGame->tiltEnabled < gCurrentPinballGame->tiltWarningCount)
-            gCurrentPinballGame->tiltWarningCount--;
+        if (gCurrentPinballGame->tiltYOffset < gCurrentPinballGame->tiltTargetYOffset)
+            gCurrentPinballGame->tiltTargetYOffset--;
     }
-    else if (gCurrentPinballGame->tiltEnabled < 0)
+    else if (gCurrentPinballGame->tiltYOffset < 0)
     {
-        if (gCurrentPinballGame->tiltEnabled > gCurrentPinballGame->tiltWarningCount)
-            gCurrentPinballGame->tiltWarningCount++;
+        if (gCurrentPinballGame->tiltYOffset > gCurrentPinballGame->tiltTargetYOffset)
+            gCurrentPinballGame->tiltTargetYOffset++;
     }
 
     if (gCurrentPinballGame->tiltLockoutTimer == 0)
     {
-        gCurrentPinballGame->tiltCooldownTimer = gCurrentPinballGame->tiltShakeDecay;
-        gCurrentPinballGame->tiltWarningCount = gCurrentPinballGame->tiltEnabled;
+        gCurrentPinballGame->tiltTargetXOffset = gCurrentPinballGame->tiltXOffset;
+        gCurrentPinballGame->tiltTargetYOffset = gCurrentPinballGame->tiltYOffset;
     }
 }
 
@@ -420,11 +420,11 @@ void ProcessMainBoardBallDrain(void)
 
     if (gCurrentPinballGame->boardState && gCurrentPinballGame->newButtonActions[1] && gCurrentPinballGame->ballInLaunchChute)
     {
-        gCurrentPinballGame->tiltInputDirection = 1;
+        gCurrentPinballGame->launcherCharging = 1;
         gCurrentPinballGame->sapphirePondFlag = 1;
     }
 
-    if (gCurrentPinballGame->tiltInputDirection && gCurrentPinballGame->releasedButtonActions[1])
+    if (gCurrentPinballGame->launcherCharging && gCurrentPinballGame->releasedButtonActions[1])
     {
         gCurrentPinballGame->sapphirePondFlag = 3;
         if (gCurrentPinballGame->ballInLaunchChute)
@@ -435,7 +435,7 @@ void ProcessMainBoardBallDrain(void)
             m4aSongNumStart(SE_UNKNOWN_0xCD);
         }
 
-        gCurrentPinballGame->tiltInputDirection = 0;
+        gCurrentPinballGame->launcherCharging = 0;
     }
 
     gCurrentPinballGame->ball = &gCurrentPinballGame->ballStates[0];

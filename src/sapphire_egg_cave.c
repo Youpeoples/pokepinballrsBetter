@@ -9,9 +9,9 @@ extern const u8 gSapphireStageBasket_Gfx[][0x280];
 extern const u8 gSapphireBoardSeedot_Gfx[][0x180];
 extern const u16 gSeedotBaseXPositions[];
 extern const u16 gSapphireBoardSeedotSpritesheetOam[6][6][2][3];
-extern const u16 gTrapDoorTransitionFrames[][14];
-extern const u16 gTrapDoorIntroFrames[][4];
-extern const u16 gTrapDoorLoopFrames[][5];
+extern const u16 gShopSignTransitionFrames[][14];
+extern const u16 gShopSignIntroFrames[][4];
+extern const u16 gShopSignLoopFrames[][5];
 
 
 void InitSapphireEggCaveState(void)
@@ -441,9 +441,9 @@ void UpdateSapphireTrapDoorAnimation(void)
             if (gCurrentPinballGame->shopAnimTimer < 96)
             {
                 if (gCurrentPinballGame->shopAnimTimer < 8)
-                    gCurrentPinballGame->trapDoorFrame = gTrapDoorIntroFrames[1][gCurrentPinballGame->shopAnimTimer / 2];
+                    gCurrentPinballGame->shopSignFrame = gShopSignIntroFrames[1][gCurrentPinballGame->shopAnimTimer / 2];
                 else
-                    gCurrentPinballGame->trapDoorFrame = gTrapDoorLoopFrames[1][(gCurrentPinballGame->shopAnimTimer % 32) / 8];
+                    gCurrentPinballGame->shopSignFrame = gShopSignLoopFrames[1][(gCurrentPinballGame->shopAnimTimer % 32) / 8];
 
                 gCurrentPinballGame->shopAnimTimer++;
             }
@@ -452,16 +452,16 @@ void UpdateSapphireTrapDoorAnimation(void)
                 gCurrentPinballGame->shopAnimTimer = 0;
             }
 
-            gCurrentPinballGame->trapDoorPaletteVariant = 2;
+            gCurrentPinballGame->shopSignPaletteIndex = 2;
         }
         else
         {
             if (gCurrentPinballGame->shopAnimTimer < 120)
             {
                 if (gCurrentPinballGame->shopAnimTimer < 8)
-                    gCurrentPinballGame->trapDoorFrame = gTrapDoorIntroFrames[0][gCurrentPinballGame->shopAnimTimer / 2];
+                    gCurrentPinballGame->shopSignFrame = gShopSignIntroFrames[0][gCurrentPinballGame->shopAnimTimer / 2];
                 else
-                    gCurrentPinballGame->trapDoorFrame = gTrapDoorLoopFrames[0][(gCurrentPinballGame->shopAnimTimer % 40) / 8];
+                    gCurrentPinballGame->shopSignFrame = gShopSignLoopFrames[0][(gCurrentPinballGame->shopAnimTimer % 40) / 8];
 
                 gCurrentPinballGame->shopAnimTimer++;
             }
@@ -470,7 +470,7 @@ void UpdateSapphireTrapDoorAnimation(void)
                 gCurrentPinballGame->shopAnimTimer = 0;
             }
 
-            gCurrentPinballGame->trapDoorPaletteVariant = 0;
+            gCurrentPinballGame->shopSignPaletteIndex = 0;
         }
 
         if (gCurrentPinballGame->evoArrowProgress > 2)
@@ -494,26 +494,26 @@ void UpdateSapphireTrapDoorAnimation(void)
     }
     else
     {
-        gCurrentPinballGame->trapDoorFrame = gTrapDoorTransitionFrames[gCurrentPinballGame->evolutionShopActive][gCurrentPinballGame->shopAnimTimer / 3];
-        if (gCurrentPinballGame->trapDoorFrame >= 4 && gCurrentPinballGame->trapDoorFrame < 6)
+        gCurrentPinballGame->shopSignFrame = gShopSignTransitionFrames[gCurrentPinballGame->evolutionShopActive][gCurrentPinballGame->shopAnimTimer / 3];
+        if (gCurrentPinballGame->shopSignFrame >= 4 && gCurrentPinballGame->shopSignFrame < 6)
         {
-            gCurrentPinballGame->trapDoorPaletteVariant = 1;
+            gCurrentPinballGame->shopSignPaletteIndex = 1;
         }
         else
         {
             if (gCurrentPinballGame->evolutionShopActive == 1)
             {
                 if (gCurrentPinballGame->shopAnimTimer < 15)
-                    gCurrentPinballGame->trapDoorPaletteVariant = 0;
+                    gCurrentPinballGame->shopSignPaletteIndex = 0;
                 else
-                    gCurrentPinballGame->trapDoorPaletteVariant = 2;
+                    gCurrentPinballGame->shopSignPaletteIndex = 2;
             }
             else
             {
                 if (gCurrentPinballGame->shopAnimTimer < 15)
-                    gCurrentPinballGame->trapDoorPaletteVariant = 2;
+                    gCurrentPinballGame->shopSignPaletteIndex = 2;
                 else
-                    gCurrentPinballGame->trapDoorPaletteVariant = 0;
+                    gCurrentPinballGame->shopSignPaletteIndex = 0;
             }
         }
 

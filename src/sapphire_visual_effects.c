@@ -12,10 +12,10 @@ extern const s16 gSplashEffectTileIndices[][2];
 extern const u8 gHoleIndicatorTileGfx[][0x440];
 extern struct Vector16 gSplashEffectPositions[];
 extern const u8 gRubyStageCyndaquil_Gfx[][0x280];
-extern const u8 gSapphirePelipperPalettes[][0x20];
-extern const u8 gSapphirePelipperTileGfx[][0x480];
+extern const u8 gSapphireShopSignPalettes[][0x20];
+extern const u8 gSapphireShopSignTileGfx[][0x480];
 
-void DrawSapphirePelipperSprite(void)
+void DrawSapphireShopSignSprite(void)
 {
     s16 i;
     struct SpriteGroup *group;
@@ -27,9 +27,9 @@ void DrawSapphirePelipperSprite(void)
     {
         group->baseX = 16 - gCurrentPinballGame->cameraXOffset;
         group->baseY = 115 - gCurrentPinballGame->cameraYOffset;
-        index = gCurrentPinballGame->trapDoorPaletteVariant + gCurrentPinballGame->activePaletteIndex * 3;
-        DmaCopy16(3, gSapphirePelipperPalettes[index], (void *)0x05000300, 0x20);
-        DmaCopy16(3, gSapphirePelipperTileGfx[gCurrentPinballGame->trapDoorFrame], (void *) 0x06014B20, 0x480);
+        index = gCurrentPinballGame->shopSignPaletteIndex + gCurrentPinballGame->activePaletteIndex * 3;
+        DmaCopy16(3, gSapphireShopSignPalettes[index], (void *)0x05000300, 0x20);
+        DmaCopy16(3, gSapphireShopSignTileGfx[gCurrentPinballGame->shopSignFrame], (void *) 0x06014B20, 0x480);
         for (i = 0; i < 2; i++)
         {
             oamSimple = &group->oam[i];

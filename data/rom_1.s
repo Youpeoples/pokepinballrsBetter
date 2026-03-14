@@ -652,13 +652,13 @@ gPelliperFlyAnimTable:: @ 0x08137CBC
 gBumperMosaicValues:: @ 0x08137CD6
 	.incbin "baserom.gba", 0x137CD6, 0xC
 
-gTrapDoorLoopFrames:: @ 0x08137CE2
+gShopSignLoopFrames:: @ 0x08137CE2
 	.incbin "baserom.gba", 0x137CE2, 0x14
 
-gTrapDoorIntroFrames:: @ 0x08137CF6
+gShopSignIntroFrames:: @ 0x08137CF6
 	.incbin "baserom.gba", 0x137CF6, 0x10
 
-gTrapDoorTransitionFrames:: @ 0x08137D06
+gShopSignTransitionFrames:: @ 0x08137D06
 	.incbin "baserom.gba", 0x137D06, 0x3A
 
 gDusclopsBossAnimFrames:: @ 0x08137D40
@@ -844,7 +844,7 @@ gUnknown_081BA984:: @ 0x081BA984
 gUnknown_081BB984:: @ 0x081BB984
 	.incbin "baserom.gba", 0x1BB984, 0x1000
 
-gSapphirePelipperPalettes:: @ 0x081BC984
+gSapphireShopSignPalettes:: @ 0x081BC984
 	.incbin "baserom.gba", 0x1BC984, 0x120
 
 gRubyBoardBonusGfx:: @ 0x081BCAA4
@@ -1378,7 +1378,7 @@ gShopDigitTilesGfx:: @ 0x0847FF0C
 gDecimalDigitTilesGfx:: @ 0x08480E0C
 	.incbin "baserom.gba", 0x480E0C, 0x280
 
-gSapphirePelipperTileGfx:: @ 0x0848108C
+gSapphireShopSignTileGfx:: @ 0x0848108C
 	.incbin "baserom.gba", 0x48108C, 0x2D00
 
 gRubyTravelPelliper_Gfx:: @ 0x08483D8C

@@ -1310,7 +1310,7 @@ void UpdatePikachuChargeCounter(void)
         if (gCurrentPinballGame->pikaSpinPeriod < 5)
             gCurrentPinballGame->pikaSpinPeriod = 5;
 
-        gCurrentPinballGame->pikachuSpinDirection = (gCurrentPinballGame->pikaSpinFrameCounter * 16) / gCurrentPinballGame->pikaSpinPeriod;
+        gCurrentPinballGame->pikachuSpinFrame = (gCurrentPinballGame->pikaSpinFrameCounter * 16) / gCurrentPinballGame->pikaSpinPeriod;
     }
     else
     {
@@ -1341,15 +1341,15 @@ void UpdatePikachuChargeCounter(void)
             if (gCurrentPinballGame->pikaSpinPeriod < 5)
                 gCurrentPinballGame->pikaSpinPeriod = 5;
 
-            gCurrentPinballGame->pikachuSpinDirection = (gCurrentPinballGame->pikaSpinFrameCounter * 16) / gCurrentPinballGame->pikaSpinPeriod;
+            gCurrentPinballGame->pikachuSpinFrame = (gCurrentPinballGame->pikaSpinFrameCounter * 16) / gCurrentPinballGame->pikaSpinPeriod;
         }
         else
         {
-            if (gCurrentPinballGame->pikachuSpinDirection > 0)
+            if (gCurrentPinballGame->pikachuSpinFrame > 0)
             {
                 gCurrentPinballGame->pikaSpinFrameCounter++;
                 gCurrentPinballGame->pikaSpinFrameCounter %= 40;
-                gCurrentPinballGame->pikachuSpinDirection = (gCurrentPinballGame->pikaSpinFrameCounter * 16) / 40;
+                gCurrentPinballGame->pikachuSpinFrame = (gCurrentPinballGame->pikaSpinFrameCounter * 16) / 40;
             }
         }
     }
@@ -1362,7 +1362,7 @@ void DrawPikachuSpinner(void)
     struct OamDataSimple *oamSimple;
     s16 index;
 
-    index = gCurrentPinballGame->pikachuSpinDirection;
+    index = gCurrentPinballGame->pikachuSpinFrame;
     group = gMain.fieldSpriteGroups[31];
     group->baseX = 206 - gCurrentPinballGame->cameraXOffset;
     if (gMain.selectedField == FIELD_RUBY)
@@ -1370,9 +1370,9 @@ void DrawPikachuSpinner(void)
     else
         group->baseY = 154 - gCurrentPinballGame->cameraYOffset;
 
-    if (gCurrentPinballGame->pikachuSpinDirection != gCurrentPinballGame->pikachuSpinEnabled)
+    if (gCurrentPinballGame->pikachuSpinFrame != gCurrentPinballGame->pikachuSpinPrevFrame)
     {
-        gCurrentPinballGame->pikachuSpinEnabled = gCurrentPinballGame->pikachuSpinDirection;
+        gCurrentPinballGame->pikachuSpinPrevFrame = gCurrentPinballGame->pikachuSpinFrame;
         DmaCopy16(3, gMainBoardPikaSpinner_Gfx[index], (void *)0x06010780, 0x120);
     }
 
@@ -1896,9 +1896,9 @@ void UpdateCatchModeLogic(void)
         gCurrentPinballGame->catchHoleOccupied[1 - gCurrentPinballGame->outLanePikaPosition] = 0;
     }
 
-    if (gCurrentPinballGame->catchCounterBlinkState != 0)
+    if (gCurrentPinballGame->pikaKickbackTimer != 0)
     {
-        if (gCurrentPinballGame->catchCounterBlinkState == 120)
+        if (gCurrentPinballGame->pikaKickbackTimer == 120)
         {
             // gCurrentPinballGame->outLaneSide + gCurrentPinballGame->outLanePikaPosition
             // Note: this can be && chained off of the previous if, once we have this line deciphered.
@@ -1937,7 +1937,7 @@ void UpdateCatchModeLogic(void)
                 }
                 else
                 {
-                    gCurrentPinballGame->catchCounterBlinkState = 60;
+                    gCurrentPinballGame->pikaKickbackTimer = 60;
                     MPlayStart(&gMPlayInfo_SE1, &se_unk_142);
                 }
 
@@ -1957,7 +1957,7 @@ void UpdateCatchModeLogic(void)
         else
             gCurrentPinballGame->monIconTileIndex[gCurrentPinballGame->outLaneSide - 1] = 2;
 
-        gCurrentPinballGame->catchCounterBlinkState--;
+        gCurrentPinballGame->pikaKickbackTimer--;
     }
 
     if (gCurrentPinballGame->entityOverlayCollisionState != 0)

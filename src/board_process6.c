@@ -143,7 +143,7 @@ void AllBoardProcess_6B_1333C()
             var0.y += gBoardConfig.fieldLayout.flipperOriginY * 2;
             break;
         default:
-            if (gCurrentPinballGame->tiltCooldownTimer > 0)
+            if (gCurrentPinballGame->tiltTargetXOffset > 0)
             {
                 if (gCurrentPinballGame->tiltLockoutActive != 1)
                 {
@@ -151,7 +151,7 @@ void AllBoardProcess_6B_1333C()
                     gCurrentPinballGame->tiltLockoutActive = 1;
                 }
             }
-            else if (gCurrentPinballGame->tiltCooldownTimer < 0)
+            else if (gCurrentPinballGame->tiltTargetXOffset < 0)
             {
                 if (gCurrentPinballGame->tiltLockoutActive != -1)
                 {
@@ -186,12 +186,12 @@ u16 DetectBallCollision(struct Vector16* param)
     gCurrentPinballGame->tiltInputCounterX = 0;
     gCurrentPinballGame->tiltInputCounterY = 0;
 
-    if (!gCurrentPinballGame->collisionResponseType && (gCurrentPinballGame->tiltCooldownTimer || gCurrentPinballGame->tiltWarningCount))
+    if (!gCurrentPinballGame->collisionResponseType && (gCurrentPinballGame->tiltTargetXOffset || gCurrentPinballGame->tiltTargetYOffset))
     {
         param->x = gCurrentPinballGame->ball->positionQ1.x;
         param->y = gCurrentPinballGame->ball->positionQ1.y;
-        test.x = gCurrentPinballGame->tiltCooldownTimer;
-        test.y = gCurrentPinballGame->tiltWarningCount;
+        test.x = gCurrentPinballGame->tiltTargetXOffset;
+        test.y = gCurrentPinballGame->tiltTargetYOffset;
         retVal = PixelWalkCollisionDetection(param, test);
         gCurrentPinballGame->tiltInputCounterX = param->x - gCurrentPinballGame->ball->positionQ1.x;
         gCurrentPinballGame->tiltInputCounterY = param->y - gCurrentPinballGame->ball->positionQ1.y;
@@ -205,10 +205,10 @@ void ApplyTiltEffectOnCollision(struct Vector16 *arg0, struct Vector16 *arg1, u1
 
     arg1->x = 0;
     arg1->y = 0;
-    if (gCurrentPinballGame->tiltCooldownTimer)
+    if (gCurrentPinballGame->tiltTargetXOffset)
     {
         arg0->x -= gCurrentPinballGame->tiltInputCounterX;
-        if (gCurrentPinballGame->tiltCooldownTimer > 0)
+        if (gCurrentPinballGame->tiltTargetXOffset > 0)
         {
             cos = Cos(angle);
             if (cos < 0)
@@ -217,7 +217,7 @@ void ApplyTiltEffectOnCollision(struct Vector16 *arg0, struct Vector16 *arg1, u1
                 gCurrentPinballGame->tiltLockoutTimer = 1;
             }
         }
-        else if (gCurrentPinballGame->tiltCooldownTimer < 0)
+        else if (gCurrentPinballGame->tiltTargetXOffset < 0)
         {
             cos = Cos(angle);
             if (cos > 0)
@@ -228,19 +228,19 @@ void ApplyTiltEffectOnCollision(struct Vector16 *arg0, struct Vector16 *arg1, u1
         }
     }
 
-    if (gCurrentPinballGame->tiltWarningCount > 0)
+    if (gCurrentPinballGame->tiltTargetYOffset > 0)
     {
         arg0->y -= gCurrentPinballGame->tiltInputCounterY;
         if (gCurrentPinballGame->ball->positionQ0.y > 364)
         {
-            if (gCurrentPinballGame->tiltCooldownTimer == 0)
+            if (gCurrentPinballGame->tiltTargetXOffset == 0)
                 arg1->y = -(Sin(angle) * 130) / 20000;
             else
                 arg1->y = -(Sin(angle) * 100) / 20000;
         }
         else
         {
-            if (gCurrentPinballGame->tiltCooldownTimer == 0)
+            if (gCurrentPinballGame->tiltTargetXOffset == 0)
                 arg1->y = -(Sin(angle) * 100) / 20000;
             else
                 arg1->y = -(Sin(angle) * 75) / 20000;
@@ -256,8 +256,8 @@ void ApplyTiltEffectOnCollision(struct Vector16 *arg0, struct Vector16 *arg1, u1
 
     if (gCurrentPinballGame->tiltLockoutTimer)
     {
-        gCurrentPinballGame->tiltCooldownTimer = 0;
-        gCurrentPinballGame->tiltWarningCount = 0;
+        gCurrentPinballGame->tiltTargetXOffset = 0;
+        gCurrentPinballGame->tiltTargetYOffset = 0;
     }
 }
 

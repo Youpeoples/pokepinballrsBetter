@@ -711,7 +711,7 @@ void ProcessRubyCollisionEvent(s32 arg0, s16* arg1, u16* arg2)
             return;
         }
 
-        if (gCurrentPinballGame->catchCounterBlinkState != 0)
+        if (gCurrentPinballGame->pikaKickbackTimer != 0)
             return;
 
         if (gCurrentPinballGame->ball->positionQ0.x <= 120)
@@ -724,11 +724,11 @@ void ProcessRubyCollisionEvent(s32 arg0, s16* arg1, u16* arg2)
             if (gCurrentPinballGame->outLanePikaPosition != gCurrentPinballGame->outLaneSide - 1)
                 return;
             else
-                gCurrentPinballGame->catchCounterBlinkState = 120;
+                gCurrentPinballGame->pikaKickbackTimer = 120;
             return;
         }
 
-        gCurrentPinballGame->catchCounterBlinkState = 120;
+        gCurrentPinballGame->pikaKickbackTimer = 120;
         return;
 
     case 11:
@@ -1379,7 +1379,7 @@ void ProcessSapphireCollisionEvent(u8 arg0, u16* arg1, u16* arg2)
         }
         break;
     case 11:
-        if (gCurrentPinballGame->catchCounterBlinkState == 0)
+        if (gCurrentPinballGame->pikaKickbackTimer == 0)
         {
             if (gCurrentPinballGame->ball->positionQ0.x <= 120)
                 gCurrentPinballGame->outLaneSide = 1;
@@ -1389,11 +1389,11 @@ void ProcessSapphireCollisionEvent(u8 arg0, u16* arg1, u16* arg2)
             if (gCurrentPinballGame->outLanePikaPosition < 2)
             {
                 if (gCurrentPinballGame->outLanePikaPosition == gCurrentPinballGame->outLaneSide - 1)
-                    gCurrentPinballGame->catchCounterBlinkState = 120;
+                    gCurrentPinballGame->pikaKickbackTimer = 120;
             }
             else
             {
-                gCurrentPinballGame->catchCounterBlinkState = 120;
+                gCurrentPinballGame->pikaKickbackTimer = 120;
             }
         }
         break;

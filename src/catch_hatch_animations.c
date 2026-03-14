@@ -2619,7 +2619,7 @@ void UpdateAreaRoulette(void)
 
                     gCurrentPinballGame->rouletteInitialSpeed = gCurrentPinballGame->rouletteSpinSpeed;
                     gCurrentPinballGame->sapphirePondFlag = 1;
-                    gCurrentPinballGame->tiltInputDirection = 1;
+                    gCurrentPinballGame->launcherCharging = 1;
                     gCurrentPinballGame->modeTimeRemaining = 3600;
                     gCurrentPinballGame->rubyPondState = RUBY_POND_STATE_CHINCHOU_COUNTERCLOCKWISE;
                 }
