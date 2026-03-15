@@ -1248,10 +1248,10 @@ gKyogreWhirlpoolSpriteFrames:: @ 0x083C1A6C
 gRubyFlashingDecorationTiles:: @ 0x083C3C2C
 	.incbin "baserom.gba", 0x3C3C2C, 0x1800
 
-gGauntletProjectileTiles:: @ 0x083C542C
+gChikoritaProjectileTiles:: @ 0x083C542C
 	.incbin "baserom.gba", 0x3C542C, 0x200
 
-gGauntletExplosionTiles:: @ 0x083C562C
+gChikoritaExplosionTiles:: @ 0x083C562C
 	.incbin "baserom.gba", 0x3C562C, 0x400
 
 gRayquazaSkyBackgroundGfx:: @ 0x083C5A2C
@@ -1448,7 +1448,7 @@ gPelipper_Gfx:: @ 0x084BB16C
 gCatchCounterDigitTilesGfx:: @ 0x084C00EC
 	.incbin "baserom.gba", 0x4C00EC, 0x700
 
-gMonIconTilesGfx:: @ 0x084C07EC
+gPikaSaverTilesGfx:: @ 0x084C07EC
 	.incbin "baserom.gba", 0x4C07EC, 0x480
 
 gDxModePikachuObjTiles:: @ 0x084C0C6C

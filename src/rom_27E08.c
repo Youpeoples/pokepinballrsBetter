@@ -119,7 +119,7 @@ void AnimateCreatureApproach(void)
         {
             if (gCurrentPinballGame->pikaRescuePath != 1)
             {
-                DmaCopy16(3, gMonIconTilesGfx, (void *)0x06010600, 0x180);
+                DmaCopy16(3, gPikaSaverTilesGfx, (void *)0x06010600, 0x180);
             }
         }
         tempVec.x = gPikaSaverWaypoints[gCurrentPinballGame->creatureWaypointIndex].x - 120 - gCurrentPinballGame->catchCreatureX;
@@ -964,12 +964,12 @@ void AnimateCoinReward(void)
     }
 }
 
-void InitPelipperEggDelivery(void)
+void InitTotodileEggDelivery(void)
 {
     gCurrentPinballGame->eggDeliveryX = 1600;
     gCurrentPinballGame->eggDeliveryY = 2080;
-    gCurrentPinballGame->pelipperDeliveryFrame = 0;
-    gCurrentPinballGame->pelipperDeliveryTimer = 0;
+    gCurrentPinballGame->totodileDeliveryFrame = 0;
+    gCurrentPinballGame->totodileDeliveryTimer = 0;
     gMain.spriteGroups[82].available = 1;
     gCurrentPinballGame->eggAnimationPhase = 1;
     gCurrentPinballGame->portraitOffsetX = 240;
@@ -979,7 +979,7 @@ void InitPelipperEggDelivery(void)
     DmaCopy16(3, gCaptureModeTilesGfx, (void *)0x06015800, 0xCA0);
 }
 
-void AnimatePelipperEggDelivery(void)
+void AnimateTotodileEggDelivery(void)
 {
     s16 i;
     struct SpriteGroup *group;
@@ -990,48 +990,48 @@ void AnimatePelipperEggDelivery(void)
 
     var0 = 0;
     group = &gMain.spriteGroups[82];
-    if (gPikaSaverFrameData[gCurrentPinballGame->pelipperDeliveryFrame][1] > gCurrentPinballGame->pelipperDeliveryTimer)
+    if (gPikaSaverFrameData[gCurrentPinballGame->totodileDeliveryFrame][1] > gCurrentPinballGame->totodileDeliveryTimer)
     {
-        gCurrentPinballGame->pelipperDeliveryTimer++;
+        gCurrentPinballGame->totodileDeliveryTimer++;
     }
     else
     {
-        gCurrentPinballGame->pelipperDeliveryFrame++;
-        gCurrentPinballGame->pelipperDeliveryTimer = 0;
-        if (gCurrentPinballGame->pelipperDeliveryFrame == 41)
+        gCurrentPinballGame->totodileDeliveryFrame++;
+        gCurrentPinballGame->totodileDeliveryTimer = 0;
+        if (gCurrentPinballGame->totodileDeliveryFrame == 41)
         {
-            gCurrentPinballGame->pelipperDeliveryFrame = 40;
+            gCurrentPinballGame->totodileDeliveryFrame = 40;
             group->available = 0;
             gCurrentPinballGame->eggDeliveryState = 2;
             gCurrentPinballGame->activePortraitType = 0;
         }
 
-        if (gCurrentPinballGame->pelipperDeliveryFrame == 1)
+        if (gCurrentPinballGame->totodileDeliveryFrame == 1)
             m4aSongNumStart(SE_UNKNOWN_0x146);
 
-        if (gCurrentPinballGame->pelipperDeliveryFrame == 7)
+        if (gCurrentPinballGame->totodileDeliveryFrame == 7)
             m4aSongNumStart(SE_UNKNOWN_0x147);
 
-        if (gCurrentPinballGame->pelipperDeliveryFrame == 13)
+        if (gCurrentPinballGame->totodileDeliveryFrame == 13)
             m4aSongNumStart(SE_UNKNOWN_0x148);
 
-        if (gCurrentPinballGame->pelipperDeliveryFrame == 39)
+        if (gCurrentPinballGame->totodileDeliveryFrame == 39)
         {
             gCurrentPinballGame->portraitOffsetX = 0;
             gCurrentPinballGame->portraitOffsetY = 0;
             DmaCopy16(3, gEggFrameTilesGfx[0], (void *)0x06011CE0, 0x200);
         }
 
-        if (gCurrentPinballGame->pelipperDeliveryFrame == 14)
+        if (gCurrentPinballGame->totodileDeliveryFrame == 14)
             gCurrentPinballGame->scoreAddedInFrame = 2000000;
     }
 
-    if (gCurrentPinballGame->pelipperDeliveryFrame >= 14 && gCurrentPinballGame->pelipperDeliveryFrame < 38 && gCurrentPinballGame->globalAnimFrameCounter % 7 == 0)
+    if (gCurrentPinballGame->totodileDeliveryFrame >= 14 && gCurrentPinballGame->totodileDeliveryFrame < 38 && gCurrentPinballGame->globalAnimFrameCounter % 7 == 0)
         m4aSongNumStart(SE_UNKNOWN_0x149);
 
     group->baseX = gCurrentPinballGame->eggDeliveryX / 20 - gCurrentPinballGame->cameraXOffset;
     group->baseY = gCurrentPinballGame->eggDeliveryY / 20 - gCurrentPinballGame->cameraYOffset;
-    var0 = gPikaSaverFrameData[gCurrentPinballGame->pelipperDeliveryFrame][0];
+    var0 = gPikaSaverFrameData[gCurrentPinballGame->totodileDeliveryFrame][0];
     for (i = 0; i < 6; i++)
     {
         oamSimple = &group->oam[i];
@@ -1046,7 +1046,7 @@ void AnimatePelipperEggDelivery(void)
     }
 }
 
-void InitEggDropDelivery(void)
+void InitAerodactylEggDelivery(void)
 {
     gCurrentPinballGame->eggDropTimer = 0;
     gCurrentPinballGame->eggDeliveryX = 3600;
@@ -1062,7 +1062,7 @@ void InitEggDropDelivery(void)
     DmaCopy16(3, gEggModeTilesGfx, (void *)0x06015800, 0x1000);
 }
 
-void AnimateEggDropDelivery(void)
+void AnimateAerodactylEggDelivery(void)
 {
     s16 i;
     struct SpriteGroup *group;
@@ -3191,7 +3191,7 @@ void UpdateEvolutionMode(void)
             gCurrentPinballGame->modeAnimTimer++;
             if (gMain.spriteGroups[13].available)
             {
-                if (gCurrentPinballGame->gauntletProjectileTimer >= 80)
+                if (gCurrentPinballGame->chikoritaProjectileTimer >= 80)
                 {
                     RunEvolutionCutscene();
                     if (gCurrentPinballGame->boardSubState == 6)

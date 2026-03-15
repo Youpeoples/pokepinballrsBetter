@@ -219,7 +219,7 @@ void UpdateCatchEmMode(void)
             gCurrentPinballGame->creatureHitCooldown--;
         break;
     case 10:
-        HideCaughtPokemonSprite();
+        CleanupCaughtPokemonSprite();
         DisableHatchTileDisplay();
         gCurrentPinballGame->boardSubState++;
         break;
@@ -481,7 +481,7 @@ void UpdateJirachiBonus(void)
         break;
     case 5:
         DrawJirachiSprites();
-        HideJirachiSprites();
+        CleanupJirachiSprites();
         CleanupCatchEmState();
         gCurrentPinballGame->jirachiActivationFlags = 240;
         gCurrentPinballGame->boardSubState = 6;
@@ -594,7 +594,7 @@ void DrawCaughtPokemonSprite(void)
     }
 }
 
-void HideCaughtPokemonSprite(void)
+void CleanupCaughtPokemonSprite(void)
 {
     s16 i;
     struct SpriteGroup *group;
@@ -738,7 +738,7 @@ void DrawJirachiSprites(void)
     }
 }
 
-void HideJirachiSprites(void)
+void CleanupJirachiSprites(void)
 {
     s16 i;
     struct SpriteGroup *group;
@@ -1850,14 +1850,14 @@ void RunBallCaptureSequence(void)
             {
                 if (gCurrentPinballGame->boardState == 4 && gCurrentPinballGame->boardSubState == 9)
                 {
-                    HideCaughtPokemonSprite();
+                    CleanupCaughtPokemonSprite();
                     gCurrentPinballGame->jirachiCollisionEnabled = 0;
                     m4aMPlayAllStop();
                 }
 
                 if (gCurrentPinballGame->boardState == 8 && gCurrentPinballGame->boardSubState == 3)
                 {
-                    HideJirachiSprites();
+                    CleanupJirachiSprites();
                     gCurrentPinballGame->jirachiCollisionEnabled = 0;
                     m4aMPlayAllStop();
                 }

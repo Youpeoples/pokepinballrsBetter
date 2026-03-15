@@ -20,8 +20,8 @@ extern void RubyPond_EntityLogic(void);
 extern void RubyPondTriBumperHandleHitAndDraw(void);
 extern void AnimateSharpedoEntity(void);
 extern void DrawPikachuSpinner(void);
-extern void UpdateGauntletBossAnimation(void);
-extern void AnimateGauntletBossSprite(void);
+extern void UpdateChikoritaAttackAnimation(void);
+extern void AnimateChikoritaSprite(void);
 extern void UpdateGulpinBossState(void);
 extern void UpdateSideBumperAnimation(void);
 extern void DrawSideBumperSprites(void);
@@ -258,10 +258,10 @@ void UpdateRubyBoardEntityRendering(void)
         AnimateSharpedoEntity();
         DrawPikachuSpinner();
     }
-    UpdateGauntletBossAnimation();
+    UpdateChikoritaAttackAnimation();
     if (gCurrentPinballGame->cameraYViewport > 63)
     {
-        AnimateGauntletBossSprite();
+        AnimateChikoritaSprite();
         UpdateGulpinBossState();
     }
     if (gCurrentPinballGame->cameraYViewport > 115)
@@ -303,7 +303,7 @@ void UpdateRubyBoardEntityRendering(void)
 void UpdateRubyBoardEntityLogic(void)
 {
     RubyPond_EntityLogic();
-    UpdateCatchModeAnimation();
+    UpdateRubyCatchModeAnimation();
     UpdatePikachuChargeCounter();
     UpdateSideBumperAnimation();
     if (gCurrentPinballGame->mainBoardCountdownTimer != 0)

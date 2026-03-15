@@ -4113,7 +4113,7 @@ gSharpedoAnimFrameData:: @ 0x086AD9FC
     .2byte 0x13, 0x2
     .2byte 0x14, 0x2
 
-gGauntletBossFlashFrameIndices:: @ 0x086ADA58
+gChikoritaFlashFrameIndices:: @ 0x086ADA58
 	.incbin "baserom.gba", 0x6ADA58, 0x16
 
 gGulpinAnimData:: @ 0x086ADA6E
@@ -4441,7 +4441,7 @@ gRayquazaMinionOrbitWaypoints:: @ 0x086AF744
 gRayquazaCloudScrollPositions:: @ 0x086AF784
 	.incbin "baserom.gba", 0x6AF784, 0x33C
 
-gSphealFlyingEnemyPathData:: @ 0x086AFAC0
+gSphealFlightPathData:: @ 0x086AFAC0
 	.incbin "baserom.gba", 0x6AFAC0, 0x20
 
 gSphealFramesetToSpriteMap:: @ 0x086AFAE0

@@ -885,7 +885,7 @@ void ProcessBonusTrapPhysics(void)
             gCurrentPinballGame->collisionMapScrollY = 0;
             gCurrentPinballGame->ballCatchState = 4;
             if (gMain.selectedField == FIELD_RUBY)
-                DispatchCatchModeInit();
+                DispatchRubyCatchModeInit();
             else
                 DispatchSapphireCatchModeInit();
 

@@ -3,12 +3,12 @@
 #include "main.h"
 #include "constants/bg_music.h"
 
-struct FlyingEnemyPath
+struct SphealFlightPath
 {
     struct Vector16 *pathWaypoints;
     s16 pathLength;
 };
-extern const struct FlyingEnemyPath gSphealFlyingEnemyPathData[];
+extern const struct SphealFlightPath gSphealFlightPathData[];
 
 extern const s16 gSphealWhiscashAnimFrameset[][4];
 extern struct SongHeader se_unk_137;
@@ -114,8 +114,8 @@ void SphealBoardProcess_3A_42E48(void)
     }
 
     gCurrentPinballGame->flippersDisabled = 0;
-    UpdateSphealFlyingEnemyLogic();
-    UpdateSphealMinionLogic();
+    UpdateSphealEntityLogic();
+    UpdateSealeoEntityLogic();
     UpdateSphealScoreAndDelivery();
     AnimateSphealBackground();
 
@@ -262,8 +262,8 @@ void SphealBoardProcess_3B_43228(void)
         break;
     }
 
-    UpdateSphealFlyingEnemyLogic();
-    UpdateSphealMinionLogic();
+    UpdateSphealEntityLogic();
+    UpdateSealeoEntityLogic();
     UpdateSphealScoreAndDelivery();
     AnimateSphealBackground();
     if (gCurrentPinballGame->returnToMainBoardFlag)
@@ -275,7 +275,7 @@ void SphealBoardProcess_3B_43228(void)
     BonusStage_HandleModeChangeFlags();
 }
 
-void UpdateSphealMinionLogic(void)
+void UpdateSealeoEntityLogic(void)
 {
     s16 i;
     struct SpriteGroup *group;
@@ -283,7 +283,7 @@ void UpdateSphealMinionLogic(void)
     s16 var0;
 
     if (gCurrentPinballGame->boardState < 2 && gMain.modeChangeFlags == MODE_CHANGE_NONE)
-        UpdateSphealKnockdownPhysics();
+        UpdateSealeoKnockdownPhysics();
 
     if (gCurrentPinballGame->boardState < 2 && gMain.modeChangeFlags == MODE_CHANGE_NONE)
     {
@@ -401,7 +401,7 @@ void UpdateSphealMinionLogic(void)
     }
 }
 
-void UpdateSphealFlyingEnemyLogic(void)
+void UpdateSphealEntityLogic(void)
 {
     s16 i;
     s16 j;
@@ -414,7 +414,7 @@ void UpdateSphealFlyingEnemyLogic(void)
     const u16 *src;
     int var3;
     s16 var4;
-    const struct FlyingEnemyPath *var5;
+    const struct SphealFlightPath *var5;
 
     if (gCurrentPinballGame->boardState == 1 && gMain.modeChangeFlags == MODE_CHANGE_NONE)
     {
@@ -696,10 +696,10 @@ void UpdateSphealFlyingEnemyLogic(void)
                 else
                     var1 = 0;
 
-                len = gSphealFlyingEnemyPathData[var1].pathLength;
+                len = gSphealFlightPathData[var1].pathLength;
                 for (j = 0; j < len; j++)
                 {
-                    if (gSphealFlyingEnemyPathData[var1].pathWaypoints[j].y <= gCurrentPinballGame->flyingEnemyScreenY[i])
+                    if (gSphealFlightPathData[var1].pathWaypoints[j].y <= gCurrentPinballGame->flyingEnemyScreenY[i])
                         break;
                 }
 
@@ -708,8 +708,8 @@ void UpdateSphealFlyingEnemyLogic(void)
                 gCurrentPinballGame->flyingEnemyFramesetIndex[i] = 29;
                 gCurrentPinballGame->flyingEnemyAnimTimer[i] = 0;
 
-                gCurrentPinballGame->flyingEnemyPositionQ8[i].x = gSphealFlyingEnemyPathData[var1].pathWaypoints[gCurrentPinballGame->flyingEnemyPathIndex[i]].x << 8;
-                gCurrentPinballGame->flyingEnemyPositionQ8[i].y = gSphealFlyingEnemyPathData[var1].pathWaypoints[gCurrentPinballGame->flyingEnemyPathIndex[i]].y << 8;
+                gCurrentPinballGame->flyingEnemyPositionQ8[i].x = gSphealFlightPathData[var1].pathWaypoints[gCurrentPinballGame->flyingEnemyPathIndex[i]].x << 8;
+                gCurrentPinballGame->flyingEnemyPositionQ8[i].y = gSphealFlightPathData[var1].pathWaypoints[gCurrentPinballGame->flyingEnemyPathIndex[i]].y << 8;
 
                 gCurrentPinballGame->flyingEnemyPathIndex[i]++;
                 gCurrentPinballGame->flyingEnemyCollisionType[i] = 0;
@@ -722,7 +722,7 @@ void UpdateSphealFlyingEnemyLogic(void)
                     var1 = 0;
 
                 var4 = gCurrentPinballGame->flyingEnemyPathIndex[i];
-                var5 = gSphealFlyingEnemyPathData;
+                var5 = gSphealFlightPathData;
                 if (var4 < var5[var1].pathLength)
                 {
                     gCurrentPinballGame->flyingEnemyPositionQ8[i].x = var5[var1].pathWaypoints[gCurrentPinballGame->flyingEnemyPathIndex[i]].x << 8;
@@ -1159,7 +1159,7 @@ void SphealBoard_PelipperDeliversBall(void)
     gCurrentPinballGame->deliveryAnimTimer++;
 }
 
-void UpdateSphealKnockdownPhysics(void)
+void UpdateSealeoKnockdownPhysics(void)
 {
     s16 i;
     s16 var0;

@@ -391,7 +391,7 @@ void SetBallPositionForBonusReturn(void)
         gCurrentPinballGame->modeAnimTimer = 120;
         gCurrentPinballGame->ballCatchState = 4;
         if (gMain.selectedField == FIELD_RUBY)
-            UpdateCatchModeAnimation();
+            UpdateRubyCatchModeAnimation();
         else
             UpdateSapphireCatchModeAnimation();
 
@@ -989,7 +989,7 @@ void SaveGameStateSnapshot(s16 arg0)
     gCurrentPinballGame->bgOffsets1 = gMain.bgOffsets[1];
     gCurrentPinballGame->bgOffsets2 = gMain.bgOffsets[2];
     gCurrentPinballGame->bgOffsets3 = gMain.bgOffsets[3];
-    gCurrentPinballGame->field = gMain.selectedField;
+    gCurrentPinballGame->savedField = gMain.selectedField;
     gCurrentPinballGame->savedTempField = gMain.tempField;
     gCurrentPinballGame->savedIsBonusField = gMain.isBonusField;
     gCurrentPinballGame->savedModeChangeFlags = gMain.modeChangeFlags;
@@ -1052,7 +1052,7 @@ void RestoreGameState(u16 arg0)
 
     if (arg0 != 0)
     {
-        gMain.selectedField = gCurrentPinballGame->field;
+        gMain.selectedField = gCurrentPinballGame->savedField;
         gMain.tempField = gCurrentPinballGame->savedTempField;
         gMain.isBonusField = gCurrentPinballGame->savedIsBonusField;
         gMain.modeChangeFlags = gCurrentPinballGame->savedModeChangeFlags;
@@ -1374,7 +1374,7 @@ void RestoreMainFieldDynamicGraphics(void)
 
     for (i = 0; i <= 1; i++)
     {
-        DmaCopy16(3, gMonIconTilesGfx + ((var0 =gCurrentPinballGame->monIconTileIndex[i]) * 0x180), 0x06010480 + (i * 0x180), 0x180);
+        DmaCopy16(3, gPikaSaverTilesGfx + ((var0 =gCurrentPinballGame->pikaSaverTileIndex[i]) * 0x180), 0x06010480 + (i * 0x180), 0x180);
     }
 
     var0 = gCurrentPinballGame->pikachuSpinFrame;

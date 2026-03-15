@@ -283,7 +283,7 @@ void ProcessRubyCollisionEvent(s32 arg0, s16* arg1, u16* arg2)
             else
                 gCurrentPinballGame->ballCatchState= 2;
 
-            DispatchCatchModeInit();
+            DispatchRubyCatchModeInit();
             gCurrentPinballGame->collisionResponseType = 7;
             *arg1 = 1;
             return;
@@ -347,10 +347,10 @@ void ProcessRubyCollisionEvent(s32 arg0, s16* arg1, u16* arg2)
             {
                 gCurrentPinballGame->scoreAddedInFrame = 1000;
 
-                if (gCurrentPinballGame->gauntletFlashActive == 0)
+                if (gCurrentPinballGame->chikoritaFlashActive == 0)
                 {
-                    gCurrentPinballGame->gauntletFlashActive = 1;
-                    gCurrentPinballGame->gauntletFlashTimer = 0;
+                    gCurrentPinballGame->chikoritaFlashActive = 1;
+                    gCurrentPinballGame->chikoritaFlashTimer = 0;
                 }
             }
             gCurrentPinballGame->mainBoardCountdownTimer = 45;

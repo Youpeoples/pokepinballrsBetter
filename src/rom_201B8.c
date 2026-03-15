@@ -10,10 +10,10 @@ extern const u16 gSideBumperAnimDurations[][2];
 extern const s16 gGulpinAnimData[][5];
 extern const u16 gGulpinOamData[146][18];
 extern const u8 gRubyStageGulpin_Gfx[][0x180];
-extern const s16 gGauntletBossFlashFrameIndices[];
+extern const s16 gChikoritaFlashFrameIndices[];
 extern const u8 gRubyFlashingDecorationTiles[][0x300];
-extern const u8 gGauntletExplosionTiles[][0x100];
-extern const u8 gGauntletProjectileTiles[][0x80];
+extern const u8 gChikoritaExplosionTiles[][0x100];
+extern const u8 gChikoritaProjectileTiles[][0x80];
 extern const u8 gRubyBoardSharpedo_Gfx[][0x260];
 extern const s16 gSharpedoAnimFrameData[][2];
 extern const u16 gSharpedoSpritesheetOam[42][3][3];
@@ -1384,7 +1384,7 @@ void DrawPikachuSpinner(void)
     }
 }
 
-void UpdateGauntletBossAnimation(void)
+void UpdateChikoritaAttackAnimation(void)
 {
     s16 i;
     struct SpriteGroup *group;
@@ -1394,12 +1394,12 @@ void UpdateGauntletBossAnimation(void)
 
     index = 0;
     group = &gMain.spriteGroups[14];
-    if (gCurrentPinballGame->gauntletProjectileTimer < 60)
+    if (gCurrentPinballGame->chikoritaProjectileTimer < 60)
     {
-        if (gCurrentPinballGame->gauntletProjectileTimer >= 27 && gCurrentPinballGame->gauntletProjectileTimer < 47)
+        if (gCurrentPinballGame->chikoritaProjectileTimer >= 27 && gCurrentPinballGame->chikoritaProjectileTimer < 47)
         {
-            index = (gCurrentPinballGame->gauntletProjectileTimer - 27) / 5;
-            DmaCopy16(3, gGauntletExplosionTiles[index], (void *)0x06014280, 0x100);
+            index = (gCurrentPinballGame->chikoritaProjectileTimer - 27) / 5;
+            DmaCopy16(3, gChikoritaExplosionTiles[index], (void *)0x06014280, 0x100);
             group->baseX = 176 - gCurrentPinballGame->cameraXOffset;
         }
         else
@@ -1410,10 +1410,10 @@ void UpdateGauntletBossAnimation(void)
     }
     else
     {
-        if (gCurrentPinballGame->gauntletProjectileTimer >= 100 && gCurrentPinballGame->gauntletProjectileTimer < 120)
+        if (gCurrentPinballGame->chikoritaProjectileTimer >= 100 && gCurrentPinballGame->chikoritaProjectileTimer < 120)
         {
-            index = (gCurrentPinballGame->gauntletProjectileTimer - 100) / 5;
-            DmaCopy16(3, gGauntletExplosionTiles[index], (void *)0x06014280, 0x100);
+            index = (gCurrentPinballGame->chikoritaProjectileTimer - 100) / 5;
+            DmaCopy16(3, gChikoritaExplosionTiles[index], (void *)0x06014280, 0x100);
             group->baseX = 32 - gCurrentPinballGame->cameraXOffset;
         }
         else
@@ -1441,23 +1441,23 @@ void UpdateGauntletBossAnimation(void)
     group = &gMain.spriteGroups[13];
     if (group->available)
     {
-        if (gCurrentPinballGame->gauntletProjectileTimer < 120)
+        if (gCurrentPinballGame->chikoritaProjectileTimer < 120)
         {
-            if (gCurrentPinballGame->gauntletProjectileTimer % 8 == 0)
+            if (gCurrentPinballGame->chikoritaProjectileTimer % 8 == 0)
                 m4aSongNumStart(SE_UNKNOWN_0xC6);
 
-            index = (gCurrentPinballGame->gauntletProjectileTimer % 16) / 4;
-            DmaCopy16(3, gGauntletProjectileTiles[index], (void *)0x06014200, 0x80);
-            var0 = (gCurrentPinballGame->gauntletProjectileTimer << 0x10) / 90;
-            gCurrentPinballGame->gauntletProjectileVelX -= 2;
-            gCurrentPinballGame->gauntletProjectileX += gCurrentPinballGame->gauntletProjectileVelX;
-            if (gCurrentPinballGame->gauntletProjectileTimer < 30)
-                gCurrentPinballGame->gauntletProjectileY = gCurrentPinballGame->gauntletProjectileTimer + (Sin(var0) * 24) / 20000;
+            index = (gCurrentPinballGame->chikoritaProjectileTimer % 16) / 4;
+            DmaCopy16(3, gChikoritaProjectileTiles[index], (void *)0x06014200, 0x80);
+            var0 = (gCurrentPinballGame->chikoritaProjectileTimer << 0x10) / 90;
+            gCurrentPinballGame->chikoritaProjectileVelX -= 2;
+            gCurrentPinballGame->chikoritaProjectileX += gCurrentPinballGame->chikoritaProjectileVelX;
+            if (gCurrentPinballGame->chikoritaProjectileTimer < 30)
+                gCurrentPinballGame->chikoritaProjectileY = gCurrentPinballGame->chikoritaProjectileTimer + (Sin(var0) * 24) / 20000;
             else
-                gCurrentPinballGame->gauntletProjectileY = 30 + (Sin(var0) * 24) / 20000;
+                gCurrentPinballGame->chikoritaProjectileY = 30 + (Sin(var0) * 24) / 20000;
 
-            gCurrentPinballGame->gauntletProjectileTimer++;
-            if (gCurrentPinballGame->gauntletProjectileTimer == 27)
+            gCurrentPinballGame->chikoritaProjectileTimer++;
+            if (gCurrentPinballGame->chikoritaProjectileTimer == 27)
             {
                 gMain.spriteGroups[14].available = 1;
                 m4aSongNumStart(SE_UNKNOWN_0xC7);
@@ -1472,7 +1472,7 @@ void UpdateGauntletBossAnimation(void)
                 }
             }
 
-            if (gCurrentPinballGame->gauntletProjectileTimer == 100)
+            if (gCurrentPinballGame->chikoritaProjectileTimer == 100)
             {
                 gMain.spriteGroups[14].available = 1;
                 m4aSongNumStart(SE_UNKNOWN_0xC7);
@@ -1489,16 +1489,16 @@ void UpdateGauntletBossAnimation(void)
         }
         else
         {
-            gCurrentPinballGame->gauntletProjectileTimer = 0;
-            gCurrentPinballGame->gauntletProjectileX = 0;
-            gCurrentPinballGame->gauntletProjectileY = 190;
-            gCurrentPinballGame->gauntletProjectileVelX = 100;
-            gCurrentPinballGame->gauntletProjectileUnused = 0;
+            gCurrentPinballGame->chikoritaProjectileTimer = 0;
+            gCurrentPinballGame->chikoritaProjectileX = 0;
+            gCurrentPinballGame->chikoritaProjectileY = 190;
+            gCurrentPinballGame->chikoritaProjectileVelX = 100;
+            gCurrentPinballGame->chikoritaProjectileUnused = 0;
             group->available = 0;
         }
 
-        group->baseX = (gCurrentPinballGame->gauntletProjectileX / 20) + 71u - gCurrentPinballGame->cameraXOffset;
-        group->baseY = gCurrentPinballGame->gauntletProjectileY + 248u - gCurrentPinballGame->cameraYOffset;
+        group->baseX = (gCurrentPinballGame->chikoritaProjectileX / 20) + 71u - gCurrentPinballGame->cameraXOffset;
+        group->baseY = gCurrentPinballGame->chikoritaProjectileY + 248u - gCurrentPinballGame->cameraYOffset;
         if (group->baseY > 190)
             group->baseY = 190;
 
@@ -1508,7 +1508,7 @@ void UpdateGauntletBossAnimation(void)
     }
 }
 
-void AnimateGauntletBossSprite(void)
+void AnimateChikoritaSprite(void)
 {
     s16 i;
     struct SpriteGroup *group;
@@ -1516,23 +1516,23 @@ void AnimateGauntletBossSprite(void)
     s16 index;
 
     group = &gMain.spriteGroups[53];
-    if (gCurrentPinballGame->gauntletFlashActive)
+    if (gCurrentPinballGame->chikoritaFlashActive)
     {
-        index = gGauntletBossFlashFrameIndices[gCurrentPinballGame->gauntletFlashTimer / 5];
-        if (gCurrentPinballGame->gauntletFlashTimer == 40)
+        index = gChikoritaFlashFrameIndices[gCurrentPinballGame->chikoritaFlashTimer / 5];
+        if (gCurrentPinballGame->chikoritaFlashTimer == 40)
         {
-            gCurrentPinballGame->gauntletProjectileTimer = 0;
-            gCurrentPinballGame->gauntletProjectileX = 0;
-            gCurrentPinballGame->gauntletProjectileY = 0;
-            gCurrentPinballGame->gauntletProjectileVelX = 100;
-            gCurrentPinballGame->gauntletProjectileUnused = 0;
+            gCurrentPinballGame->chikoritaProjectileTimer = 0;
+            gCurrentPinballGame->chikoritaProjectileX = 0;
+            gCurrentPinballGame->chikoritaProjectileY = 0;
+            gCurrentPinballGame->chikoritaProjectileVelX = 100;
+            gCurrentPinballGame->chikoritaProjectileUnused = 0;
             gMain.spriteGroups[13].available = 1;
         }
 
-        if (gCurrentPinballGame->gauntletFlashTimer < 54)
-            gCurrentPinballGame->gauntletFlashTimer++;
+        if (gCurrentPinballGame->chikoritaFlashTimer < 54)
+            gCurrentPinballGame->chikoritaFlashTimer++;
         else
-            gCurrentPinballGame->gauntletFlashActive = 0;
+            gCurrentPinballGame->chikoritaFlashActive = 0;
 
         DmaCopy16(3, gRubyFlashingDecorationTiles[index], (void *)0x06012720, 0x300);
     }
@@ -1870,19 +1870,19 @@ void UpdateCatchModeLogic(void)
 
     if (gCurrentPinballGame->pikaChargeTarget > 167)
     {
-        gCurrentPinballGame->monIconTileIndex[0] = gPikaSaverAnimFrameTable[(gMain.fieldFrameCount % 160) / 5];
+        gCurrentPinballGame->pikaSaverTileIndex[0] = gPikaSaverAnimFrameTable[(gMain.fieldFrameCount % 160) / 5];
         if (gCurrentPinballGame->outLanePikaPosition == 2)
-            gCurrentPinballGame->monIconTileIndex[1] = gCurrentPinballGame->monIconTileIndex[0] + 6;
+            gCurrentPinballGame->pikaSaverTileIndex[1] = gCurrentPinballGame->pikaSaverTileIndex[0] + 6;
         else
-            gCurrentPinballGame->monIconTileIndex[1] = gCurrentPinballGame->monIconTileIndex[0];
+            gCurrentPinballGame->pikaSaverTileIndex[1] = gCurrentPinballGame->pikaSaverTileIndex[0];
     }
     else
     {
-        gCurrentPinballGame->monIconTileIndex[0] = (gMain.fieldFrameCount % 50) / 25;
+        gCurrentPinballGame->pikaSaverTileIndex[0] = (gMain.fieldFrameCount % 50) / 25;
         if (gCurrentPinballGame->outLanePikaPosition == 2)
-            gCurrentPinballGame->monIconTileIndex[1] = gCurrentPinballGame->monIconTileIndex[0] + 9;
+            gCurrentPinballGame->pikaSaverTileIndex[1] = gCurrentPinballGame->pikaSaverTileIndex[0] + 9;
         else
-            gCurrentPinballGame->monIconTileIndex[1] = gCurrentPinballGame->monIconTileIndex[0];
+            gCurrentPinballGame->pikaSaverTileIndex[1] = gCurrentPinballGame->pikaSaverTileIndex[0];
     }
 
     if (gCurrentPinballGame->outLanePikaPosition == 2)
@@ -1944,18 +1944,18 @@ void UpdateCatchModeLogic(void)
                 i = gCurrentPinballGame->outLaneSide - 1;
 
                 if (gCurrentPinballGame->outLanePikaPosition == 2)
-                    gCurrentPinballGame->monIconTileIndex[i] = (i) * 7 + 2;
+                    gCurrentPinballGame->pikaSaverTileIndex[i] = (i) * 7 + 2;
                 else
-                    gCurrentPinballGame->monIconTileIndex[i] = 2;
+                    gCurrentPinballGame->pikaSaverTileIndex[i] = 2;
 
-                DmaCopy16(3, gMonIconTilesGfx + (gCurrentPinballGame->monIconTileIndex[i] * 0x180), 0x06010480 + ((i) * 0x180), 0x180);
+                DmaCopy16(3, gPikaSaverTilesGfx + (gCurrentPinballGame->pikaSaverTileIndex[i] * 0x180), 0x06010480 + ((i) * 0x180), 0x180);
             }
         }
 
         if (gCurrentPinballGame->outLanePikaPosition == 2)
-            gCurrentPinballGame->monIconTileIndex[gCurrentPinballGame->outLaneSide - 1] = (gCurrentPinballGame->outLaneSide - 1) * 7 + 2;
+            gCurrentPinballGame->pikaSaverTileIndex[gCurrentPinballGame->outLaneSide - 1] = (gCurrentPinballGame->outLaneSide - 1) * 7 + 2;
         else
-            gCurrentPinballGame->monIconTileIndex[gCurrentPinballGame->outLaneSide - 1] = 2;
+            gCurrentPinballGame->pikaSaverTileIndex[gCurrentPinballGame->outLaneSide - 1] = 2;
 
         gCurrentPinballGame->pikaKickbackTimer--;
     }
@@ -2041,9 +2041,9 @@ void UpdateCatchModeLogic(void)
         if (gCurrentPinballGame->catchOverlayTimer >= 100)
         {
             if (gCurrentPinballGame->outLanePikaPosition == 2)
-                gCurrentPinballGame->monIconTileIndex[gCurrentPinballGame->outLaneSide - 1] = (gCurrentPinballGame->outLaneSide - 1) * 7 + 2;
+                gCurrentPinballGame->pikaSaverTileIndex[gCurrentPinballGame->outLaneSide - 1] = (gCurrentPinballGame->outLaneSide - 1) * 7 + 2;
             else
-                gCurrentPinballGame->monIconTileIndex[gCurrentPinballGame->outLaneSide - 1] = 2;
+                gCurrentPinballGame->pikaSaverTileIndex[gCurrentPinballGame->outLaneSide - 1] = 2;
 
             if (gCurrentPinballGame->catchOverlayTimer == 100)
             {
@@ -2083,11 +2083,11 @@ void UpdateCatchModeLogic(void)
 
                     i = gCurrentPinballGame->outLaneSide - 1;
                     if (gCurrentPinballGame->outLanePikaPosition == 2)
-                        gCurrentPinballGame->monIconTileIndex[i] = i * 9;
+                        gCurrentPinballGame->pikaSaverTileIndex[i] = i * 9;
                     else
-                        gCurrentPinballGame->monIconTileIndex[i] = 0;
+                        gCurrentPinballGame->pikaSaverTileIndex[i] = 0;
 
-                    DmaCopy16(3, gMonIconTilesGfx + (gCurrentPinballGame->monIconTileIndex[i] * 0x180), 0x06010480 + (i * 0x180), 0x180);
+                    DmaCopy16(3, gPikaSaverTilesGfx + (gCurrentPinballGame->pikaSaverTileIndex[i] * 0x180), 0x06010480 + (i * 0x180), 0x180);
                 }
             }
 
@@ -2140,7 +2140,7 @@ void UpdateCatchModeLogic(void)
             {
                 if ((gMain.fieldFrameCount % 5) == 0)
                 {
-                    DmaCopy16(3, gMonIconTilesGfx + (gCurrentPinballGame->monIconTileIndex[i] * 0x180), 0x06010480 + (i * 0x180), 0x180);
+                    DmaCopy16(3, gPikaSaverTilesGfx + (gCurrentPinballGame->pikaSaverTileIndex[i] * 0x180), 0x06010480 + (i * 0x180), 0x180);
                 }
 
                 tempY = 380 - gCurrentPinballGame->cameraYOffset;

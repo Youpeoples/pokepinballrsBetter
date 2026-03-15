@@ -98,7 +98,7 @@ void MainBoardProcess_2B_4D960(void)
 
     var0 = 0x1000;
     if (gMain.modeChangeFlags == MODE_CHANGE_NONE)
-        ProcessMainBoardBallDrain();
+        ProcessMainBoardBallDrainAndLaunch();
 
     if (gCurrentPinballGame->cameraScrollEnabled)
     {
@@ -414,7 +414,7 @@ void ProcessTiltInput(void)
     }
 }
 
-void ProcessMainBoardBallDrain(void)
+void ProcessMainBoardBallDrainAndLaunch(void)
 {
     struct BallState *ballStates;
 

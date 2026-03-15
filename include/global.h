@@ -390,19 +390,19 @@ struct PinballGame
     /*0x2AA*/ u16 screenShakeX;
     /*0x2AC*/ s16 screenShakeY;
     /*0x2AE*/ u8 filler2AE[0x2];
-    /*0x2B0*/ u16 gauntletFlashTimer;
-    /*0x2B2*/ s8 gauntletFlashActive;
+    /*0x2B0*/ u16 chikoritaFlashTimer;
+    /*0x2B2*/ s8 chikoritaFlashActive;
     /*0x2B3*/ u8 filler2B3[0x1];
-    /*0x2B4*/ s16 gauntletProjectileX;
-    /*0x2B6*/ s16 gauntletProjectileY;
-    /*0x2B8*/ u16 gauntletProjectileVelX;
-    /*0x2BA*/ u16 gauntletProjectileUnused;
-    /*0x2BC*/ u16 gauntletProjectileTimer;
+    /*0x2B4*/ s16 chikoritaProjectileX;
+    /*0x2B6*/ s16 chikoritaProjectileY;
+    /*0x2B8*/ u16 chikoritaProjectileVelX;
+    /*0x2BA*/ u16 chikoritaProjectileUnused;
+    /*0x2BC*/ u16 chikoritaProjectileTimer;
     /*0x2BE*/ s8 gulpinCurrentLevel;
     /*0x2C0*/ u16 gulpinAnimFrameTimer;
     /*0x2C2*/ s8 gulpinAnimFrameIndex;
-    /*0x2C3*/ s8 pelipperDeliveryFrame;
-    /*0x2C4*/ u16 pelipperDeliveryTimer;
+    /*0x2C3*/ s8 totodileDeliveryFrame;
+    /*0x2C4*/ u16 totodileDeliveryTimer;
     /*0x2C6*/ u16 eggDropTimer;
     /*0x2C8*/ s16 eggDeliveryX;
     /*0x2CA*/ s16 eggDeliveryY;
@@ -788,7 +788,7 @@ struct PinballGame
     /*0x706*/ u8 filler706[0x2];
     /*0x708*/ u32 portraitCycleFrame;
     /*0x70C*/ u16 hudAnimFrameCounter;
-    /*0x70E*/ s8 progressLevel;
+    /*0x70E*/ s8 progressLevel; // Becomes bonusMultiplier at end-of-ball; displayed on the blue bonus sign
     /*0x70F*/ s8 unk70F;
     /*0x710*/ s8 holeIndicators[4]; // 'HOLE' light indicators in Ruby/Sapphire field
     /*0x714*/ s8 allHolesLit;
@@ -825,7 +825,7 @@ struct PinballGame
     /*0x73E*/ u8 filler73E[0x2];
     /*0x740*/ u8 debugMenuSelection;
     /*0x741*/ u8 filler741[0x3];
-    /*0x744*/ u8 monIconTileIndex[2];
+    /*0x744*/ u8 pikaSaverTileIndex[2];
     /*0x746*/ u8 cyndaquilFrame;
     /*0x747*/ u8 portraitRenderMode[2];
     /*0x749*/ u8 portraitGfxIndex[2];
@@ -840,7 +840,7 @@ struct PinballGame
     /*0xF64*/ struct BgOffsets bgOffsets3;
     /*0xF68*/ u16 savedSpriteAvailability[2][100];
     /*0x10F8*/u8 eReaderBonuses[NUM_EREADER_CARDS];
-    /*0x10FD*/u8 field;
+    /*0x10FD*/u8 savedField;
     /*0x10FE*/u8 savedTempField;
     /*0x10FF*/u8 savedIsBonusField;
     /*0x1100*/u8 startButtonDisabled;
@@ -849,11 +849,13 @@ struct PinballGame
     /*0x1103*/u8 savedPendingModeChangeType;
     /*0x1104*/s8 pauseMenuCursorIndex; //Pause Menu Pointer index
     /*0x1105*/u8 filler1105[0x1];
+    // Values applied by the pause process (set when pausing)
     /*0x1106*/volatile u16 pauseBlendControl;
     /*0x1108*/volatile u16 pauseBlendAlpha;
     /*0x110A*/volatile u16 pauseBlendBrightness;
     /*0x110C*/u16 pauseScoreOverlayActive;
     /*0x110E*/u16 pauseVCount;
+    // Values preserved from before pause (restored when unpausing)
     /*0x1110*/volatile u16 savedBlendControl;
     /*0x1112*/volatile u16 savedBlendAlpha;
     /*0x1114*/volatile u16 savedBlendBrightness;
@@ -866,7 +868,7 @@ struct PinballGame
     /*0x1322*/s16 savedModeChangeDelayTimer;
     /*0x1324*/s16 savedShopPanelActive;
     /*0x1326*/s16 savedShopPanelSlideOffset;
-    /*0x1328*/u16 ballLaunchTimer;
+    /*0x1328*/u16 ballLaunchTimer; // Countdown to activate secondaryBall (multiball)
     /*0x132A*/u8 filler132A[0x2];
     /*0x132C*/struct BallState *ball;
     /*0x1330*/struct BallState *secondaryBall;
@@ -998,7 +1000,7 @@ extern const u8 gBallShadowTileGraphics[][0x200];
 extern const u8 gMainStageBonusTrap_Gfx[][0x300];
 extern const u8 gPortraitGenericGraphics[][0x300];
 extern const u8 gCatchCounterDigitTilesGfx[][0x80];
-extern const u8 gMonIconTilesGfx[];
+extern const u8 gPikaSaverTilesGfx[];
 extern const u8 gMainBoardPikaSpinner_Gfx[][0x120];
 extern const u8 gEggFrameTilesGfx[][0x200];
 extern const u8 *gEvoItemTilesGfxPtrs[];

@@ -7,17 +7,17 @@
 void AnimateSharpedoCatchSequence(void);
 void InitSharpedoCatchMode(void);
 void AnimateEggHatchSequence(void);
-void InitEvolutionShopMode(void);
-void AnimateEvolutionShopSequence(void);
+void InitRubyEvolutionShopMode(void);
+void AnimateRubyEvolutionShopSequence(void);
 void InitCenterTrapMode(void);
 void AnimateCenterTrapSequence(void);
 void RequestBoardStateTransition(u8);
-void AnimatePelipperEggDelivery(void);
-void InitEggDropDelivery(void);
-void AnimateEggDropDelivery(void);
+void AnimateTotodileEggDelivery(void);
+void InitAerodactylEggDelivery(void);
+void AnimateAerodactylEggDelivery(void);
 
 
-void DispatchCatchModeInit(void)
+void DispatchRubyCatchModeInit(void)
 {
     if (gMain.modeChangeFlags != MODE_CHANGE_NONE)
         return;
@@ -31,7 +31,7 @@ void DispatchCatchModeInit(void)
         InitEggHatchMode();
         break;
     case 3:
-        InitEvolutionShopMode();
+        InitRubyEvolutionShopMode();
         break;
     case 4:
         InitCenterTrapMode();
@@ -41,7 +41,7 @@ void DispatchCatchModeInit(void)
     gCurrentPinballGame->collisionCooldownTimer = 60;
 }
 
-void UpdateCatchModeAnimation(void)
+void UpdateRubyCatchModeAnimation(void)
 {
     if (gCurrentPinballGame->collisionCooldownTimer > 0)
         gCurrentPinballGame->collisionCooldownTimer--;
@@ -55,7 +55,7 @@ void UpdateCatchModeAnimation(void)
         AnimateEggHatchSequence(); //Hatch hole
         break;
     case 3:
-        AnimateEvolutionShopSequence(); //Mart / Evo hole
+        AnimateRubyEvolutionShopSequence(); //Mart / Evo hole
         break;
     case 4:
         AnimateCenterTrapSequence(); //Center Hole
@@ -86,7 +86,7 @@ void InitSharpedoCatchMode(void)
 * Echoes UpdateSapphireWailmerCatchSequence, which is the equivalent 'catch hole' on the sapphire board.
 *
 * Note: this *does not* affect the start of the catch mode itself.
-* When this function is nulled out at UpdateCatchModeAnimation, the banner *doesn't* show, and
+* When this function is nulled out at UpdateRubyCatchModeAnimation, the banner *doesn't* show, and
 * the ball bounces off the sharpedo. However, the grid still shows a picked mon,
 * and the mode otherwise works mostly normally, with the exception of affecting
 * the 'tilt' behavior, and the collision with the cyndaquil pushback.
@@ -294,17 +294,17 @@ void AnimateEggHatchSequence(void)
             else
             {
                 if (gCurrentPinballGame->scoreHi != 0 && gCurrentPinballGame->rubyPondState == RUBY_POND_STATE_LOTAD)
-                    InitPelipperEggDelivery();
+                    InitTotodileEggDelivery();
                 else
-                    InitEggDropDelivery();
+                    InitAerodactylEggDelivery();
             }
         }
         else
         {
             if (gCurrentPinballGame->scoreHi != 0 && gCurrentPinballGame->rubyPondState == RUBY_POND_STATE_LOTAD)
-                AnimatePelipperEggDelivery();
+                AnimateTotodileEggDelivery();
             else
-                AnimateEggDropDelivery();
+                AnimateAerodactylEggDelivery();
         }
         if (gCurrentPinballGame->modeAnimTimer <= 9)
             gCurrentPinballGame->modeAnimTimer++;
@@ -337,7 +337,7 @@ void AnimateEggHatchSequence(void)
     }
 }
 
-void InitEvolutionShopMode(void)
+void InitRubyEvolutionShopMode(void)
 {
     gCurrentPinballGame->shopAnimSlideTimer = 0;
     gCurrentPinballGame->shopUISlideOffset = 0;
@@ -349,7 +349,7 @@ void InitEvolutionShopMode(void)
     gCurrentPinballGame->ballUpgradeTimerFrozen = 1;
 }
 
-void AnimateEvolutionShopSequence(void)
+void AnimateRubyEvolutionShopSequence(void)
 {
 
     if (gCurrentPinballGame->modeAnimTimer > 0x18)
