@@ -64,7 +64,7 @@ void KecleonBoardProcess_3A_35860(void)
     gCurrentPinballGame->boardModeType = 1;
     gCurrentPinballGame->eventTimer = gCurrentPinballGame->timerBonus + 120 * 60; // 120 seconds
     gCurrentPinballGame->timerBonus = 0;
-    gCurrentPinballGame->gravityFrozen = 0;
+    gCurrentPinballGame->ballGrabbed = 0;
     gCurrentPinballGame->ballRespawnState = 3;
     gCurrentPinballGame->ballRespawnTimer = 0;
     gCurrentPinballGame->ball->ballHidden = 1;
@@ -77,8 +77,8 @@ void KecleonBoardProcess_3A_35860(void)
     gCurrentPinballGame->bonusModeHitCount = 0;
     gCurrentPinballGame->boardEntityCollisionMode = 0;
     gCurrentPinballGame->bannerSlideYOffset = 0;
-    gCurrentPinballGame->bossColorState = 0;
-    gCurrentPinballGame->bossSubEntityState = 0;
+    gCurrentPinballGame->kecleonFramesetBase = 0;
+    gCurrentPinballGame->dusclopsWalkFootIndex = 0;
     gCurrentPinballGame->bossFramesetIndex = 0;
     gCurrentPinballGame->bossFrameTimer = 0;
     gCurrentPinballGame->kecleonTargetState = 0;
@@ -87,7 +87,7 @@ void KecleonBoardProcess_3A_35860(void)
     gCurrentPinballGame->kecleonCollisionEnabled = 0;
     gCurrentPinballGame->kecleonTargetX = 0;
     gCurrentPinballGame->kecleonTargetY = 0;
-    gCurrentPinballGame->kecleonHitState = 0;
+    gCurrentPinballGame->kecleonBoardHitState = 0;
     gCurrentPinballGame->kecleonHitFrameIndex = 0;
     gCurrentPinballGame->kecleonTargetActive = 0;
     gCurrentPinballGame->kecleonAnimTimer = 0;
@@ -219,7 +219,7 @@ void KecleonBoardProcess_3B_35AA4(void)
     {
         m4aMPlayAllStop();
         m4aSongNumStart(MUS_END_OF_BALL3);
-        gCurrentPinballGame->kecleonHitState = 0;
+        gCurrentPinballGame->kecleonBoardHitState = 0;
         gCurrentPinballGame->kecleonAnimTimer = 0;
         gCurrentPinballGame->kecleonTargetActive = 0;
         gMain.modeChangeFlags |= MODE_CHANGE_EXPIRED_BONUS;
@@ -333,8 +333,8 @@ void UpdateKecleonEntityLogic(void)
         deltaVec.x = gCurrentPinballGame->bossVelocityX - gCurrentPinballGame->bossPositionX;
         deltaVec.y = gCurrentPinballGame->bossVelocityY - gCurrentPinballGame->bossPositionY;
         angle = ArcTan2(deltaVec.x, -deltaVec.y);
-        gCurrentPinballGame->bossColorState = gKecleonVisibleWalkDirectionMap[angle / 0x2000];
-        gCurrentPinballGame->bossFramesetIndex = gCurrentPinballGame->bossColorState;
+        gCurrentPinballGame->kecleonFramesetBase = gKecleonVisibleWalkDirectionMap[angle / 0x2000];
+        gCurrentPinballGame->bossFramesetIndex = gCurrentPinballGame->kecleonFramesetBase;
         gCurrentPinballGame->bossFrameTimer = 0;
         gCurrentPinballGame->bossEntityState = 4;
         break;
@@ -352,14 +352,14 @@ void UpdateKecleonEntityLogic(void)
         if (deltaMagSquared < 2500)
         {
             gCurrentPinballGame->bossEntityState = 8;
-            if (gCurrentPinballGame->bossColorState == 3)
+            if (gCurrentPinballGame->kecleonFramesetBase == 3)
             {
-                gCurrentPinballGame->bossColorState = 66;
+                gCurrentPinballGame->kecleonFramesetBase = 66;
                 gCurrentPinballGame->bossFramesetIndex = 66;
             }
             else
             {
-                gCurrentPinballGame->bossColorState = 69;
+                gCurrentPinballGame->kecleonFramesetBase = 69;
                 gCurrentPinballGame->bossFramesetIndex = 69;
             }
 
@@ -374,8 +374,8 @@ void UpdateKecleonEntityLogic(void)
         {
             gCurrentPinballGame->bossFrameTimer = 0;
             gCurrentPinballGame->bossFramesetIndex++;
-            if (gCurrentPinballGame->bossFramesetIndex == gCurrentPinballGame->bossColorState + 6)
-                gCurrentPinballGame->bossFramesetIndex = gCurrentPinballGame->bossColorState;
+            if (gCurrentPinballGame->bossFramesetIndex == gCurrentPinballGame->kecleonFramesetBase + 6)
+                gCurrentPinballGame->bossFramesetIndex = gCurrentPinballGame->kecleonFramesetBase;
         }
         break;
     case 5:
@@ -385,7 +385,7 @@ void UpdateKecleonEntityLogic(void)
                 MPlayStart(&gMPlayInfo_SE1, &se_unk_fe);
 
             gCurrentPinballGame->bossFrameTimer++;
-            if (gCurrentPinballGame->bossColorState == 66)
+            if (gCurrentPinballGame->kecleonFramesetBase == 66)
                 gCurrentPinballGame->bossFramesetIndex = 37;
             else
                 gCurrentPinballGame->bossFramesetIndex = 48;
@@ -397,8 +397,8 @@ void UpdateKecleonEntityLogic(void)
             deltaVec.x = gCurrentPinballGame->bossVelocityX - gCurrentPinballGame->bossPositionX;
             deltaVec.y = gCurrentPinballGame->bossVelocityY - gCurrentPinballGame->bossPositionY;
             angle = ArcTan2(deltaVec.x, -deltaVec.y);
-            gCurrentPinballGame->bossColorState = gKecleonInvisibleDashDirectionMap[angle / 0x2000];
-            gCurrentPinballGame->bossFramesetIndex = gCurrentPinballGame->bossColorState;
+            gCurrentPinballGame->kecleonFramesetBase = gKecleonInvisibleDashDirectionMap[angle / 0x2000];
+            gCurrentPinballGame->bossFramesetIndex = gCurrentPinballGame->kecleonFramesetBase;
             gCurrentPinballGame->bossEntityState = 6;
         }
         break;
@@ -417,19 +417,19 @@ void UpdateKecleonEntityLogic(void)
         {
             if (gCurrentPinballGame->bonusModeHitCount > 9)
             {
-                if (gCurrentPinballGame->bossColorState == 66)
+                if (gCurrentPinballGame->kecleonFramesetBase == 66)
                 {
-                    gCurrentPinballGame->bossColorState = 75;
+                    gCurrentPinballGame->kecleonFramesetBase = 75;
                     gCurrentPinballGame->bossPositionX += 240;
                 }
                 else
                 {
-                    gCurrentPinballGame->bossColorState = 95;
+                    gCurrentPinballGame->kecleonFramesetBase = 95;
                     gCurrentPinballGame->bossPositionX -= 240;
                 }
 
                 gCurrentPinballGame->bossEntityState = 14;
-                gCurrentPinballGame->bossFramesetIndex = gCurrentPinballGame->bossColorState;
+                gCurrentPinballGame->bossFramesetIndex = gCurrentPinballGame->kecleonFramesetBase;
             }
             else
             {
@@ -442,14 +442,14 @@ void UpdateKecleonEntityLogic(void)
                 else
                 {
                     gCurrentPinballGame->bossEntityState = 7;
-                    if (gCurrentPinballGame->bossColorState == 38)
+                    if (gCurrentPinballGame->kecleonFramesetBase == 38)
                     {
-                        gCurrentPinballGame->bossColorState = 42;
+                        gCurrentPinballGame->kecleonFramesetBase = 42;
                         gCurrentPinballGame->bossFramesetIndex = 42;
                     }
                     else
                     {
-                        gCurrentPinballGame->bossColorState = 53;
+                        gCurrentPinballGame->kecleonFramesetBase = 53;
                         gCurrentPinballGame->bossFramesetIndex = 53;
                     }
 
@@ -466,12 +466,12 @@ void UpdateKecleonEntityLogic(void)
         {
             gCurrentPinballGame->bossFrameTimer = 0;
             gCurrentPinballGame->bossFramesetIndex++;
-            if (gCurrentPinballGame->bossFramesetIndex == gCurrentPinballGame->bossColorState + 4)
-                gCurrentPinballGame->bossFramesetIndex = gCurrentPinballGame->bossColorState;
+            if (gCurrentPinballGame->bossFramesetIndex == gCurrentPinballGame->kecleonFramesetBase + 4)
+                gCurrentPinballGame->bossFramesetIndex = gCurrentPinballGame->kecleonFramesetBase;
 
-            if (gCurrentPinballGame->bossFramesetIndex == gCurrentPinballGame->bossColorState + 1)
+            if (gCurrentPinballGame->bossFramesetIndex == gCurrentPinballGame->kecleonFramesetBase + 1)
                 MPlayStart(&gMPlayInfo_SE1, &se_unk_ff);
-            if (gCurrentPinballGame->bossFramesetIndex == gCurrentPinballGame->bossColorState + 3)
+            if (gCurrentPinballGame->bossFramesetIndex == gCurrentPinballGame->kecleonFramesetBase + 3)
                 MPlayStart(&gMPlayInfo_SE1, &se_unk_ff);
         }
         break;
@@ -484,7 +484,7 @@ void UpdateKecleonEntityLogic(void)
         {
             gCurrentPinballGame->bossFrameTimer = 0;
             gCurrentPinballGame->bossFramesetIndex++;
-            if (gCurrentPinballGame->bossFramesetIndex == gCurrentPinballGame->bossColorState + 6)
+            if (gCurrentPinballGame->bossFramesetIndex == gCurrentPinballGame->kecleonFramesetBase + 6)
             {
                 int rand, mask;
 
@@ -510,7 +510,7 @@ void UpdateKecleonEntityLogic(void)
                 rand = Random() + gMain.systemFrameCount;
                 mask = 0x3;
                 gCurrentPinballGame->kecleonTargetState = gKecleonMovementTargetGraph[gCurrentPinballGame->kecleonTargetState].adjacentStates[rand & mask];
-                gCurrentPinballGame->bossFramesetIndex = gCurrentPinballGame->bossColorState + 5;
+                gCurrentPinballGame->bossFramesetIndex = gCurrentPinballGame->kecleonFramesetBase + 5;
             }
         }
         break;
@@ -525,7 +525,7 @@ void UpdateKecleonEntityLogic(void)
 
             gCurrentPinballGame->bossFrameTimer = 0;
             gCurrentPinballGame->bossFramesetIndex++;
-            if (gCurrentPinballGame->bossFramesetIndex == gCurrentPinballGame->bossColorState + 2)
+            if (gCurrentPinballGame->bossFramesetIndex == gCurrentPinballGame->kecleonFramesetBase + 2)
             {
                 if (gCurrentPinballGame->kecleonFrameTimer < 8)
                 {
@@ -549,7 +549,7 @@ void UpdateKecleonEntityLogic(void)
                 rand = Random() + gMain.systemFrameCount;
                 mask = 0x3;
                 gCurrentPinballGame->kecleonTargetState = gKecleonMovementTargetGraph[gCurrentPinballGame->kecleonTargetState].adjacentStates[rand & mask];
-                gCurrentPinballGame->bossFramesetIndex = gCurrentPinballGame->bossColorState + 1;
+                gCurrentPinballGame->bossFramesetIndex = gCurrentPinballGame->kecleonFramesetBase + 1;
             }
         }
         break;
@@ -560,12 +560,12 @@ void UpdateKecleonEntityLogic(void)
             if (gCurrentPinballGame->bossPositionX < -640)
             {
                 gCurrentPinballGame->kecleonTargetColorMatch = 1;
-                gCurrentPinballGame->bossColorState = 32;
+                gCurrentPinballGame->kecleonFramesetBase = 32;
             }
             else
             {
                 gCurrentPinballGame->kecleonTargetColorMatch = 0;
-                gCurrentPinballGame->bossColorState = 27;
+                gCurrentPinballGame->kecleonFramesetBase = 27;
             }
         }
         else
@@ -573,19 +573,19 @@ void UpdateKecleonEntityLogic(void)
             if (gCurrentPinballGame->bossPositionX > 640)
             {
                 gCurrentPinballGame->kecleonTargetColorMatch = 0;
-                gCurrentPinballGame->bossColorState = 27;
+                gCurrentPinballGame->kecleonFramesetBase = 27;
             }
             else
             {
                 gCurrentPinballGame->kecleonTargetColorMatch = 1;
-                gCurrentPinballGame->bossColorState = 32;
+                gCurrentPinballGame->kecleonFramesetBase = 32;
             }
         }
 
         if (gCurrentPinballGame->kecleonTargetX < 16)
             gCurrentPinballGame->kecleonTargetX = 0;
 
-        gCurrentPinballGame->bossFramesetIndex = gCurrentPinballGame->bossColorState;
+        gCurrentPinballGame->bossFramesetIndex = gCurrentPinballGame->kecleonFramesetBase;
         gCurrentPinballGame->bossFrameTimer = 0;
         MPlayStart(&gMPlayInfo_SE1, &se_unk_100);
         break;
@@ -598,19 +598,19 @@ void UpdateKecleonEntityLogic(void)
         {
             gCurrentPinballGame->bossFrameTimer = 0;
             gCurrentPinballGame->bossFramesetIndex++;
-            if (gCurrentPinballGame->bossFramesetIndex == gCurrentPinballGame->bossColorState + 1)
+            if (gCurrentPinballGame->bossFramesetIndex == gCurrentPinballGame->kecleonFramesetBase + 1)
                 gCurrentPinballGame->kecleonTargetY = 23;
 
-            if (gCurrentPinballGame->bossFramesetIndex == gCurrentPinballGame->bossColorState + 2)
+            if (gCurrentPinballGame->bossFramesetIndex == gCurrentPinballGame->kecleonFramesetBase + 2)
             {
                 gCurrentPinballGame->bossEntityState = 13;
-                gCurrentPinballGame->bossFramesetIndex = gCurrentPinballGame->bossColorState + 1;
+                gCurrentPinballGame->bossFramesetIndex = gCurrentPinballGame->kecleonFramesetBase + 1;
             }
         }
         break;
     case 11:
         gCurrentPinballGame->bossEntityState = 12;
-        gCurrentPinballGame->bossFramesetIndex = gCurrentPinballGame->bossColorState + 2;
+        gCurrentPinballGame->bossFramesetIndex = gCurrentPinballGame->kecleonFramesetBase + 2;
         gCurrentPinballGame->bossFrameTimer = 0;
         gCurrentPinballGame->kecleonTargetX = 0;
         gCurrentPinballGame->scoreAddedInFrame = 500000;
@@ -627,9 +627,9 @@ void UpdateKecleonEntityLogic(void)
         {
             gCurrentPinballGame->bossFrameTimer = 0;
             gCurrentPinballGame->bossFramesetIndex++;
-            if (gCurrentPinballGame->bossFramesetIndex == gCurrentPinballGame->bossColorState + 4)
+            if (gCurrentPinballGame->bossFramesetIndex == gCurrentPinballGame->kecleonFramesetBase + 4)
             {
-                gCurrentPinballGame->bossFramesetIndex = gCurrentPinballGame->bossColorState + 3;
+                gCurrentPinballGame->bossFramesetIndex = gCurrentPinballGame->kecleonFramesetBase + 3;
                 if (gCurrentPinballGame->bonusModeHitCount < 10)
                 {
                     gCurrentPinballGame->bossEntityState = 13;
@@ -641,7 +641,7 @@ void UpdateKecleonEntityLogic(void)
                     gCurrentPinballGame->ballRespawnState = 2;
                     gCurrentPinballGame->ballRespawnTimer = 0;
                     gCurrentPinballGame->bossEntityState = 13;
-                    gCurrentPinballGame->kecleonHitState = 0;
+                    gCurrentPinballGame->kecleonBoardHitState = 0;
                     gCurrentPinballGame->kecleonAnimTimer = 0;
                     gCurrentPinballGame->kecleonTargetActive = 0;
                     gCurrentPinballGame->boardEntityCollisionMode = 0;
@@ -650,7 +650,7 @@ void UpdateKecleonEntityLogic(void)
         }
         break;
     case 13:
-        gCurrentPinballGame->bossFramesetIndex = gCurrentPinballGame->bossColorState + 4;
+        gCurrentPinballGame->bossFramesetIndex = gCurrentPinballGame->kecleonFramesetBase + 4;
         if (gCurrentPinballGame->bossFrameTimer < 8)
         {
             gCurrentPinballGame->bossFrameTimer++;
@@ -739,16 +739,16 @@ void UpdateKecleonEntityLogic(void)
         {
             gCurrentPinballGame->bossFrameTimer = 0;
             gCurrentPinballGame->bossFramesetIndex++;
-            if (gCurrentPinballGame->bossFramesetIndex == gCurrentPinballGame->bossColorState + 19)
+            if (gCurrentPinballGame->bossFramesetIndex == gCurrentPinballGame->kecleonFramesetBase + 19)
             {
-                gCurrentPinballGame->bossFramesetIndex = gCurrentPinballGame->bossColorState + 18;
+                gCurrentPinballGame->bossFramesetIndex = gCurrentPinballGame->kecleonFramesetBase + 18;
                 gCurrentPinballGame->bossEntityState = 15;
             }
 
-            if (gCurrentPinballGame->bossFramesetIndex == gCurrentPinballGame->bossColorState + 6)
+            if (gCurrentPinballGame->bossFramesetIndex == gCurrentPinballGame->kecleonFramesetBase + 6)
                 MPlayStart(&gMPlayInfo_SE1, &se_unk_102);
 
-            if (gCurrentPinballGame->bossFramesetIndex == gCurrentPinballGame->bossColorState + 8)
+            if (gCurrentPinballGame->bossFramesetIndex == gCurrentPinballGame->kecleonFramesetBase + 8)
                 MPlayStart(&gMPlayInfo_SE1, &se_unk_103);
         }
         break;
@@ -764,7 +764,7 @@ void UpdateKecleonEntityLogic(void)
             gCurrentPinballGame->bossFrameTimer++;
         }
 
-        gCurrentPinballGame->bossFramesetIndex = gCurrentPinballGame->bossColorState + 15;
+        gCurrentPinballGame->bossFramesetIndex = gCurrentPinballGame->kecleonFramesetBase + 15;
         break;
     }
 }
@@ -935,7 +935,7 @@ void UpdateKecleonScopeItem(void)
     if (!group->available)
         return;
 
-    if (gCurrentPinballGame->kecleonHitState)
+    if (gCurrentPinballGame->kecleonBoardHitState)
     {
         if (gCurrentPinballGame->kecleonCollisionX == 0)
         {
@@ -972,7 +972,7 @@ void UpdateKecleonScopeItem(void)
             squaredMagnitude = xx + yy;
             if (squaredMagnitude <= 120)
             {
-                gCurrentPinballGame->kecleonHitState = 0;
+                gCurrentPinballGame->kecleonBoardHitState = 0;
                 gCurrentPinballGame->kecleonTargetActive = 1;
                 gCurrentPinballGame->kecleonAnimTimer = 0;
                 gCurrentPinballGame->scoreAddedInFrame = 10000;

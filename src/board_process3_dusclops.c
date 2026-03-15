@@ -27,7 +27,7 @@ void DuskullBonus_Setup(void)
     gCurrentPinballGame->boardModeType = 1;
     gCurrentPinballGame->eventTimer = gCurrentPinballGame->timerBonus + BONUS_DUSKULL_TIME;
     gCurrentPinballGame->timerBonus = 0;
-    gCurrentPinballGame->gravityFrozen = 0;
+    gCurrentPinballGame->ballGrabbed = 0;
     gCurrentPinballGame->ballRespawnState = 3;
     gCurrentPinballGame->ball->ballHidden = 1;
     gCurrentPinballGame->bonusModeHitCount = 0;
@@ -57,9 +57,9 @@ void DuskullBonus_Setup(void)
     }
 
     gCurrentPinballGame->bossEntityState = 0;
-    gCurrentPinballGame->bossColorState = 0;
+    gCurrentPinballGame->kecleonFramesetBase = 0;
     gCurrentPinballGame->bossVulnerable = 0;
-    gCurrentPinballGame->bossSubEntityState = 0;
+    gCurrentPinballGame->dusclopsWalkFootIndex = 0;
     gCurrentPinballGame->bossFramesetIndex = 0;
     gCurrentPinballGame->bossFrameTimer = 0;
     gCurrentPinballGame->bossAnimLoopCount = 0;
@@ -667,11 +667,11 @@ void DusclopsPhase_ProcessEntityLogicAndGraphics(void)
             {
                 gCurrentPinballGame->bossFramesetIndex = DUSCLOPS_FRAME_INTRO_START;
 
-                if (gCurrentPinballGame->bossSubEntityState <= 0)
-                    gCurrentPinballGame->bossSubEntityState++;
+                if (gCurrentPinballGame->dusclopsWalkFootIndex <= 0)
+                    gCurrentPinballGame->dusclopsWalkFootIndex++;
                 else
                 {
-                    gCurrentPinballGame->bossSubEntityState = 0;
+                    gCurrentPinballGame->dusclopsWalkFootIndex = 0;
                     gCurrentPinballGame->bossEntityState = DUSCLOPS_ENTITY_STATE_GUARD_READY;
                 }
             }
@@ -709,9 +709,9 @@ void DusclopsPhase_ProcessEntityLogicAndGraphics(void)
                 gCurrentPinballGame->bossEntityState = DUSCLOPS_ENTITY_STATE_WALKING;
                 gCurrentPinballGame->bossFrameTimer = 0;
 
-                if (gCurrentPinballGame->bossSubEntityState > 3)
-                    gCurrentPinballGame->bossSubEntityState = 0;
-                if (gCurrentPinballGame->bossSubEntityState <= 1)
+                if (gCurrentPinballGame->dusclopsWalkFootIndex > 3)
+                    gCurrentPinballGame->dusclopsWalkFootIndex = 0;
+                if (gCurrentPinballGame->dusclopsWalkFootIndex <= 1)
                     gCurrentPinballGame->bossFramesetIndex = DUSCLOPS_FRAME_WALK_NEUTRAL;
                 else
                     gCurrentPinballGame->bossFramesetIndex = DUSCLOPS_FRAME_RIGHT_FOOT_FORWARD;
@@ -746,16 +746,16 @@ void DusclopsPhase_ProcessEntityLogicAndGraphics(void)
         {
             gCurrentPinballGame->bossFrameTimer = 0;
 
-            if (gCurrentPinballGame->bossSubEntityState <= 1)
+            if (gCurrentPinballGame->dusclopsWalkFootIndex <= 1)
             {
                 gCurrentPinballGame->bossFramesetIndex++;
 
                 if (gCurrentPinballGame->bossFramesetIndex > DUSCLOPS_FRAME_RIGHT_FOOT_FORWARD)
                 {
                     gCurrentPinballGame->bossFramesetIndex = DUSCLOPS_FRAME_WALK_NEUTRAL;
-                    gCurrentPinballGame->bossSubEntityState++;
+                    gCurrentPinballGame->dusclopsWalkFootIndex++;
 
-                    if ((gCurrentPinballGame->bossSubEntityState & 1) == 0)
+                    if ((gCurrentPinballGame->dusclopsWalkFootIndex & 1) == 0)
                     {
                         gCurrentPinballGame->bossEntityState = DUSCLOPS_ENTITY_STATE_GUARD_READY;
                         gCurrentPinballGame->bossFrameTimer = 0;
@@ -764,9 +764,9 @@ void DusclopsPhase_ProcessEntityLogicAndGraphics(void)
             }
             else if (--gCurrentPinballGame->bossFramesetIndex < 0)
             {
-                gCurrentPinballGame->bossSubEntityState++;
+                gCurrentPinballGame->dusclopsWalkFootIndex++;
 
-                if ((gCurrentPinballGame->bossSubEntityState & 1) == 0)
+                if ((gCurrentPinballGame->dusclopsWalkFootIndex & 1) == 0)
                 {
                     gCurrentPinballGame->bossEntityState = DUSCLOPS_ENTITY_STATE_GUARD_READY;
                     gCurrentPinballGame->bossFrameTimer = 0;
@@ -801,7 +801,7 @@ void DusclopsPhase_ProcessEntityLogicAndGraphics(void)
             break;
         }
 
-        if (gCurrentPinballGame->bossSubEntityState <= 1)
+        if (gCurrentPinballGame->dusclopsWalkFootIndex <= 1)
         {
             if (gCurrentPinballGame->bossPositionY <= 583)
             {
@@ -815,7 +815,7 @@ void DusclopsPhase_ProcessEntityLogicAndGraphics(void)
             gCurrentPinballGame->bossEntityState = DUSCLOPS_ENTITY_STATE_GUARD_READY;
             gCurrentPinballGame->bossFrameTimer = 0;
             gCurrentPinballGame->bossFramesetIndex = DUSCLOPS_FRAME_WALK_NEUTRAL;
-            gCurrentPinballGame->bossSubEntityState = 2;
+            gCurrentPinballGame->dusclopsWalkFootIndex = 2;
             break;
         }
 
@@ -831,7 +831,7 @@ void DusclopsPhase_ProcessEntityLogicAndGraphics(void)
         gCurrentPinballGame->bossEntityState = DUSCLOPS_ENTITY_STATE_GUARD_READY;
         gCurrentPinballGame->bossFrameTimer = 0;
         gCurrentPinballGame->bossFramesetIndex = DUSCLOPS_FRAME_WALK_NEUTRAL;
-        gCurrentPinballGame->bossSubEntityState = 4;
+        gCurrentPinballGame->dusclopsWalkFootIndex = 4;
 
         break;
     }
@@ -892,9 +892,9 @@ void DusclopsPhase_ProcessEntityLogicAndGraphics(void)
         tempVector.x = (gCurrentPinballGame->catchTargetX << 8) - gCurrentPinballGame->ball->positionQ8.x;
         tempVector.y = (gCurrentPinballGame->catchTargetY << 8) - gCurrentPinballGame->ball->positionQ8.y;
 
-        gCurrentPinballGame->catchSpinRadius = (tempVector.x * tempVector.x) + (tempVector.y * tempVector.y);
-        gCurrentPinballGame->catchSpinRadius = Sqrt(gCurrentPinballGame->catchSpinRadius * 4) / 2;
-        gCurrentPinballGame->captureAngleQ16 = ArcTan2(-tempVector.x, tempVector.y);
+        gCurrentPinballGame->trapSpinRadius = (tempVector.x * tempVector.x) + (tempVector.y * tempVector.y);
+        gCurrentPinballGame->trapSpinRadius = Sqrt(gCurrentPinballGame->trapSpinRadius * 4) / 2;
+        gCurrentPinballGame->trapAngleQ16 = ArcTan2(-tempVector.x, tempVector.y);
 
         PlayRumble(13);
         break;
@@ -944,14 +944,14 @@ void DusclopsPhase_ProcessEntityLogicAndGraphics(void)
             s16 tr4 = 29 - gCurrentPinballGame->captureSequenceFrame;
             s32 sl;
 
-            gCurrentPinballGame->captureAngleQ16 -= ((tr4 * 8192) / 30) - 8192;
+            gCurrentPinballGame->trapAngleQ16 -= ((tr4 * 8192) / 30) - 8192;
             gCurrentPinballGame->ball->spinAngle = gCurrentPinballGame->ball->spinAngle - 8192;
 
-            sl = (gCurrentPinballGame->catchSpinRadius * tr4) / 30;
+            sl = (gCurrentPinballGame->trapSpinRadius * tr4) / 30;
 
-            gCurrentPinballGame->ball->positionQ8.x = (gCurrentPinballGame->catchTargetX * 256) + ((Cos(gCurrentPinballGame->captureAngleQ16) * sl) / 20000);
+            gCurrentPinballGame->ball->positionQ8.x = (gCurrentPinballGame->catchTargetX * 256) + ((Cos(gCurrentPinballGame->trapAngleQ16) * sl) / 20000);
 
-            gCurrentPinballGame->ball->positionQ8.y = (gCurrentPinballGame->catchTargetY * 256) - ((Sin(gCurrentPinballGame->captureAngleQ16) * sl) / 20000);
+            gCurrentPinballGame->ball->positionQ8.y = (gCurrentPinballGame->catchTargetY * 256) - ((Sin(gCurrentPinballGame->trapAngleQ16) * sl) / 20000);
 
             gCurrentPinballGame->ball->velocity.x = (gCurrentPinballGame->ball->velocity.x * 4) / 5;
             gCurrentPinballGame->ball->velocity.y = (gCurrentPinballGame->ball->velocity.y * 4) / 5;

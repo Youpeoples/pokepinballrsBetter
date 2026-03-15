@@ -54,7 +54,7 @@ void GroudonBoardProcess_3A_3B120(void)
     gCurrentPinballGame->boardEntityCollisionMode = 1;
     gCurrentPinballGame->portraitDisplayState = 3;
     gCurrentPinballGame->bossPhaseCounter = 0;
-    gCurrentPinballGame->gravityFrozen = 0;
+    gCurrentPinballGame->ballGrabbed = 0;
     gCurrentPinballGame->bonusModeHitCount = 0;
     gCurrentPinballGame->legendaryFlashState = 0;
     gCurrentPinballGame->bossAttackTimer = 0;
@@ -62,9 +62,9 @@ void GroudonBoardProcess_3A_3B120(void)
     gCurrentPinballGame->bannerSlideYOffset = 0;
     gCurrentPinballGame->bossEntityState = 0;
     gCurrentPinballGame->bossAttackPhase = 0;
-    gCurrentPinballGame->bossColorState = 0;
+    gCurrentPinballGame->kecleonFramesetBase = 0;
     gCurrentPinballGame->bossVulnerable = 0;
-    gCurrentPinballGame->bossSubEntityState = 0;
+    gCurrentPinballGame->dusclopsWalkFootIndex = 0;
     gCurrentPinballGame->bossFramesetIndex = 0;
     gCurrentPinballGame->bossMovementPhase = 0;
     gCurrentPinballGame->bossFrameTimer = 0;
@@ -1050,11 +1050,11 @@ void UpdateGroudonFieldEntities(void)
         {
             gMain.spriteGroups[24].available = 0;
             gCurrentPinballGame->ballGrabFlashTimer = 0;
-            gCurrentPinballGame->gravityFrozen = 0;
+            gCurrentPinballGame->ballGrabbed = 0;
         }
         else
         {
-            gCurrentPinballGame->gravityFrozen = 1;
+            gCurrentPinballGame->ballGrabbed = 1;
             gCurrentPinballGame->ball->velocity.x = 0;
             gCurrentPinballGame->ball->velocity.y = 0;
             gCurrentPinballGame->ball->spinSpeed = 0;
@@ -1633,9 +1633,9 @@ void UpdateGroudonFieldEntities(void)
             squaredMagnitude = xx + yy;
             if (gCurrentPinballGame->ballRespawnState == 0 && squaredMagnitude < gShockwaveSplashDistanceThresholds[gCurrentPinballGame->shockwaveAnimTimer])
             {
-                gCurrentPinballGame->captureAngleQ16 = ArcTan2(-tempVector.x, tempVector.y);
-                gCurrentPinballGame->ball->velocity.x = (Cos(gCurrentPinballGame->captureAngleQ16) * -400) / 20000;
-                gCurrentPinballGame->ball->velocity.y = (Sin(gCurrentPinballGame->captureAngleQ16) *  400) / 20000;
+                gCurrentPinballGame->trapAngleQ16 = ArcTan2(-tempVector.x, tempVector.y);
+                gCurrentPinballGame->ball->velocity.x = (Cos(gCurrentPinballGame->trapAngleQ16) * -400) / 20000;
+                gCurrentPinballGame->ball->velocity.y = (Sin(gCurrentPinballGame->trapAngleQ16) *  400) / 20000;
                 PlayRumble(9);
             }
         }

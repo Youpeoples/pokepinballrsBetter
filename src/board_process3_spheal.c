@@ -51,7 +51,7 @@ void SphealBoardProcess_3A_42E48(void)
     gCurrentPinballGame->eventTimer = gCurrentPinballGame->timerBonus + 7200;
     gCurrentPinballGame->timerBonus = 0;
     gCurrentPinballGame->ballRespawnTimer = 0;
-    gCurrentPinballGame->gravityFrozen = 0;
+    gCurrentPinballGame->ballGrabbed = 0;
     gCurrentPinballGame->ballRespawnState = 0;
     gCurrentPinballGame->ball->ballHidden = 1;
     gCurrentPinballGame->ballFrozenState = 1;

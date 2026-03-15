@@ -500,7 +500,7 @@ struct PinballGame
     /*0x37E*/ u16 sapphireBumperAnimFrame;
     /*0x380*/ u16 sapphireBumperTimer;
     /*0x382*/ s8 bossPhaseCounter;
-    /*0x383*/ s8 gravityFrozen;
+    /*0x383*/ s8 ballGrabbed;
     /*0x384*/ s8 legendaryHitsRequired;
     /*0x385*/ s8 bonusModeHitCount;
     /*0x386*/ s8 returnToMainBoardFlag;
@@ -530,9 +530,9 @@ struct PinballGame
     /*0x3D0*/ struct Vector16 minionCollisionPosition[3];
     /*0x3DC*/ s8 bossEntityState;
     /*0x3DD*/ s8 bossAttackPhase;
-    /*0x3DE*/ s8 bossColorState;
+    /*0x3DE*/ s8 kecleonFramesetBase;
     /*0x3DF*/ s8 bossVulnerable;
-    /*0x3E0*/ s8 bossSubEntityState;
+    /*0x3E0*/ s8 dusclopsWalkFootIndex;
     /*0x3E1*/ s8 bossMovementPhase;
     /*0x3E2*/ s16 bossFramesetIndex;
     /*0x3E4*/ u16 bossFrameTimer;
@@ -553,7 +553,7 @@ struct PinballGame
     /*0x3FC*/ s16 kecleonTargetY;
     /*0x3FE*/ u8 filler3FE[0x2];
     /*0x400*/ struct Vector16 kecleonCollisionPos;
-    /*0x404*/ s8 kecleonHitState;
+    /*0x404*/ s8 kecleonBoardHitState;
     /*0x405*/ s8 kecleonHitFrameIndex;
     /*0x406*/ s8 kecleonTargetActive;
     /*0x407*/ u8 filler407[0x1];
@@ -690,8 +690,8 @@ struct PinballGame
     /*0x5A8*/ s8 captureSequenceTimer;
     /*0x5A9*/ u8 captureFlashTimer;
     /*0x5AA*/ u16 creatureHitCooldown;
-    /*0x5AC*/ s32 catchSpinRadius;
-    /*0x5B0*/ u16 captureAngleQ16;
+    /*0x5AC*/ s32 trapSpinRadius;
+    /*0x5B0*/ u16 trapAngleQ16;
     /*0x5B2*/ s8 ballInLowerHalf;
     /*0x5B3*/ u8 filler5B3[0x6];
     /*0x5B9*/ s8 tileParticleGravity[6];
@@ -717,10 +717,10 @@ struct PinballGame
     /*0x608*/ u16 travelAnimSubTimer;
     /*0x60A*/ s8 travelAnimKeyframeIndex;
     /*0x60B*/ s8 unk60B;
-    /*0x60C*/ s16 travelPelipperPosX;
-    /*0x60E*/ s16 travelPelipperPosY;
-    /*0x610*/ u16 travelPelipperVelX;
-    /*0x612*/ u16 travelPelipperVelY;
+    /*0x60C*/ s16 travelPainterPosX;
+    /*0x60E*/ s16 travelPainterPosY;
+    /*0x610*/ u16 travelPainterVelX;
+    /*0x612*/ u16 travelPainterVelY;
     /*0x614*/ s16 pikaSpinMomentum;
     /*0x616*/ u16 pikaSpinCooldownTimer;
     /*0x618*/ u16 pikaSpinFrameCounter;
@@ -765,7 +765,7 @@ struct PinballGame
     /*0x6CC*/ s8 hatchFrameId;
     /*0x6CD*/ u8 hatchTileShufflePool[6];
     /*0x6D3*/ u8 hatchTilePalette[6];
-    /*0x6D9*/ s8 rouletteSpeciesId[2];
+    /*0x6D9*/ s8 rouletteAreaIndex[2];
     /*0x6DB*/ u8 creatureOamPriority;
     /*0x6DC*/ u8 rouletteOutcomeId;
     /*0x6DD*/ s8 shopPurchaseConfirmed;

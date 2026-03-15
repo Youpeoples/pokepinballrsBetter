@@ -172,7 +172,7 @@ void BonusBoardProcess_5B_11F88(void)
     currentBall->prevPositionQ8 = currentBall->positionQ8;
     if (gCurrentPinballGame->captureState != 2)
     {
-        if (!gCurrentPinballGame->ballFrozenState && !gCurrentPinballGame->gravityFrozen)
+        if (!gCurrentPinballGame->ballFrozenState && !gCurrentPinballGame->ballGrabbed)
         {
             // Gravity is applied at different strengths, depending on fast the ball is
             // currently moving downwards.

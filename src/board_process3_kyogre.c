@@ -52,7 +52,7 @@ void KyogreBoardProcess_3A_383E4(void)
 
     gCurrentPinballGame->bossRoarTimer = 0;
     gCurrentPinballGame->legendaryFlashState = 0;
-    gCurrentPinballGame->gravityFrozen = 0;
+    gCurrentPinballGame->ballGrabbed = 0;
     gCurrentPinballGame->bossPhaseCounter = 0;
     gCurrentPinballGame->ballRespawnState = 3;
     gCurrentPinballGame->ballRespawnTimer = 0;
@@ -67,8 +67,8 @@ void KyogreBoardProcess_3A_383E4(void)
     gCurrentPinballGame->bossEntityState = 0;
     gCurrentPinballGame->bossPositionX = 0;
     gCurrentPinballGame->bossPositionY = 0;
-    gCurrentPinballGame->bossColorState = 0;
-    gCurrentPinballGame->bossSubEntityState = 0;
+    gCurrentPinballGame->kecleonFramesetBase = 0;
+    gCurrentPinballGame->dusclopsWalkFootIndex = 0;
     gCurrentPinballGame->bossFramesetIndex = 0;
     gCurrentPinballGame->bossFrameTimer = 0;
     gCurrentPinballGame->shockwaveAlreadyHit = 0;
@@ -588,7 +588,7 @@ void UpdateKyogreEntityLogic(void)
                     {
                         gCurrentPinballGame->orbAnimTimer[i] = 0;
                         gCurrentPinballGame->orbEntityState[i] = 4;
-                        gCurrentPinballGame->catchSpinRadius /= 2;
+                        gCurrentPinballGame->trapSpinRadius /= 2;
                     }
 
                     if (gCurrentPinballGame->orbEntityState[i] == 2)
@@ -971,14 +971,14 @@ void UpdateKyogreFieldEntities(void)
 
         if (gCurrentPinballGame->whirlpoolTrapAnimFrame < 18)
         {
-            gCurrentPinballGame->gravityFrozen = 1;
+            gCurrentPinballGame->ballGrabbed = 1;
             gCurrentPinballGame->ball->velocity.x = 0;
             gCurrentPinballGame->ball->velocity.y = 0;
             gCurrentPinballGame->ball->spinSpeed = 0;
         }
         else
         {
-            gCurrentPinballGame->gravityFrozen = 0;
+            gCurrentPinballGame->ballGrabbed = 0;
         }
 
         group->baseX = gCurrentPinballGame->ball->screenPosition.x;
@@ -1043,7 +1043,7 @@ void UpdateKyogreFieldEntities(void)
                     xx = tempVector.x * tempVector.x;
                     yy = tempVector.y * tempVector.y;
                     squaredMagnitude = xx + yy;
-                    if (gCurrentPinballGame->gravityFrozen == 0 && gCurrentPinballGame->ballRespawnState == 0 &&
+                    if (gCurrentPinballGame->ballGrabbed == 0 && gCurrentPinballGame->ballRespawnState == 0 &&
                         gCurrentPinballGame->bonusModeHitCount < gCurrentPinballGame->legendaryHitsRequired &&
                         gCurrentPinballGame->bossHitFlashTimer == 0 && squaredMagnitude < 400)
                     {
@@ -1057,9 +1057,9 @@ void UpdateKyogreFieldEntities(void)
                         tempVector2.y = gCurrentPinballGame->orbScreenPosition[i].y / 10 + 144;
                         tempVector.x = (tempVector2.x << 8) - gCurrentPinballGame->ball->positionQ8.x;
                         tempVector.y = (tempVector2.y << 8) - gCurrentPinballGame->ball->positionQ8.y;
-                        gCurrentPinballGame->catchSpinRadius = (tempVector.x * tempVector.x) + (tempVector.y * tempVector.y);
-                        gCurrentPinballGame->catchSpinRadius = Sqrt(gCurrentPinballGame->catchSpinRadius * 4) / 2;
-                        gCurrentPinballGame->captureAngleQ16 = ArcTan2(-tempVector.x, tempVector.y);
+                        gCurrentPinballGame->trapSpinRadius = (tempVector.x * tempVector.x) + (tempVector.y * tempVector.y);
+                        gCurrentPinballGame->trapSpinRadius = Sqrt(gCurrentPinballGame->trapSpinRadius * 4) / 2;
+                        gCurrentPinballGame->trapAngleQ16 = ArcTan2(-tempVector.x, tempVector.y);
                     }
                 }
 
@@ -1082,13 +1082,13 @@ void UpdateKyogreFieldEntities(void)
                 if (var4 < 10)
                     var4 = 10;
 
-                gCurrentPinballGame->captureAngleQ16 -= ((0x2000 - (var4 * 0x2000) / 30) * 2) / 5;
+                gCurrentPinballGame->trapAngleQ16 -= ((0x2000 - (var4 * 0x2000) / 30) * 2) / 5;
                 gCurrentPinballGame->ball->spinAngle -= 0x2000;
-                var5 = (gCurrentPinballGame->catchSpinRadius * var4) / 30;
+                var5 = (gCurrentPinballGame->trapSpinRadius * var4) / 30;
                 tempVector2.x = gCurrentPinballGame->orbScreenPosition[i].x / 10 + 120;
                 tempVector2.y = gCurrentPinballGame->orbScreenPosition[i].y / 10 + 144;
-                gCurrentPinballGame->ball->positionQ8.x = (tempVector2.x << 8) + ((Cos(gCurrentPinballGame->captureAngleQ16) * var5) / 20000);
-                gCurrentPinballGame->ball->positionQ8.y = (tempVector2.y << 8) - ((Sin(gCurrentPinballGame->captureAngleQ16) * var5) / 20000);
+                gCurrentPinballGame->ball->positionQ8.x = (tempVector2.x << 8) + ((Cos(gCurrentPinballGame->trapAngleQ16) * var5) / 20000);
+                gCurrentPinballGame->ball->positionQ8.y = (tempVector2.y << 8) - ((Sin(gCurrentPinballGame->trapAngleQ16) * var5) / 20000);
                 gCurrentPinballGame->ball->velocity.x = (gCurrentPinballGame->ball->velocity.x * 4) / 5;
                 gCurrentPinballGame->ball->velocity.y = (gCurrentPinballGame->ball->velocity.y * 4) / 5;
 
@@ -1102,19 +1102,19 @@ void UpdateKyogreFieldEntities(void)
                 {
                     gCurrentPinballGame->orbAnimTimer[i] = 0;
                     gCurrentPinballGame->orbEntityState[i] = 4;
-                    gCurrentPinballGame->catchSpinRadius /= 2;
+                    gCurrentPinballGame->trapSpinRadius /= 2;
                 }
                 break;
             case 4:
                 index = 5 - gCurrentPinballGame->orbAnimTimer[i] / 8;
                 var4 = 47 - gCurrentPinballGame->orbAnimTimer[i];
-                gCurrentPinballGame->captureAngleQ16 -= ((0x2000 - (var4 * 0x1000) / 47) * 2) / 5;
+                gCurrentPinballGame->trapAngleQ16 -= ((0x2000 - (var4 * 0x1000) / 47) * 2) / 5;
                 gCurrentPinballGame->ball->spinAngle -= 0x2000;
-                var5 = (gCurrentPinballGame->catchSpinRadius * var4) / 47;
+                var5 = (gCurrentPinballGame->trapSpinRadius * var4) / 47;
                 tempVector2.x = gCurrentPinballGame->orbScreenPosition[i].x / 10 + 120;
                 tempVector2.y = gCurrentPinballGame->orbScreenPosition[i].y / 10 + 144;
-                gCurrentPinballGame->ball->positionQ8.x = (tempVector2.x << 8) + ((Cos(gCurrentPinballGame->captureAngleQ16) * var5) / 20000);
-                gCurrentPinballGame->ball->positionQ8.y = (tempVector2.y << 8) - ((Sin(gCurrentPinballGame->captureAngleQ16) * var5) / 20000);
+                gCurrentPinballGame->ball->positionQ8.x = (tempVector2.x << 8) + ((Cos(gCurrentPinballGame->trapAngleQ16) * var5) / 20000);
+                gCurrentPinballGame->ball->positionQ8.y = (tempVector2.y << 8) - ((Sin(gCurrentPinballGame->trapAngleQ16) * var5) / 20000);
                 gCurrentPinballGame->ball->velocity.x = (gCurrentPinballGame->ball->velocity.x * 4) / 5;
                 gCurrentPinballGame->ball->velocity.y = (gCurrentPinballGame->ball->velocity.y * 4) / 5;
 

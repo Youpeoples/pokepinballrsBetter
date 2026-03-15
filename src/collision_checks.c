@@ -1754,12 +1754,12 @@ s16 CollisionCheck_Kecleon(struct Vector16 *arg0, u16 *arg1)
         gCurrentPinballGame->collisionResponseType = 1;
         *arg1 = sp00 & 0x0000FFF0;
         return_val = 1;
-        if (gCurrentPinballGame->kecleonHitState == 0)
+        if (gCurrentPinballGame->kecleonBoardHitState == 0)
         {
             s32 kecleonActive = gCurrentPinballGame->kecleonTargetActive;
             if (kecleonActive == 0)
             {
-                gCurrentPinballGame->kecleonHitState = 1;
+                gCurrentPinballGame->kecleonBoardHitState = 1;
                 gCurrentPinballGame->kecleonCollisionX = kecleonActive;
             }
         }

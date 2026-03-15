@@ -1381,10 +1381,10 @@ gDecimalDigitTilesGfx:: @ 0x08480E0C
 gSapphireShopSignTileGfx:: @ 0x0848108C
 	.incbin "baserom.gba", 0x48108C, 0x2D00
 
-gRubyTravelPelipper_Gfx:: @ 0x08483D8C
+gRubyTravelVolbeat_Gfx:: @ 0x08483D8C
 	.incbin "baserom.gba", 0x483D8C, 0x4C80
 
-gSapphireTravelPelipper_Gfx:: @ 0x08488A0C
+gSapphireTravelIllumise_Gfx:: @ 0x08488A0C
 	.incbin "baserom.gba", 0x488A0C, 0x4C80
 
 gPortraitGenericGraphics:: @ 0x0848D68C
